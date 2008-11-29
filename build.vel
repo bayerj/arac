@@ -1,0 +1,74 @@
+options (
+	default "lib"
+	
+	project "Arac - Neural Network Composition Library"
+	author "Justin S Bayer, bayer.justin@googlemail.com"
+	version "pre0.3"
+
+	compiler "g++"
+	flags "-g -I/usr/local/include -I/usr/include -I/sw/include" 
+   lnflags "-L/usr/local/lib -L/usr/lib -lm -lblas"
+)
+
+
+depends (
+	lib ['basis']
+	test.c.build ['lib']
+	test.c.run ['test.c.build']
+	test.py ['lib']
+	test ['test.c.run' 'test.py.run']
+	benchmark ['test']
+)
+
+
+imports [
+]
+
+
+targets (
+
+	basis [
+		$ %(compiler)s %(flags)s -c src/cpp/common/buffer.c -o src/cpp/common/buffer.o
+		$ %(compiler)s %(flags)s -c src/cpp/structure/modules/module.c -o src/cpp/structure/modules/module.o
+		$ %(compiler)s %(flags)s -c src/cpp/structure/modules/linear.c -o src/cpp/structure/modules/linear.o
+		$ %(compiler)s %(flags)s -c src/cpp/structure/modules/mdlstm.c -o src/cpp/structure/modules/mdlstm.o
+		$ %(compiler)s %(flags)s -c src/cpp/structure/modules/partialsoftmax.c -o src/cpp/structure/modules/partialsoftmax.o
+		$ %(compiler)s %(flags)s -c src/cpp/structure/modules/softmax.c -o src/cpp/structure/modules/softmax.o
+		$ %(compiler)s %(flags)s -c src/cpp/structure/modules/sigmoid.c -o src/cpp/structure/modules/sigmoid.o
+		$ %(compiler)s %(flags)s -c src/cpp/structure/modules/tanh.c -o src/cpp/structure/modules/tanh.o
+		$ %(compiler)s %(flags)s -c src/cpp/structure/modules/modules.c -o src/cpp/structure/modules/modules.o
+		$ %(compiler)s %(flags)s -c src/cpp/structure/connections/connection.c -o src/cpp/structure/connections/connection.o
+		$ %(compiler)s %(flags)s -c src/cpp/structure/connections/full.c -o src/cpp/structure/connections/full.o
+		$ %(compiler)s %(flags)s -c src/cpp/structure/connections/identity.c -o src/cpp/structure/connections/identity.o
+		$ %(compiler)s %(flags)s -c src/cpp/structure/connections/connections.c -o src/cpp/structure/connections/connections.o
+		$ %(compiler)s %(flags)s -c src/cpp/structure/networks/network.c -o src/cpp/structure/networks/network.o
+		$ %(compiler)s %(flags)s -c src/cpp/structure/networks/networks.c -o src/cpp/structure/networks/networks.o
+		$ %(compiler)s %(flags)s -c src/cpp/structure/component.c -o src/cpp/structure/component.o
+		$ %(compiler)s %(flags)s -c src/cpp/structure/parametrized.c -o src/cpp/structure/parametrized.o
+		$ %(compiler)s %(flags)s -c src/cpp/structure/structure.c -o src/cpp/structure/structure.o
+		$ %(compiler)s %(flags)s -c src/cpp/arac.c -o src/cpp/arac.o
+	]
+
+	lib [
+		$ %(compiler)s %(flags)s %(lnflags)s -dynamiclib -shared -o libarac.so src/cpp/common/buffer.o src/cpp/structure/modules/module.o src/cpp/structure/modules/linear.o src/cpp/structure/modules/mdlstm.o src/cpp/structure/modules/partialsoftmax.o src/cpp/structure/modules/softmax.o src/cpp/structure/modules/sigmoid.o src/cpp/structure/modules/tanh.o src/cpp/structure/modules/modules.o src/cpp/structure/connections/connection.o src/cpp/structure/connections/identity.o src/cpp/structure/connections/full.o src/cpp/structure/connections/connections.o src/cpp/structure/networks/network.o src/cpp/structure/networks/networks.o src/cpp/structure/component.o src/cpp/structure/parametrized.o src/cpp/structure/structure.o src/cpp/arac.o
+	]
+	
+	test.c.build [
+		$ %(compiler)s %(flags)s -c -o src/cpp/tests/test_structure.o src/cpp/tests/test_structure.c
+      $ %(compiler)s -L. -lgtest -larac -o test-arac src/cpp/tests/test_structure.o
+	]
+	
+	test.c.run [
+		$ ./test-arac
+	]
+	
+	test []
+	
+	clean [
+		$ rm -rf src/cpp/*.o
+		$ rm -rf src/cpp/connections/*.o
+		$ rm -rf src/cpp/layers/*.o
+		$ rm libarac.so
+		$ rm test-arac
+	]
+)
