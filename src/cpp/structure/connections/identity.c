@@ -64,11 +64,11 @@ IdentityConnection::_backward()
         return;
     }
     
-    double* sinkbuffer_p = _recurrent ? _incoming_p->outerror()[_timestep - 1] : 
-                                        _incoming_p->outerror()[_timestep];                                
+    double* sinkbuffer_p = _recurrent ? _incoming_p->outerror()[timestep() - 1] : 
+                                        _incoming_p->outerror()[timestep()];                                
     sinkbuffer_p += _incomingstart;
 
-    double* sourcebuffer_p = _outgoing_p->inerror()[_timestep] + _outgoingstart;
+    double* sourcebuffer_p = _outgoing_p->inerror()[timestep()] + _outgoingstart;
     int size = (_incomingstop - _incomingstart) * sizeof(double);
     memcpy((void*) sinkbuffer_p, (void*) sourcebuffer_p, size);
 }
