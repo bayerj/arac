@@ -12,9 +12,6 @@
 #include "../../common/common.h"
 
 
-using arac::common::Buffer;
-
-
 namespace arac {
 namespace structure {
 namespace modules {
@@ -23,18 +20,15 @@ namespace modules {
 class Module : public arac::structure::Component
 {
     public:
-
+        
         // Create a new module and allocate the necessary buffers.
         Module(int insize, int outsize);
         
-        // Create a new module. 
-        //
-        // If error_agnostic is true, no buffers will be allocated.
-        Module(int insize, int outsize, bool error_agnostic);
-
         // Destroy the module. Depending on the ownership, the arrays are 
         // deallocated.
-        ~Module();
+        virtual ~Module();
+        
+        virtual void forward();
     
         // Add the contents at the given pointer to the input.
         void add_to_input(double* addend_p);
@@ -46,46 +40,45 @@ class Module : public arac::structure::Component
         void clear();
         
         // Return the input Buffer.
-        Buffer& input();
+        arac::common::Buffer& input();
         
         // Return the output Buffer.
-        Buffer& output();
+        arac::common::Buffer& output();
         
         // Return the inerror Buffer.
-        Buffer& inerror();
+        arac::common::Buffer& inerror();
         
         // Return the outerror Buffer.
-        Buffer& outerror();
+        arac::common::Buffer& outerror();
         
         // Return the input size of the module.
         int insize();
         
         // Return the output size of the module.
         int outsize();
-        
-        // Set the sequential flag of the module.
-        void set_sequential(bool sequential);
-        
-        // Tell if the module is sequential.
-        bool sequential();
-        
+
+        // Tell if the modules internal pointer points to the last timestep.
+        bool last_timestep();
+
     protected:
 
-        bool _sequential;
-        int *_timestep_p;
+        // Initialize all the buffers.
+        virtual void init_buffers();
         
-        bool _error_agnostic;
+        // Free the space used by the buffers.
+        virtual void free_buffers();
+        
+        // Expand the size of all the buffers.
+        virtual void expand();
+
         int _insize;
         int _outsize;
         
-        Buffer _input;
-        Buffer _output;
-        Buffer _inerror;
-        Buffer _outerror;
+        arac::common::Buffer* _input_p;
+        arac::common::Buffer* _output_p;
+        arac::common::Buffer* _inerror_p;
+        arac::common::Buffer* _outerror_p;
 };
-
-
-
 
 
 inline
@@ -103,12 +96,20 @@ Module::outsize()
     return _outsize;
 }
 
+inline
+bool 
+Module::last_timestep()
+{
+    return (_timestep == _input_p->size());
+}
+
+
 
 inline 
 void
 Module::add_to_input(double* addend_p)
 {
-    _input.add(addend_p);
+    _input_p->add(addend_p, timestep());
 }
 
 
@@ -116,38 +117,39 @@ inline
 void
 Module::add_to_outerror(double* addend_p)
 {
-    _outerror.add(addend_p);
+    _outerror_p->add(addend_p, timestep() - 1);
 }
 
 
 inline
-Buffer&
+arac::common::Buffer&
 Module::input()
 {
-    return _input; 
+    return *_input_p; 
 }
 
 
 inline
-Buffer&
+arac::common::Buffer&
 Module::output()
 {
-    return _output;
+    return *_output_p;
 }
 
+
 inline
-Buffer&
+arac::common::Buffer&
 Module::inerror()
 {
-    return _inerror;
+    return *_inerror_p;
 }
 
 
 inline
-Buffer&
+arac::common::Buffer&
 Module::outerror()
 {
-    return _outerror;
+    return *_outerror_p;
 }
 
 

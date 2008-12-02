@@ -6,6 +6,7 @@
 #define Arac_STRUCTURE_CONNECTIONS_CONNECTION_INCLUDED
 
 
+#include <cassert>
 
 #include "../component.h"
 #include "../modules/module.h"
@@ -20,11 +21,10 @@ namespace connections {
 using namespace arac::structure::modules;
 
 
-class Connection : public arac::structure::Component 
+class Connection : public arac::structure::Component
 {
     public: 
         
-        Connection();
         Connection(Module* incoming, Module* outgoing,
                    int incomingstart, int incomingstop, 
                    int outgoingstart, int outgoingstop);
@@ -41,6 +41,12 @@ class Connection : public arac::structure::Component
         int get_outgoingstart();
         int get_outgoingstop();
         
+        void set_recurrent(bool recurrent);
+        bool get_recurrent();
+        
+        Module* incoming();
+        Module* outgoing();
+        
     protected:
         
         Module* _incoming_p;
@@ -55,11 +61,9 @@ class Connection : public arac::structure::Component
 };
     
     
-inline Connection::Connection() {};
-
-
 inline
-void Connection::set_incomingstart(int n)
+void
+Connection::set_incomingstart(int n)
 {
     _incomingstart = n;
     
@@ -67,42 +71,48 @@ void Connection::set_incomingstart(int n)
 
 
 inline
-void Connection::set_incomingstop(int n)
+void
+Connection::set_incomingstop(int n)
 {
     _incomingstop = n;
 }
 
 
 inline
-void Connection::set_outgoingstart(int n)
+void
+Connection::set_outgoingstart(int n)
 {
     _outgoingstart = n;
 }
 
 
 inline
-void Connection::set_outgoingstop(int n)
+void
+Connection::set_outgoingstop(int n)
 {
     _outgoingstop = n;
 }
 
 
 inline
-int Connection::get_incomingstart()
+int
+Connection::get_incomingstart()
 {
     return _incomingstart;
 }
 
 
 inline
-int Connection::get_incomingstop()
+int
+Connection::get_incomingstop()
 {
     return _incomingstop;
 }
 
 
 inline
-int Connection::get_outgoingstart()
+int
+Connection::get_outgoingstart()
 {
     return _outgoingstart;
     
@@ -110,9 +120,43 @@ int Connection::get_outgoingstart()
 
 
 inline
-int Connection::get_outgoingstop()
+int
+Connection::get_outgoingstop()
 {
     return _outgoingstop;
+}
+
+
+inline
+bool
+Connection::get_recurrent()
+{
+    return _recurrent;
+}
+
+
+inline
+void
+Connection::set_recurrent(bool recurrent)
+{
+    assert(sequential());
+    _recurrent = recurrent;
+}
+
+
+inline
+Module* 
+Connection::incoming()
+{
+    return _incoming_p;
+}
+
+
+inline
+Module* 
+Connection::outgoing()
+{
+    return _outgoing_p;
 }
 
     

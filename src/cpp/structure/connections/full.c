@@ -63,20 +63,20 @@ FullConnection::~FullConnection()
 }
 
 
-void FullConnection::forward()
+void FullConnection::_forward()
 {
-    // This will be zero for non-recurrent networks.
-    int timestep = _timestep;
-    
-    // Buffer incrementers with respect to time.
-    if (_recurrent) 
+    if ((_recurrent) && (_timestep == 0))
     {
-        // Move on timestep back if the connection is a recurrent one.
-        timestep -= 1;
+        return;
     }
-    
+
     int indim = _incomingstop - _incomingstart;
     int outdim = _outgoingstop - _outgoingstart;
+    
+    double* sink_p = _outgoing_p->input()[_timestep] + _incomingstart;
+    double* source_p = _recurrent ? _incoming_p->output()[_timestep - 1] :
+                                    _incoming_p->output()[_timestep];
+    source_p += _outgoingstart;
 
     cblas_dgemv(CblasRowMajor, 
                 // Transpose the matrix since we want to multiply from the right
@@ -91,26 +91,34 @@ void FullConnection::forward()
                 // Dimension of the vector
                 indim,
                 // Pointer to the vector
-                _incoming_p->output().current() + _incomingstart,
-                // ??? some incrementer
+                source_p,
+                // Some incrementer.
                 1,                      
                 // Scalar of the target vector
                 1.0,                    
                 // Pointer to the target vector
-                _outgoing_p->input().current() + _outgoingstart,
-                // ??? some incrementer
+                sink_p,
+                // Incrementer.
                 1);   
 }
 
 
-void FullConnection::backward()
+void FullConnection::_backward()
 {
+    if (_outgoing_p->last_timestep())
+    {
+        return;
+    }
+    
     int indim = _incomingstop - _incomingstart;
     int outdim = _outgoingstop - _outgoingstart;
     
-    double* inerror_p = _incoming_p->outerror().current() + _incomingstart;
-    double* outerror_p = _outgoing_p->inerror().current() + _outgoingstart;
-    double* input_p = _incoming_p->output().current();
+    double* inerror_p = _recurrent ? _incoming_p->outerror()[_timestep - 1] :
+                                     _incoming_p->outerror()[_timestep];
+    inerror_p += _incomingstart;
+    double* outerror_p = _outgoing_p->inerror()[_timestep] + _outgoingstart;
+    double* input_p = _recurrent ? _incoming_p->output()[_timestep - 1] :
+                                   _incoming_p->output()[_timestep];
 
     // TODO: use BLAS for this.
     double* weights_p = get_parameters();

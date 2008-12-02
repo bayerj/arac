@@ -2,8 +2,11 @@
 // (c) 2008 by Justin S Bayer, <bayer.justin@googlemail.com>
 
 
-#ifndef Arac_STRUCTURE_NETWORKS_NETWORK_INCLUDED
-#define Arac_STRUCTURE_NETWORKS_NETWORK_INCLUDED
+#ifndef Arac_STRUCTURE_NETWORKS_INCLUDED
+#define Arac_STRUCTURE_NETWORKS_INCLUDED
+
+
+#include "network.h"
 
 
 #endif

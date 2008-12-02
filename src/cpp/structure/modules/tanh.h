@@ -20,10 +20,12 @@ class TanhLayer : public Module
     public:
 
         TanhLayer(int size);
-        ~TanhLayer();
-
-        virtual void forward();
-        virtual void backward();
+        virtual ~TanhLayer();
+        
+    protected:
+        
+        virtual void _forward();
+        virtual void _backward();
 };
 
 

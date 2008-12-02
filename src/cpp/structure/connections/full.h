@@ -34,8 +34,10 @@ class FullConnection : public Connection, public Parametrized
                        int outgoingstart, int outgoingstop);
         ~FullConnection();
         
-        virtual void forward();
-        virtual void backward();
+    protected:
+        
+        virtual void _forward();
+        virtual void _backward();
 };    
     
 }

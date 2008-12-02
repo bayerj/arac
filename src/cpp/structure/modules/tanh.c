@@ -14,10 +14,10 @@ using arac::common::tanhprime;
 
 
 void
-TanhLayer::forward()
+TanhLayer::_forward()
 {
-    double* input_p = input().current();
-    double* output_p = output().current();
+    double* input_p = input()[_timestep];
+    double* output_p = output()[_timestep];
     for (int i = 0; i < _insize; i++)
     {
         *output_p = tanh_(*input_p);
@@ -28,11 +28,11 @@ TanhLayer::forward()
 
 
 void
-TanhLayer::backward()
+TanhLayer::_backward()
 {
-    double* outerror_p = outerror().current();
-    double* output_p =  output().current();
-    double* inerror_p = inerror().current();
+    double* outerror_p = outerror()[_timestep];
+    double* output_p =  output()[_timestep];
+    double* inerror_p = inerror()[_timestep];
     for (int i = 0; i < _insize; i++)
     {
         inerror_p[i] += (1 - output_p[i] * output_p[i]) * outerror_p[i];

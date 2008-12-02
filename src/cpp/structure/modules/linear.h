@@ -13,17 +13,21 @@ namespace arac {
 namespace structure {
 namespace modules {
 
+
 using arac::structure::modules::Module;
+
 
 class LinearLayer : public Module
 {
     public:
 
         LinearLayer(int size);
-        ~LinearLayer();
+        virtual ~LinearLayer();
 
-        virtual void forward();
-        virtual void backward();
+    protected:
+
+        virtual void _forward();
+        virtual void _backward();
 };
 
 

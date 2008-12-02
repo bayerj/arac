@@ -7,14 +7,13 @@
 
 
 #include "linear.h"
+#include "lstm.h"
 #include "mdlstm.h"
 #include "module.h"
 #include "partialsoftmax.h"
 #include "sigmoid.h"
 #include "softmax.h"
 #include "tanh.h"
-
-
 
 
 #endif

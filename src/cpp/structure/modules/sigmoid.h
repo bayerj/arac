@@ -20,10 +20,12 @@ class SigmoidLayer : public Module
     public:
 
         SigmoidLayer(int size);
-        ~SigmoidLayer();
+        virtual ~SigmoidLayer();
 
-        virtual void forward();
-        virtual void backward();
+    protected:
+        
+        virtual void _forward();
+        virtual void _backward();
 };
 
 

@@ -11,8 +11,7 @@ using arac::common::Buffer;
 
 Buffer::Buffer(int rowsize, bool owner) : 
     _rowsize(rowsize), 
-    _owner(owner), 
-    _current_index(-1)
+    _owner(owner)
 {
     expand();
 }
@@ -25,9 +24,9 @@ Buffer::~Buffer()
 }
 
 
-void Buffer::add(double* addend_p)
+void Buffer::add(double* addend_p, int index)
 {
-    double* current_p = _content[_current_index];
+    double* current_p = index == -1 ? _content.back() : _content[index];
     for(int i = 0; i < _rowsize; i++)
     {
         current_p[i] += addend_p[i];
@@ -40,7 +39,6 @@ void Buffer::expand()
     double* new_chunk = new double[_rowsize];
     memset((void*) new_chunk, 0, sizeof(double) * _rowsize);
     _content.push_back(new_chunk);
-    _current_index++;
 }
 
 
@@ -64,27 +62,5 @@ void Buffer::free_memory()
 }
 
 
-void Buffer::append(double* row)
-{
-    _content.push_back(row);
-}
-
-
-void Buffer::make_owner()
-{
-    _owner = true;
-}
-
-
-bool Buffer::owner()
-{
-    return _owner;
-}
-
-double* Buffer::current()
-{
-    return _content[_current_index];
-}
-        
 
         

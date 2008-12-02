@@ -11,11 +11,11 @@ using arac::structure::modules::SoftmaxLayer;
 
 
 void
-SoftmaxLayer::forward()
+SoftmaxLayer::_forward()
 {
     double sum = 0;
-    double* input_p = input().current();
-    double* output_p = output().current();
+    double* input_p = input()[_timestep];
+    double* output_p = output()[_timestep];
     for(int i = 0; i < _insize; i++)
     {
         double item = exp(input_p[i]);
@@ -32,10 +32,10 @@ SoftmaxLayer::forward()
 
 
 void
-SoftmaxLayer::backward()
+SoftmaxLayer::_backward()
 {
     int size = _outsize * sizeof(double);
-    void* sourcebuffer_p = (void*) outerror().current();
-    void* sinkbuffer_p = (void*) inerror().current();
+    void* sourcebuffer_p = (void*) outerror()[_timestep];
+    void* sinkbuffer_p = (void*) inerror()[_timestep];
     memcpy(sinkbuffer_p, sourcebuffer_p, size);
 }

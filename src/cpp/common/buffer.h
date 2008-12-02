@@ -6,6 +6,8 @@
 #define Arac_COMMON_BUFFER_INCLUDED
 
 
+#include <cassert>
+
 #include "typedefs.h"
 
 
@@ -18,10 +20,10 @@ class Buffer
     public:
         
         Buffer(int rowsize, bool owner=true);
-        ~Buffer();
+        virtual ~Buffer();
         
         // Add the contents at the given pointer to the last buffer row.
-        void add(double* addend_p);
+        void add(double* addend_p, int index=-1);
         
         // Add another row to the buffer's contents.
         void expand();
@@ -47,9 +49,6 @@ class Buffer
         // Return the number of rows in the buffer.
         int size();
         
-        // Return a pointer to the current row.
-        double* current();
-        
         // Return the pointer at the given index.
         double* operator [](int index);
         
@@ -57,7 +56,6 @@ class Buffer
         
         DoublePtrVec _content;
         int _rowsize;
-        int _current_index;
         bool _owner;
     
 };
@@ -84,6 +82,30 @@ double*
 Buffer::operator[] (int index)
 {
     return _content[index];
+}
+
+
+inline
+void
+Buffer::append(double* row)
+{
+    _content.push_back(row);
+}
+
+
+inline
+void
+Buffer::make_owner()
+{
+    _owner = true;
+}
+
+
+inline
+bool
+Buffer::owner()
+{
+    return _owner;
 }
 
 

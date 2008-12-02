@@ -16,6 +16,7 @@ namespace connections {
 
     
 using namespace arac::structure::modules;
+using arac::structure::Component;
 
 
 class IdentityConnection : public Connection 
@@ -28,8 +29,10 @@ class IdentityConnection : public Connection
                            int outgoingstart, int outgoingstop);
         ~IdentityConnection();
     
-        virtual void forward();
-        virtual void backward();
+    protected:
+        
+        virtual void _forward();
+        virtual void _backward();
 };
 
 

@@ -16,7 +16,7 @@ class Parametrized
     
         Parametrized();
         Parametrized(int size);
-        ~Parametrized();
+        virtual ~Parametrized();
         
         double* get_parameters() const;
         void set_parameters(double* parameters_p);

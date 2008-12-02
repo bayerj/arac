@@ -20,12 +20,12 @@ class PartialSoftmaxLayer : public Module
     public:
 
         PartialSoftmaxLayer(int size, int slicelength);
-        ~PartialSoftmaxLayer();
+        virtual ~PartialSoftmaxLayer();
 
-        virtual void forward();
-        virtual void backward();
-        
     protected:
+        
+        virtual void _forward();
+        virtual void _backward();
         
         int _slicelength;
 };

@@ -13,29 +13,30 @@ namespace arac {
 namespace structure {
 namespace modules {
 
-using arac::structure::modules::Module;
 
-class MdlstmLayer : public Module
+class MdlstmLayer : public arac::structure::modules::Module
 {
     public:
 
         MdlstmLayer(int timedim, int size);
-        ~MdlstmLayer();
+        virtual ~MdlstmLayer();
 
-        virtual void forward();
-        virtual void backward();
-        
     protected:
+        
+        virtual void _forward();
+        virtual void _backward();
+        
+        virtual void expand();
         
         int _timedim;
         
-        Buffer _input_squashed;
-        Buffer _input_gate_squashed;
-        Buffer _input_gate_unsquashed;
-        Buffer _output_gate_squashed;
-        Buffer _output_gate_unsquashed;
-        Buffer _forget_gate_unsquashed;
-        Buffer _forget_gate_squashed;
+        arac::common::Buffer _input_squashed;
+        arac::common::Buffer _input_gate_squashed;
+        arac::common::Buffer _input_gate_unsquashed;
+        arac::common::Buffer _output_gate_squashed;
+        arac::common::Buffer _output_gate_unsquashed;
+        arac::common::Buffer _forget_gate_unsquashed;
+        arac::common::Buffer _forget_gate_squashed;
 };
 
 

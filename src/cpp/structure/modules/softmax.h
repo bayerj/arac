@@ -20,10 +20,12 @@ class SoftmaxLayer : public Module
     public:
 
         SoftmaxLayer(int size);
-        ~SoftmaxLayer();
+        virtual ~SoftmaxLayer();
 
-        virtual void forward();
-        virtual void backward();
+    protected:
+
+        virtual void _forward();
+        virtual void _backward();
 };
 
 
