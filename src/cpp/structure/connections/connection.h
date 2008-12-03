@@ -41,8 +41,8 @@ class Connection : public arac::structure::Component
         int get_outgoingstart();
         int get_outgoingstop();
         
-        void set_recurrent(bool recurrent);
-        bool get_recurrent();
+        void set_recurrent(int recurrent);
+        int get_recurrent();
         
         Module* incoming();
         Module* outgoing();
@@ -57,7 +57,7 @@ class Connection : public arac::structure::Component
         int _outgoingstart;
         int _outgoingstop;
         
-        bool _recurrent;
+        int _recurrent;
 };
     
     
@@ -128,7 +128,7 @@ Connection::get_outgoingstop()
 
 
 inline
-bool
+int
 Connection::get_recurrent()
 {
     return _recurrent;
@@ -137,9 +137,9 @@ Connection::get_recurrent()
 
 inline
 void
-Connection::set_recurrent(bool recurrent)
+Connection::set_recurrent(int recurrent)
 {
-    assert(sequential());
+    assert((!recurrent) || (sequential()));
     _recurrent = recurrent;
 }
 

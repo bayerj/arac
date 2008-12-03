@@ -1,13 +1,15 @@
 // Part of Arac Neural Network Composition Library.
 // (c) 2008 by Justin S Bayer, <bayer.justin@googlemail.com>
 
+
 #include <iostream>
-#include "full.h"
 
 extern "C"
 {
     #include "cblas.h"
 }
+
+#include "full.h"
 
 
 using arac::structure::connections::FullConnection;
@@ -65,7 +67,7 @@ FullConnection::~FullConnection()
 
 void FullConnection::_forward()
 {
-    if ((_recurrent) && (_timestep == 0))
+    if (timestep() - get_recurrent() < 0)
     {
         return;
     }
@@ -73,9 +75,8 @@ void FullConnection::_forward()
     int indim = _incomingstop - _incomingstart;
     int outdim = _outgoingstop - _outgoingstart;
     
-    double* sink_p = _outgoing_p->input()[_timestep] + _incomingstart;
-    double* source_p = _recurrent ? _incoming_p->output()[_timestep - 1] :
-                                    _incoming_p->output()[_timestep];
+    double* sink_p = _outgoing_p->input()[timestep()] + _incomingstart;
+    double* source_p = _incoming_p->output()[timestep() - get_recurrent()];
     source_p += _outgoingstart;
 
     cblas_dgemv(CblasRowMajor, 
@@ -105,7 +106,8 @@ void FullConnection::_forward()
 
 void FullConnection::_backward()
 {
-    if (_outgoing_p->last_timestep())
+    int this_timestep = timestep() - 1;
+    if (this_timestep + get_recurrent() > sequencelength())
     {
         return;
     }
@@ -113,12 +115,14 @@ void FullConnection::_backward()
     int indim = _incomingstop - _incomingstart;
     int outdim = _outgoingstop - _outgoingstart;
     
-    double* inerror_p = _recurrent ? _incoming_p->outerror()[_timestep - 1] :
-                                     _incoming_p->outerror()[_timestep];
-    inerror_p += _incomingstart;
-    double* outerror_p = _outgoing_p->inerror()[_timestep] + _outgoingstart;
-    double* input_p = _recurrent ? _incoming_p->output()[_timestep - 1] :
-                                   _incoming_p->output()[_timestep];
+    double* inerror_p = _incoming_p->outerror()[this_timestep] \
+                        + _incomingstart;
+    
+    double* outerror_p = _outgoing_p->inerror()[this_timestep + get_recurrent()] \
+                          + _outgoingstart;
+                          
+    double* input_p = _incoming_p->output()[this_timestep] \
+                      + _incomingstart;
 
     // TODO: use BLAS for this.
     double* weights_p = get_parameters();

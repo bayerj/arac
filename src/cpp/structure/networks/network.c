@@ -62,19 +62,19 @@ Network::activate(double* input_p)
     memcpy((void*) input()[_timestep], 
            (void*) input_p, 
            sizeof(double) * _insize);
-    _forward();
-    return output()[timestep()];
+    forward();
+    return output()[timestep() - 1];
 }
 
 
 const double*
 Network::back_activate(double* error_p)
 {
-    memcpy((void*) outerror()[_timestep], 
+    memcpy((void*) outerror()[timestep() - 1], 
            (void*) error_p, 
            sizeof(double) * _outsize);
 
-    _backward();
+    backward();
     return inerror()[timestep()];
 }
 
@@ -115,7 +115,8 @@ Network::_forward()
     {
         Module* module_p = *mod_iter;
         int size = module_p->outsize();
-        double* source_p = module_p->output()[module_p->timestep()];
+        // Modules have already been forwarded, thus substract 1 from timestep.
+        double* source_p = module_p->output()[module_p->timestep() - 1];
         memcpy((void*) sink_p, (void*) source_p, size * sizeof(double));
         sink_p += size;
     }
@@ -125,18 +126,19 @@ Network::_forward()
 void
 Network::_backward()
 {
+    int this_timestep = timestep() - 1;
     std::vector<Module*>::iterator mod_iter;
-    double* error_p = outerror()[timestep()];
+    double* error_p = outerror()[this_timestep];
     for(mod_iter = _outmodules.begin(); 
         mod_iter != _outmodules.end(); 
         mod_iter++)
     {
         Module* module_p = *mod_iter;
         int size = module_p->outsize();
-        int timestep = module_p->timestep();
+        int mod_timestep = module_p->timestep() - 1;
         if (!module_p->error_agnostic())
         {
-            double* sink_p = module_p->outerror()[timestep];
+            double* sink_p = module_p->outerror()[mod_timestep];
             memcpy((void*) sink_p, (void*) error_p, size * sizeof(double));
         }
         error_p += size;
@@ -155,15 +157,17 @@ Network::_backward()
         comp_p->backward();
     }
     
-    double* inerror_p = inerror()[timestep()];
+    double* inerror_p = inerror()[this_timestep];
     for(mod_iter = _inmodules.begin();
         mod_iter != _inmodules.end();
         mod_iter++)
     {
         Module* module_p = *mod_iter;
         int size = module_p->insize();
-        int timestep = module_p->timestep();
-        double* source_p = module_p->inerror()[timestep];
+        // No -1 on the timestep, since the modules have been backwarded 
+        // already.
+        int mod_timestep = module_p->timestep();
+        double* source_p = module_p->inerror()[mod_timestep];
         memcpy((void*) inerror_p, (void*) source_p, size * sizeof(double));
         inerror_p += size;
     }

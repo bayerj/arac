@@ -14,8 +14,8 @@ void
 LinearLayer::_forward()
 {
     int size = _insize * sizeof(double);
-    void* sourcebuffer_p = (void*) input()[_timestep];
-    void* sinkbuffer_p = (void*) output()[_timestep];
+    void* sourcebuffer_p = (void*) input()[timestep()];
+    void* sinkbuffer_p = (void*) output()[timestep()];
     memcpy(sinkbuffer_p, sourcebuffer_p, size);
 }
 
@@ -24,7 +24,7 @@ void
 LinearLayer::_backward()
 {
     int size = _outsize * sizeof(double);
-    void* sourcebuffer_p = (void*) outerror()[_timestep];
-    void* sinkbuffer_p = (void*) inerror()[_timestep];
+    void* sourcebuffer_p = (void*) outerror()[timestep() - 1];
+    void* sinkbuffer_p = (void*) inerror()[timestep() - 1];
     memcpy(sinkbuffer_p, sourcebuffer_p, size);
 }

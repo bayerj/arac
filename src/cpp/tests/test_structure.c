@@ -9,6 +9,7 @@ using namespace arac::common;
 using namespace arac::structure::modules;
 using namespace arac::structure::connections;
 using namespace arac::structure::networks;
+// using namespace arac::structure::networks::mdrnn;
 
 
 TEST(TestCommon, TestBuffer) {
@@ -112,6 +113,86 @@ TEST(TestModules, LinearLayer) {
     EXPECT_DOUBLE_EQ(-0.3, layer_p->inerror()[0][1])
         << "Backward pass incorrect.";
 }
+
+
+TEST(TestModules, LinearLayerSequential) {
+    LinearLayer* layer_p = new LinearLayer(2);
+    layer_p->set_mode(Component::Sequential);
+
+    double* input_p = new double[2];
+    input_p[0] = 2.;
+    input_p[1] = 3.;
+
+    layer_p->add_to_input(input_p);
+    
+    ASSERT_DOUBLE_EQ(2, layer_p->input()[0][0])
+        << "LinearLayer::add_to_input not working.";
+    ASSERT_DOUBLE_EQ(3, layer_p->input()[0][1])
+        << "LinearLayer::add_to_input not working.";
+    
+    layer_p->forward();
+
+    ASSERT_DOUBLE_EQ(2, layer_p->output()[0][0])
+        << "Forward pass incorrect.";
+        
+    ASSERT_DOUBLE_EQ(3, layer_p->output()[0][1])
+        << "Forward pass incorrect.";
+    
+    layer_p->add_to_input(input_p);
+    layer_p->add_to_input(input_p);
+    
+    ASSERT_DOUBLE_EQ(4, layer_p->input()[1][0])
+        << "LinearLayer::add_to_input not working.";
+    ASSERT_DOUBLE_EQ(6, layer_p->input()[1][1])
+        << "LinearLayer::add_to_input not working.";
+        
+    layer_p->forward();
+    
+    ASSERT_DOUBLE_EQ(4, layer_p->output()[1][0])
+        << "Forward pass incorrect.";
+        
+    ASSERT_DOUBLE_EQ(6, layer_p->output()[1][1])
+        << "Forward pass incorrect.";
+
+    double* outerror_p = new double[2];
+    outerror_p[0] = 1;
+    outerror_p[1] = -.3;
+
+    layer_p->add_to_outerror(outerror_p);
+    
+    EXPECT_DOUBLE_EQ(1, layer_p->outerror()[1][0])
+        << "Backward pass incorrect.";
+    
+    EXPECT_DOUBLE_EQ(-0.3, layer_p->outerror()[1][1])
+        << "Backward pass incorrect.";
+    
+    layer_p->backward();
+    
+    EXPECT_DOUBLE_EQ(1, layer_p->inerror()[1][0])
+        << "Backward pass incorrect.";
+    
+    EXPECT_DOUBLE_EQ(-0.3, layer_p->inerror()[1][1])
+        << "Backward pass incorrect.";
+        
+    layer_p->add_to_outerror(outerror_p);
+    layer_p->add_to_outerror(outerror_p);
+
+    EXPECT_DOUBLE_EQ(1, layer_p->outerror()[1][0])
+        << "Backward pass incorrect.";
+    
+    EXPECT_DOUBLE_EQ(-0.3, layer_p->outerror()[1][1])
+        << "Backward pass incorrect.";
+    
+    layer_p->backward();
+    
+    EXPECT_DOUBLE_EQ(2, layer_p->inerror()[0][0])
+        << "Backward pass incorrect.";
+    
+    EXPECT_DOUBLE_EQ(-0.6, layer_p->inerror()[0][1])
+        << "Backward pass incorrect.";
+}
+
+
 
 
 TEST(TestModules, SigmoidLayer) {
@@ -320,87 +401,87 @@ TEST(TestModules, PartialSoftmaxLayer) {
 
 
 TEST(TestModules, LstmLayer) {
-    ASSERT_TRUE(false) << "Test ist inactive at the moment.";
-    // LstmLayer* layer_p = new LstmLayer(1);
-    // 
-    // double* input_p = new double[4];
-    // input_p[0] = 1;
-    // input_p[1] = 2;
-    // input_p[2] = 3;
-    // input_p[3] = 4;
-    // 
-    // layer_p->add_to_input(input_p);
-    // 
-    // ASSERT_DOUBLE_EQ(1, layer_p->input()[0][0])
-    //     << "add_to_input not working.";
-    // ASSERT_DOUBLE_EQ(2, layer_p->input()[0][1])
-    //     << "add_to_input not working.";
-    // ASSERT_DOUBLE_EQ(3, layer_p->input()[0][2])
-    //     << "add_to_input not working.";
-    // ASSERT_DOUBLE_EQ(4, layer_p->input()[0][3])
-    //     << "add_to_input not working.";
-    // 
-    // layer_p->forward();
-    // 
-    // EXPECT_DOUBLE_EQ(0.61032029727785686, layer_p->output()[0][0])
-    //     << "Forward pass incorrect.";
-    //     
-    // EXPECT_DOUBLE_EQ(0.72744331388925076, layer_p->state()[0][0])
-    //     << "State incorrect.";
-    //     
-    // input_p[0] = 1;
-    // input_p[1] = -2;
-    // input_p[2] = 3;
-    // input_p[3] = 4;
-    // 
-    // layer_p->add_to_input(input_p);
-    // 
-    // layer_p->forward();
-    // 
-    // EXPECT_DOUBLE_EQ(0.65979239214347674, layer_p->output()[1][0])
-    //     << "Forward pass incorrect.";
-    //     
-    // EXPECT_DOUBLE_EQ(0.81415668251030193, layer_p->state()[1][0])
-    //     << "State incorrect.";
-    // 
-    // double* outerror_p = new double[1];
-    // outerror_p[0] = -1;
-    // 
-    // layer_p->add_to_outerror(outerror_p);
-    // 
-    // ASSERT_DOUBLE_EQ(0, layer_p->outerror()[0][0])
-    //     << "add_to_error does not work.";
-    // ASSERT_DOUBLE_EQ(-1, layer_p->outerror()[1][0])
-    //     << "add_to_error does not work.";
-    // 
-    // layer_p->backward();
-    // 
-    // EXPECT_DOUBLE_EQ(-0.10539391322654772, layer_p->inerror()[1][0])
-    //     << "Backward pass incorrect.";
-    // EXPECT_DOUBLE_EQ(-0.041145334820469018, layer_p->inerror()[1][1])
-    //     << "Backward pass incorrect.";
-    // EXPECT_DOUBLE_EQ(-0.0038855598463623424, layer_p->inerror()[1][2])
-    //     << "Backward pass incorrect.";
-    // EXPECT_DOUBLE_EQ(-0.011867164496483215, layer_p->inerror()[1][3])
-    //     << "Backward pass incorrect.";
-    //     
-    // outerror_p[0] = 2;
-    // 
-    // layer_p->add_to_outerror(outerror_p);
-    // 
-    // ASSERT_DOUBLE_EQ(2, layer_p->outerror()[0][0])
-    //     << "add_to_error does not work.";
-    // 
-    // layer_p->backward();
-    // 
-    // EXPECT_DOUBLE_EQ(0.22326096032509266, layer_p->inerror()[0][0])
-    //     << "Backward pass incorrect.";
-    // EXPECT_DOUBLE_EQ(0, layer_p->inerror()[0][1])
-    //     << "Backward pass incorrect.";
-    // EXPECT_DOUBLE_EQ(0.0082309670088325619, layer_p->inerror()[0][2])
-    //     << "Backward pass incorrect.";
-    // EXPECT_DOUBLE_EQ(0.021954698021931326, layer_p->inerror()[0][3])
-    //     << "Backward pass incorrect.";
+    // ASSERT_TRUE(false) << "Test ist inactive at the moment.";
+    LstmLayer* layer_p = new LstmLayer(1);
+    
+    double* input_p = new double[4];
+    input_p[0] = 1;
+    input_p[1] = 2;
+    input_p[2] = 3;
+    input_p[3] = 4;
+    
+    layer_p->add_to_input(input_p);
+    
+    ASSERT_DOUBLE_EQ(1, layer_p->input()[0][0])
+        << "add_to_input not working.";
+    ASSERT_DOUBLE_EQ(2, layer_p->input()[0][1])
+        << "add_to_input not working.";
+    ASSERT_DOUBLE_EQ(3, layer_p->input()[0][2])
+        << "add_to_input not working.";
+    ASSERT_DOUBLE_EQ(4, layer_p->input()[0][3])
+        << "add_to_input not working.";
+    
+    layer_p->forward();
+    
+    EXPECT_DOUBLE_EQ(0.61032029727785686, layer_p->output()[0][0])
+        << "Forward pass incorrect.";
+        
+    EXPECT_DOUBLE_EQ(0.72744331388925076, layer_p->state()[0][0])
+        << "State incorrect.";
+        
+    input_p[0] = 1;
+    input_p[1] = -2;
+    input_p[2] = 3;
+    input_p[3] = 4;
+    
+    layer_p->add_to_input(input_p);
+    
+    layer_p->forward();
+    
+    EXPECT_DOUBLE_EQ(0.65979239214347674, layer_p->output()[1][0])
+        << "Forward pass incorrect.";
+        
+    EXPECT_DOUBLE_EQ(0.81415668251030193, layer_p->state()[1][0])
+        << "State incorrect.";
+    
+    double* outerror_p = new double[1];
+    outerror_p[0] = -1;
+    
+    layer_p->add_to_outerror(outerror_p);
+    
+    ASSERT_DOUBLE_EQ(0, layer_p->outerror()[0][0])
+        << "add_to_error does not work.";
+    ASSERT_DOUBLE_EQ(-1, layer_p->outerror()[1][0])
+        << "add_to_error does not work.";
+    
+    layer_p->backward();
+    
+    EXPECT_DOUBLE_EQ(-0.10539391322654772, layer_p->inerror()[1][0])
+        << "Backward pass incorrect.";
+    EXPECT_DOUBLE_EQ(-0.041145334820469018, layer_p->inerror()[1][1])
+        << "Backward pass incorrect.";
+    EXPECT_DOUBLE_EQ(-0.0038855598463623424, layer_p->inerror()[1][2])
+        << "Backward pass incorrect.";
+    EXPECT_DOUBLE_EQ(-0.011867164496483215, layer_p->inerror()[1][3])
+        << "Backward pass incorrect.";
+        
+    outerror_p[0] = 2;
+    
+    layer_p->add_to_outerror(outerror_p);
+    
+    ASSERT_DOUBLE_EQ(2, layer_p->outerror()[0][0])
+        << "add_to_error does not work.";
+    
+    layer_p->backward();
+    
+    EXPECT_DOUBLE_EQ(0.22326096032509266, layer_p->inerror()[0][0])
+        << "Backward pass incorrect.";
+    EXPECT_DOUBLE_EQ(0, layer_p->inerror()[0][1])
+        << "Backward pass incorrect.";
+    EXPECT_DOUBLE_EQ(0.0082309670088325619, layer_p->inerror()[0][2])
+        << "Backward pass incorrect.";
+    EXPECT_DOUBLE_EQ(0.021954698021931326, layer_p->inerror()[0][3])
+        << "Backward pass incorrect.";
 }
 
 
@@ -503,7 +584,7 @@ TEST(TestConnections, RecurrentIdentityConnection) {
     inlayer_p->set_mode(Component::Sequential);
     outlayer_p->set_mode(Component::Sequential);
     con_p->set_mode(Component::Sequential);
-    con_p->set_recurrent(true);
+    con_p->set_recurrent(1);
     
     // First some data that should not have any effect immediately.
     
@@ -635,6 +716,11 @@ TEST(TestConnections, FullConnection) {
     outlayer_p->backward();
     con_p->backward();
     
+    EXPECT_DOUBLE_EQ(16, inlayer_p->outerror()[0][0])
+            << "Backward pass incorrect.";
+    EXPECT_DOUBLE_EQ(21.1, inlayer_p->outerror()[0][1])
+            << "Backward pass incorrect.";
+
     EXPECT_DOUBLE_EQ(1, con_p->get_derivatives()[0])
         << "Backward pass not working.";
     EXPECT_DOUBLE_EQ(1.5, con_p->get_derivatives()[1])
@@ -706,7 +792,7 @@ TEST(TestConnections, RecurrentFullConnection) {
     inlayer_p->set_mode(Component::Sequential);
     outlayer_p->set_mode(Component::Sequential);
     con_p->set_mode(Component::Sequential);
-    con_p->set_recurrent(true);
+    con_p->set_recurrent(1);
     
     con_p->get_parameters()[0] = 0; 
     con_p->get_parameters()[1] = 1; 
@@ -788,6 +874,184 @@ TEST(TestConnections, RecurrentFullConnection) {
     outlayer_p->backward();
     con_p->backward();
     inlayer_p->backward();
+    
+    EXPECT_DOUBLE_EQ(1, con_p->get_derivatives()[0])
+        << "Backward pass not working.";
+    EXPECT_DOUBLE_EQ(1.5, con_p->get_derivatives()[1])
+        << "Backward pass not working.";
+    EXPECT_DOUBLE_EQ(2.4, con_p->get_derivatives()[2])
+        << "Backward pass not working.";
+    EXPECT_DOUBLE_EQ(3.6, con_p->get_derivatives()[3])
+        << "Backward pass not working.";
+    EXPECT_DOUBLE_EQ(6.8, con_p->get_derivatives()[4])
+        << "Backward pass not working.";
+    EXPECT_DOUBLE_EQ(10.2, con_p->get_derivatives()[5])
+        << "Backward pass not working.";
+}
+
+
+TEST(TestConnections, DeepRecurrentFullConnection) {
+    LinearLayer* inlayer_p = new LinearLayer(2);
+    LinearLayer* outlayer_p = new LinearLayer(3);
+    FullConnection* con_p = new FullConnection(inlayer_p, outlayer_p);
+    
+    inlayer_p->set_mode(Component::Sequential);
+    outlayer_p->set_mode(Component::Sequential);
+    con_p->set_mode(Component::Sequential);
+    con_p->set_recurrent(2);
+    
+    con_p->get_parameters()[0] = 0; 
+    con_p->get_parameters()[1] = 1; 
+    con_p->get_parameters()[2] = 2; 
+    con_p->get_parameters()[3] = 3; 
+    con_p->get_parameters()[4] = 4; 
+    con_p->get_parameters()[5] = 5;
+
+    EXPECT_DOUBLE_EQ(0, outlayer_p->input()[0][0])
+        << "Buffer not properly initialized.";
+    EXPECT_DOUBLE_EQ(0, outlayer_p->input()[0][1])
+        << "Buffer not properly initialized.";
+    EXPECT_DOUBLE_EQ(0, outlayer_p->input()[0][2])
+        << "Buffer not properly initialized.";
+
+    // FIRST STEP FORWARD
+    inlayer_p->input()[0][0] = 2.;
+    inlayer_p->input()[0][1] = 3.;
+    
+    inlayer_p->forward();
+    con_p->forward();
+    outlayer_p->forward();
+
+    EXPECT_DOUBLE_EQ(0, outlayer_p->input()[0][0])
+        << "Forward pass not working.";
+    EXPECT_DOUBLE_EQ(0, outlayer_p->input()[0][1])
+        << "Forward pass not working.";
+    EXPECT_DOUBLE_EQ(0, outlayer_p->input()[0][2])
+        << "Forward pass not working.";
+
+
+    // SECOND STEP FORWARD
+
+    inlayer_p->input()[1][0] = 0.;
+    inlayer_p->input()[1][1] = 0.;
+    
+    inlayer_p->forward();
+    con_p->forward();
+    outlayer_p->forward();
+
+    EXPECT_DOUBLE_EQ(0, outlayer_p->input()[0][0])
+        << "Forward pass not working.";
+    EXPECT_DOUBLE_EQ(0, outlayer_p->input()[0][1])
+        << "Forward pass not working.";
+    EXPECT_DOUBLE_EQ(0, outlayer_p->input()[0][2])
+        << "Forward pass not working.";
+
+    // THIRD STEP FORWARD
+    
+    inlayer_p->input()[2][0] = 0;
+    inlayer_p->input()[2][1] = 0;
+    
+    inlayer_p->forward();
+    con_p->forward();
+    outlayer_p->forward();
+    
+    EXPECT_DOUBLE_EQ(3, outlayer_p->output()[2][0])
+        << "Forward pass incorrect.";
+    EXPECT_DOUBLE_EQ(13, outlayer_p->output()[2][1])
+        << "Forward pass incorrect.";
+    EXPECT_DOUBLE_EQ(23, outlayer_p->output()[2][2])
+        << "Forward pass incorrect.";
+    
+    
+    // FIRST STEP BACKWARD
+    
+    outlayer_p->outerror()[2][0] = 0.5;
+    outlayer_p->outerror()[2][1] = 1.2;
+    outlayer_p->outerror()[2][2] = 3.4;
+
+    outlayer_p->backward();
+    con_p->backward();
+    inlayer_p->backward();
+
+    EXPECT_DOUBLE_EQ(0.5, outlayer_p->inerror()[2][0])
+            << "Backward pass incorrect.";
+    EXPECT_DOUBLE_EQ(1.2, outlayer_p->inerror()[2][1])
+            << "Backward pass incorrect.";
+    EXPECT_DOUBLE_EQ(3.4, outlayer_p->inerror()[2][2])
+            << "Backward pass incorrect.";
+    
+    EXPECT_DOUBLE_EQ(0, inlayer_p->outerror()[2][0])
+            << "Backward pass incorrect.";
+    EXPECT_DOUBLE_EQ(0, inlayer_p->outerror()[2][1])
+            << "Backward pass incorrect.";
+            
+    EXPECT_DOUBLE_EQ(0, con_p->get_derivatives()[0])
+        << "Backward pass not working.";
+    EXPECT_DOUBLE_EQ(0, con_p->get_derivatives()[1])
+        << "Backward pass not working.";
+    EXPECT_DOUBLE_EQ(0, con_p->get_derivatives()[2])
+        << "Backward pass not working.";
+    EXPECT_DOUBLE_EQ(0, con_p->get_derivatives()[3])
+        << "Backward pass not working.";
+    EXPECT_DOUBLE_EQ(0, con_p->get_derivatives()[4])
+        << "Backward pass not working.";
+    EXPECT_DOUBLE_EQ(0, con_p->get_derivatives()[5])
+        << "Backward pass not working.";
+
+    
+    // SECOND STEP BACKWARDS
+    
+    outlayer_p->outerror()[1][0] = -1;
+    outlayer_p->outerror()[1][1] = -1;
+    outlayer_p->outerror()[1][2] = -1;
+
+    outlayer_p->backward();
+    con_p->backward();
+    inlayer_p->backward();
+    
+    EXPECT_DOUBLE_EQ(0, inlayer_p->outerror()[1][0])
+            << "Backward pass incorrect.";
+    EXPECT_DOUBLE_EQ(0, inlayer_p->outerror()[1][1])
+            << "Backward pass incorrect.";
+            
+    EXPECT_DOUBLE_EQ(0, con_p->get_derivatives()[0])
+        << "Backward pass not working.";
+    EXPECT_DOUBLE_EQ(0, con_p->get_derivatives()[1])
+        << "Backward pass not working.";
+    EXPECT_DOUBLE_EQ(0, con_p->get_derivatives()[2])
+        << "Backward pass not working.";
+    EXPECT_DOUBLE_EQ(0, con_p->get_derivatives()[3])
+        << "Backward pass not working.";
+    EXPECT_DOUBLE_EQ(0, con_p->get_derivatives()[4])
+        << "Backward pass not working.";
+    EXPECT_DOUBLE_EQ(0, con_p->get_derivatives()[5])
+        << "Backward pass not working.";
+
+
+    // THIRD STEP BACKWARDS
+
+    outlayer_p->outerror()[0][0] = -1;
+    outlayer_p->outerror()[0][1] = -1;
+    outlayer_p->outerror()[0][1] = -1;
+
+    outlayer_p->backward();
+    con_p->backward();
+    inlayer_p->backward();
+    
+    EXPECT_DOUBLE_EQ(0, inlayer_p->outerror()[2][0])
+            << "Backward pass incorrect.";
+    EXPECT_DOUBLE_EQ(0, inlayer_p->outerror()[2][1])
+            << "Backward pass incorrect.";
+
+    EXPECT_DOUBLE_EQ(0, inlayer_p->outerror()[1][0])
+            << "Backward pass incorrect.";
+    EXPECT_DOUBLE_EQ(0, inlayer_p->outerror()[1][1])
+            << "Backward pass incorrect.";
+    
+    EXPECT_DOUBLE_EQ(16, inlayer_p->outerror()[0][0])
+            << "Backward pass incorrect.";
+    EXPECT_DOUBLE_EQ(21.1, inlayer_p->outerror()[0][1])
+            << "Backward pass incorrect.";
     
     EXPECT_DOUBLE_EQ(1, con_p->get_derivatives()[0])
         << "Backward pass not working.";
@@ -886,6 +1150,7 @@ TEST(TestNetwork, TestTwoLayerNetwork) {
     EXPECT_DOUBLE_EQ(-8, con_p->get_derivatives()[3])
         << "Derivatives incorrect.";
 }
+        
         
 }  // namespace
 

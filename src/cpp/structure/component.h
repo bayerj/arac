@@ -6,6 +6,9 @@
 #define Arac_STRUCTURE_COMPONENT_INCLUDED
 
 
+#include <cassert>
+
+
 namespace arac {
 namespace structure {
     
@@ -39,6 +42,9 @@ class Component
         // Tell if the module is sequential.
         bool sequential();
         
+        // Return the sequence length of the current sequence.
+        int sequencelength();
+        
         // Tell if the module is error agnostic.
         bool error_agnostic();
         
@@ -50,6 +56,7 @@ class Component
         virtual void _forward() = 0;
         virtual void _backward() = 0;
         
+        int _sequencelength;
         int _timestep;
         Mode _mode;
         
@@ -58,6 +65,7 @@ class Component
 
 inline Component::Component() : 
     _timestep(0),
+    _sequencelength(0),
     _mode(Component::Simple)
 {
 }
@@ -73,6 +81,12 @@ Component::forward()
     if (sequential())
     {
         _timestep += 1;
+        _sequencelength += 1;
+    }
+    else
+    {
+        _sequencelength = 1;
+        _timestep = 1;
     }
 }
 
@@ -81,10 +95,15 @@ inline
 void 
 Component::backward()
 {
+    
     _backward();
     if (sequential())
     {
         _timestep -= 1;
+    }
+    else
+    {
+        _timestep = 0;
     }
 }
 
@@ -111,6 +130,14 @@ bool
 Component::sequential()
 {
     return _mode & Component::Sequential;
+}
+
+
+inline
+int
+Component::sequencelength()
+{
+    return _sequencelength;
 }
 
 

@@ -59,16 +59,16 @@ IdentityConnection::_forward()
 void
 IdentityConnection::_backward()
 {
-    if ((_recurrent) && (_incoming_p->last_timestep()))
+    int this_timestep = timestep() - 1;
+    if (this_timestep + get_recurrent() > sequencelength())
     {
         return;
     }
     
-    double* sinkbuffer_p = _recurrent ? _incoming_p->outerror()[timestep() - 1] : 
-                                        _incoming_p->outerror()[timestep()];                                
+    double* sinkbuffer_p = _incoming_p->outerror()[this_timestep];
     sinkbuffer_p += _incomingstart;
 
-    double* sourcebuffer_p = _outgoing_p->inerror()[timestep()] + _outgoingstart;
+    double* sourcebuffer_p = _outgoing_p->inerror()[this_timestep  + get_recurrent()] + _outgoingstart;
     int size = (_incomingstop - _incomingstart) * sizeof(double);
     memcpy((void*) sinkbuffer_p, (void*) sourcebuffer_p, size);
 }

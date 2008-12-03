@@ -164,24 +164,7 @@ LstmLayer::_backward()
 {
     fill_internal_outerror();
     fill_internal_state_error();
-    
-    std::cout << "Out-Error at current timestep: ";
-    for (int i = 0; i < 2 * outsize(); i++)
-    {
-        std::cout << _mdlstm.outerror()[timestep() - 1][i] << " ";
-    }
-    std::cout << std::endl;
     _mdlstm.backward();
-    std::cout << "In-Error at current timestep: ";
-    for (int i = 0; i < 5 * outsize(); i++)
-    {
-        std::cout << _mdlstm.inerror()[timestep() - 1][i] << " ";
-    }
-    std::cout << std::endl;
-
-    
-    
-    
     retrieve_internal_inerror();
     retrieve_internal_state_error();
 }

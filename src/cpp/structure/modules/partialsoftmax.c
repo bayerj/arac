@@ -13,8 +13,8 @@ using arac::structure::modules::PartialSoftmaxLayer;
 void
 PartialSoftmaxLayer::_forward()
 {
-    double* input_p = input()[_timestep];
-    double* output_p = output()[_timestep];
+    double* input_p = input()[timestep()];
+    double* output_p = output()[timestep()];
     int slices = _insize / _slicelength;
     for (int i = 0; i < slices; i++)
     {
@@ -41,7 +41,7 @@ void
 PartialSoftmaxLayer::_backward()
 {
     int size = _outsize * sizeof(double);
-    void* sourcebuffer_p = (void*) outerror()[_timestep];
-    void* sinkbuffer_p = (void*) inerror()[_timestep];
+    void* sourcebuffer_p = (void*) outerror()[timestep() - 1];
+    void* sinkbuffer_p = (void*) inerror()[timestep() - 1];
     memcpy(sinkbuffer_p, sourcebuffer_p, size);
 }

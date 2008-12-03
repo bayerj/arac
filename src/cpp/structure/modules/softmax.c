@@ -14,8 +14,8 @@ void
 SoftmaxLayer::_forward()
 {
     double sum = 0;
-    double* input_p = input()[_timestep];
-    double* output_p = output()[_timestep];
+    double* input_p = input()[timestep()];
+    double* output_p = output()[timestep()];
     for(int i = 0; i < _insize; i++)
     {
         double item = exp(input_p[i]);
@@ -35,7 +35,7 @@ void
 SoftmaxLayer::_backward()
 {
     int size = _outsize * sizeof(double);
-    void* sourcebuffer_p = (void*) outerror()[_timestep];
-    void* sinkbuffer_p = (void*) inerror()[_timestep];
+    void* sourcebuffer_p = (void*) outerror()[timestep() - 1];
+    void* sinkbuffer_p = (void*) inerror()[timestep() - 1];
     memcpy(sinkbuffer_p, sourcebuffer_p, size);
 }

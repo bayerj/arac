@@ -1,6 +1,9 @@
 // Part of Arac Neural Network Composition Library.
 // (c) 2008 by Justin S Bayer, <bayer.justin@googlemail.com>
 
+
+#include <cstring>
+
 #include "parametrized.h"
 
 
@@ -16,6 +19,10 @@ Parametrized::Parametrized()
 Parametrized::Parametrized(int size) {
     _parameters_p = new double[size];
     _derivatives_p = new double[size];
+
+    memset(_parameters_p, 0, size * sizeof(double));
+    memset(_derivatives_p, 0, size * sizeof(double));
+
     _size = size;
 }
 
