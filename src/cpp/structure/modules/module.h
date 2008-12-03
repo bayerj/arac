@@ -96,13 +96,13 @@ Module::outsize()
     return _outsize;
 }
 
+
 inline
 bool 
 Module::last_timestep()
 {
     return (_timestep == _input_p->size());
 }
-
 
 
 inline 

@@ -2,6 +2,8 @@
 // (c) 2008 by Justin S Bayer, <bayer.justin@googlemail.com>
 
 
+#include <cassert>
+
 #include "lstm.h"
 
 
@@ -56,8 +58,9 @@ void
 LstmLayer::fill_internal_input()
 {
     // Copy input into internal MdlstmLayer.
-    double* in_p = _mdlstm.input()[timestep()];
-    memcpy((void*) in_p, input()[timestep()], insize() * sizeof(double));
+    memcpy(_mdlstm.input()[timestep()], 
+           input()[timestep()], 
+           insize() * sizeof(double));
 }
 
 
@@ -66,11 +69,11 @@ LstmLayer::fill_internal_state()
 {
     // Copy states into inputbuffer of internal MDLSTM; fill up with zero if
     // we are in the first timestep.
-    void* state_p = (void*) (_mdlstm.input()[timestep()] + insize());
+    double* state_p = _mdlstm.input()[timestep()] + insize();
     if (timestep() > 0)
     {
         memcpy(state_p, 
-               (void*) state()[timestep() - 1], 
+               state()[timestep() - 1], 
                outsize() * sizeof(double));
     }
     else
@@ -81,29 +84,11 @@ LstmLayer::fill_internal_state()
 
 
 void
-LstmLayer::fill_internal_outerror()
-{
-    memcpy((void*) _mdlstm.outerror()[timestep()], 
-           (void*) outerror()[timestep()],
-           outsize() * sizeof(double));
-}
-
-
-void
-LstmLayer::retrieve_internal_inerror()
-{
-    memcpy((void*) inerror()[timestep()],
-           (void*) _mdlstm.inerror()[timestep()],
-           insize() * sizeof(double));
-}
-
-
-void
 LstmLayer::retrieve_internal_output()
 {
     // Copy information back.
-    memcpy((void*) output()[timestep()], 
-           (void*) _mdlstm.output()[timestep()], 
+    memcpy(output()[timestep()], 
+           _mdlstm.output()[timestep()], 
            outsize() * sizeof(double));
 }
 
@@ -111,17 +96,17 @@ LstmLayer::retrieve_internal_output()
 void
 LstmLayer::retrieve_internal_state()
 {
-    memcpy((void*) state()[timestep()], 
-           (void*) (_mdlstm.output()[timestep()] + outsize()),
+    memcpy(state()[timestep()], 
+           _mdlstm.output()[timestep()] + outsize(),
            outsize() * sizeof(double));
 }
 
 
-void 
-LstmLayer::retrieve_internal_state_error()
+void
+LstmLayer::fill_internal_outerror()
 {
-    memcpy((void*) state_error()[timestep()],
-           (void*) (_mdlstm.inerror()[timestep()] + 4 * outsize()),
+    memcpy(_mdlstm.outerror()[timestep() - 1], 
+           outerror()[timestep() - 1],
            outsize() * sizeof(double));
 }
 
@@ -129,26 +114,43 @@ LstmLayer::retrieve_internal_state_error()
 void
 LstmLayer::fill_internal_state_error()
 {
-    if (!last_timestep())
+    if (timestep() - 1 >= input().size())
     {
-        memcpy((void*) (_mdlstm.outerror()[timestep()] + outsize()),
-               (void*) state_error()[timestep() + 1],
+        memset((void*) (_mdlstm.outerror()[timestep() - 1] + outsize()),
+               0,
                outsize() * sizeof(double));
     }
     else 
     {
-        memset((void*) (_mdlstm.outerror()[timestep()] + outsize()),
-               0,
+        assert(timestep() < state_error().size());
+        memcpy(_mdlstm.outerror()[timestep() - 1] + outsize(),
+               state_error()[timestep()],
                outsize() * sizeof(double));
     }
 }
 
 
 void
+LstmLayer::retrieve_internal_inerror()
+{
+    memcpy((void*) inerror()[timestep() - 1],
+           (void*) _mdlstm.inerror()[timestep() - 1],
+           insize() * sizeof(double));
+}
+
+
+void 
+LstmLayer::retrieve_internal_state_error()
+{
+    memcpy(state_error()[timestep() - 1],
+           _mdlstm.inerror()[timestep() - 1] + insize(),
+           outsize() * sizeof(double));
+}
+
+
+void
 LstmLayer::_forward()
 {
-    int inputmemorysize = sizeof(double) * _insize;
-    double* in_p = _mdlstm.input()[timestep()];
     fill_internal_input();
     fill_internal_state();
     _mdlstm.forward();
@@ -162,7 +164,24 @@ LstmLayer::_backward()
 {
     fill_internal_outerror();
     fill_internal_state_error();
+    
+    std::cout << "Out-Error at current timestep: ";
+    for (int i = 0; i < 2 * outsize(); i++)
+    {
+        std::cout << _mdlstm.outerror()[timestep() - 1][i] << " ";
+    }
+    std::cout << std::endl;
     _mdlstm.backward();
+    std::cout << "In-Error at current timestep: ";
+    for (int i = 0; i < 5 * outsize(); i++)
+    {
+        std::cout << _mdlstm.inerror()[timestep() - 1][i] << " ";
+    }
+    std::cout << std::endl;
+
+    
+    
+    
     retrieve_internal_inerror();
     retrieve_internal_state_error();
 }

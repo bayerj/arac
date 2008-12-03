@@ -11,7 +11,11 @@ using arac::common::Buffer;
 
 Module::Module(int insize, int outsize) : 
     _insize(insize),
-    _outsize(outsize)
+    _outsize(outsize),
+    _input_p(0),
+    _output_p(0),
+    _inerror_p(0),
+    _outerror_p(0)
 {
     init_buffers();
 }
@@ -50,17 +54,29 @@ void
 Module::free_buffers()
 {
     if (_input_p != 0)
+    {
         delete _input_p;
+        _input_p = 0;
+    }
     
     if (_output_p != 0)
+    {
         delete _output_p;
+        _output_p = 0;
+    }
     
     if (!error_agnostic())
     {
         if (_inerror_p != 0)
+        {
             delete _inerror_p;
+            _inerror_p = 0;
+        }
         if (_outerror_p != 0)
+        {
             delete _outerror_p;
+            _outerror_p = 0;
+        }
     }
 }
 

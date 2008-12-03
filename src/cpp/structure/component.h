@@ -81,12 +81,13 @@ inline
 void 
 Component::backward()
 {
+    _backward();
     if (sequential())
     {
         _timestep -= 1;
     }
-    _backward();
 }
+
 
 
 inline 

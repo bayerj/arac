@@ -320,86 +320,87 @@ TEST(TestModules, PartialSoftmaxLayer) {
 
 
 TEST(TestModules, LstmLayer) {
-    LstmLayer* layer_p = new LstmLayer(1);
-    
-    double* input_p = new double[4];
-    input_p[0] = 1;
-    input_p[1] = 2;
-    input_p[2] = 3;
-    input_p[3] = 4;
-    
-    layer_p->add_to_input(input_p);
-    
-    ASSERT_DOUBLE_EQ(1, layer_p->input()[0][0])
-        << "add_to_input not working.";
-    ASSERT_DOUBLE_EQ(2, layer_p->input()[0][1])
-        << "add_to_input not working.";
-    ASSERT_DOUBLE_EQ(3, layer_p->input()[0][2])
-        << "add_to_input not working.";
-    ASSERT_DOUBLE_EQ(4, layer_p->input()[0][3])
-        << "add_to_input not working.";
-    
-    layer_p->forward();
-    
-    EXPECT_DOUBLE_EQ(0.61032029727785686, layer_p->output()[0][0])
-        << "Forward pass incorrect.";
-        
-    EXPECT_DOUBLE_EQ(0.72744331388925076, layer_p->state()[0][0])
-        << "State incorrect.";
-        
-    input_p[0] = 1;
-    input_p[1] = -2;
-    input_p[2] = 3;
-    input_p[3] = 4;
-    
-    layer_p->add_to_input(input_p);
-
-    layer_p->forward();
-    
-    EXPECT_DOUBLE_EQ(0.65979239214347674, layer_p->output()[1][0])
-        << "Forward pass incorrect.";
-        
-    EXPECT_DOUBLE_EQ(0.81415668251030193, layer_p->state()[1][0])
-        << "State incorrect.";
-    
-    double* outerror_p = new double[1];
-    outerror_p[0] = -1;
-    
-    layer_p->add_to_outerror(outerror_p);
-    
-    ASSERT_DOUBLE_EQ(0, layer_p->outerror()[0][0])
-        << "add_to_error does not work.";
-    ASSERT_DOUBLE_EQ(-1, layer_p->outerror()[1][0])
-        << "add_to_error does not work.";
-    
-    layer_p->backward();
-    
-    EXPECT_DOUBLE_EQ(-0.10539391322654772, layer_p->inerror()[1][0])
-        << "Backward pass incorrect.";
-    EXPECT_DOUBLE_EQ(-0.041145334820469018, layer_p->inerror()[1][1])
-        << "Backward pass incorrect.";
-    EXPECT_DOUBLE_EQ(-0.0038855598463623424, layer_p->inerror()[1][2])
-        << "Backward pass incorrect.";
-    EXPECT_DOUBLE_EQ(-0.011867164496483215, layer_p->inerror()[1][3])
-        << "Backward pass incorrect.";
-        
-    outerror_p[0] = 2;
-    
-    layer_p->add_to_outerror(outerror_p);
-    
-    ASSERT_DOUBLE_EQ(2, layer_p->outerror()[0][0])
-        << "add_to_error does not work.";
-    
-    layer_p->backward();
-    
-    EXPECT_DOUBLE_EQ(0.22326096032509266, layer_p->inerror()[0][0])
-        << "Backward pass incorrect.";
-    EXPECT_DOUBLE_EQ(0, layer_p->inerror()[0][1])
-        << "Backward pass incorrect.";
-    EXPECT_DOUBLE_EQ(0.0082309670088325619, layer_p->inerror()[0][2])
-        << "Backward pass incorrect.";
-    EXPECT_DOUBLE_EQ(0.021954698021931326, layer_p->inerror()[0][3])
-        << "Backward pass incorrect.";
+    ASSERT_TRUE(false) << "Test ist inactive at the moment.";
+    // LstmLayer* layer_p = new LstmLayer(1);
+    // 
+    // double* input_p = new double[4];
+    // input_p[0] = 1;
+    // input_p[1] = 2;
+    // input_p[2] = 3;
+    // input_p[3] = 4;
+    // 
+    // layer_p->add_to_input(input_p);
+    // 
+    // ASSERT_DOUBLE_EQ(1, layer_p->input()[0][0])
+    //     << "add_to_input not working.";
+    // ASSERT_DOUBLE_EQ(2, layer_p->input()[0][1])
+    //     << "add_to_input not working.";
+    // ASSERT_DOUBLE_EQ(3, layer_p->input()[0][2])
+    //     << "add_to_input not working.";
+    // ASSERT_DOUBLE_EQ(4, layer_p->input()[0][3])
+    //     << "add_to_input not working.";
+    // 
+    // layer_p->forward();
+    // 
+    // EXPECT_DOUBLE_EQ(0.61032029727785686, layer_p->output()[0][0])
+    //     << "Forward pass incorrect.";
+    //     
+    // EXPECT_DOUBLE_EQ(0.72744331388925076, layer_p->state()[0][0])
+    //     << "State incorrect.";
+    //     
+    // input_p[0] = 1;
+    // input_p[1] = -2;
+    // input_p[2] = 3;
+    // input_p[3] = 4;
+    // 
+    // layer_p->add_to_input(input_p);
+    // 
+    // layer_p->forward();
+    // 
+    // EXPECT_DOUBLE_EQ(0.65979239214347674, layer_p->output()[1][0])
+    //     << "Forward pass incorrect.";
+    //     
+    // EXPECT_DOUBLE_EQ(0.81415668251030193, layer_p->state()[1][0])
+    //     << "State incorrect.";
+    // 
+    // double* outerror_p = new double[1];
+    // outerror_p[0] = -1;
+    // 
+    // layer_p->add_to_outerror(outerror_p);
+    // 
+    // ASSERT_DOUBLE_EQ(0, layer_p->outerror()[0][0])
+    //     << "add_to_error does not work.";
+    // ASSERT_DOUBLE_EQ(-1, layer_p->outerror()[1][0])
+    //     << "add_to_error does not work.";
+    // 
+    // layer_p->backward();
+    // 
+    // EXPECT_DOUBLE_EQ(-0.10539391322654772, layer_p->inerror()[1][0])
+    //     << "Backward pass incorrect.";
+    // EXPECT_DOUBLE_EQ(-0.041145334820469018, layer_p->inerror()[1][1])
+    //     << "Backward pass incorrect.";
+    // EXPECT_DOUBLE_EQ(-0.0038855598463623424, layer_p->inerror()[1][2])
+    //     << "Backward pass incorrect.";
+    // EXPECT_DOUBLE_EQ(-0.011867164496483215, layer_p->inerror()[1][3])
+    //     << "Backward pass incorrect.";
+    //     
+    // outerror_p[0] = 2;
+    // 
+    // layer_p->add_to_outerror(outerror_p);
+    // 
+    // ASSERT_DOUBLE_EQ(2, layer_p->outerror()[0][0])
+    //     << "add_to_error does not work.";
+    // 
+    // layer_p->backward();
+    // 
+    // EXPECT_DOUBLE_EQ(0.22326096032509266, layer_p->inerror()[0][0])
+    //     << "Backward pass incorrect.";
+    // EXPECT_DOUBLE_EQ(0, layer_p->inerror()[0][1])
+    //     << "Backward pass incorrect.";
+    // EXPECT_DOUBLE_EQ(0.0082309670088325619, layer_p->inerror()[0][2])
+    //     << "Backward pass incorrect.";
+    // EXPECT_DOUBLE_EQ(0.021954698021931326, layer_p->inerror()[0][3])
+    //     << "Backward pass incorrect.";
 }
 
 
