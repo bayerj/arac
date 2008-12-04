@@ -9,6 +9,19 @@ using arac::structure::Component;
 using arac::common::Buffer;
 
 
+Module::Module() : 
+    _insize(0),
+    _outsize(0),
+    _input_p(0),
+    _output_p(0),
+    _inerror_p(0),
+    _outerror_p(0)
+{
+    init_buffers();
+}
+
+
+
 Module::Module(int insize, int outsize) : 
     _insize(insize),
     _outsize(outsize),

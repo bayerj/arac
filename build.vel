@@ -42,8 +42,11 @@ targets (
 		$ %(compiler)s %(flags)s -c src/cpp/structure/connections/full.c -o src/cpp/structure/connections/full.o
 		$ %(compiler)s %(flags)s -c src/cpp/structure/connections/identity.c -o src/cpp/structure/connections/identity.o
 		$ %(compiler)s %(flags)s -c src/cpp/structure/connections/connections.c -o src/cpp/structure/connections/connections.o
+		$ %(compiler)s %(flags)s -c src/cpp/structure/networks/basenetwork.c -o src/cpp/structure/networks/basenetwork.o
 		$ %(compiler)s %(flags)s -c src/cpp/structure/networks/network.c -o src/cpp/structure/networks/network.o
 		$ %(compiler)s %(flags)s -c src/cpp/structure/networks/networks.c -o src/cpp/structure/networks/networks.o
+		$ %(compiler)s %(flags)s -c src/cpp/structure/networks/mdrnns/basemdrnn.c -o src/cpp/structure/networks/mdrnns/basemdrnn.o
+		$ %(compiler)s %(flags)s -c src/cpp/structure/networks/mdrnns/mdrnn.c -o src/cpp/structure/networks/mdrnns/mdrnn.o
 		$ %(compiler)s %(flags)s -c src/cpp/structure/component.c -o src/cpp/structure/component.o
 		$ %(compiler)s %(flags)s -c src/cpp/structure/parametrized.c -o src/cpp/structure/parametrized.o
 		$ %(compiler)s %(flags)s -c src/cpp/structure/structure.c -o src/cpp/structure/structure.o
@@ -51,7 +54,7 @@ targets (
 	]
 
 	lib [
-		$ %(compiler)s %(flags)s %(lnflags)s -dynamiclib -shared -o libarac.so src/cpp/common/buffer.o src/cpp/structure/modules/module.o src/cpp/structure/modules/linear.o src/cpp/structure/modules/mdlstm.o src/cpp/structure/modules/lstm.o src/cpp/structure/modules/partialsoftmax.o src/cpp/structure/modules/softmax.o src/cpp/structure/modules/sigmoid.o src/cpp/structure/modules/tanh.o src/cpp/structure/modules/modules.o src/cpp/structure/connections/connection.o src/cpp/structure/connections/identity.o src/cpp/structure/connections/full.o src/cpp/structure/connections/connections.o src/cpp/structure/networks/network.o src/cpp/structure/networks/networks.o src/cpp/structure/component.o src/cpp/structure/parametrized.o src/cpp/structure/structure.o src/cpp/arac.o
+		$ %(compiler)s %(flags)s %(lnflags)s -dynamiclib -shared -o libarac.so src/cpp/common/buffer.o src/cpp/structure/modules/module.o src/cpp/structure/modules/linear.o src/cpp/structure/modules/mdlstm.o src/cpp/structure/modules/lstm.o src/cpp/structure/modules/partialsoftmax.o src/cpp/structure/modules/softmax.o src/cpp/structure/modules/sigmoid.o src/cpp/structure/modules/tanh.o src/cpp/structure/modules/modules.o src/cpp/structure/connections/connection.o src/cpp/structure/connections/identity.o src/cpp/structure/connections/full.o src/cpp/structure/connections/connections.o src/cpp/structure/networks/basenetwork.o src/cpp/structure/networks/network.o src/cpp/structure/networks/networks.o src/cpp/structure/networks/mdrnns/basemdrnn.o src/cpp/structure/networks/mdrnns/mdrnn.o src/cpp/structure/component.o src/cpp/structure/parametrized.o src/cpp/structure/structure.o src/cpp/arac.o
 	]
 	
 	test.c.build [
@@ -66,9 +69,10 @@ targets (
 	test []
 	
 	clean [
-		$ rm -rf src/cpp/*.o
-		$ rm -rf src/cpp/connections/*.o
-		$ rm -rf src/cpp/layers/*.o
+		$ rm -rf src/cpp/structure/*.o
+		$ rm -rf src/cpp/structure/connections/*.o
+		$ rm -rf src/cpp/structure/layers/*.o
+		$ rm -rf src/cpp/structure/networks/*.o
 		$ rm libarac.so
 		$ rm test-arac
 	]

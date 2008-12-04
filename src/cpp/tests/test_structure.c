@@ -9,7 +9,7 @@ using namespace arac::common;
 using namespace arac::structure::modules;
 using namespace arac::structure::connections;
 using namespace arac::structure::networks;
-// using namespace arac::structure::networks::mdrnn;
+using namespace arac::structure::networks::mdrnns;
 
 
 TEST(TestCommon, TestBuffer) {
@@ -1151,6 +1151,82 @@ TEST(TestNetwork, TestTwoLayerNetwork) {
         << "Derivatives incorrect.";
 }
         
+        
+TEST(TestNetwork, TestMdrnn)
+{
+    Mdrnn<LinearLayer> net(2, 1);
+    net.set_sequence_shape(0, 2);
+    net.set_sequence_shape(1, 2);
+    
+    double* params_p = new double[2];
+    params_p[0] = 0.5;
+    params_p[1] = 2;
+    
+    net.set_parameters(params_p);
+    
+    double* input_p = new double[4];
+    input_p[0] = 1;
+    input_p[1] = 2;
+    input_p[2] = 3;
+    input_p[3] = 4;
+    
+    const double* output_p = net.activate(input_p);
+
+    ASSERT_DOUBLE_EQ(1, net.input()[0][0]) 
+        << "Networks' input not filled correctly.";
+    ASSERT_DOUBLE_EQ(2, net.input()[0][1])
+        << "Networks' input not filled correctly.";
+    ASSERT_DOUBLE_EQ(3, net.input()[0][2])
+        << "Networks' input not filled correctly.";
+    ASSERT_DOUBLE_EQ(4, net.input()[0][3])
+        << "Networks' input not filled correctly.";
+    
+    EXPECT_DOUBLE_EQ(1, output_p[0]) 
+        << "Forward pass incorrect.";
+    EXPECT_DOUBLE_EQ(2.5, output_p[1])
+        << "Forward pass incorrect.";
+    EXPECT_DOUBLE_EQ(5, output_p[2])
+        << "Forward pass incorrect.";
+    EXPECT_DOUBLE_EQ(11.5, output_p[3])
+        << "Forward pass incorrect.";
+        
+    double* outerror_p = new double[4];
+    
+    outerror_p[0] = 2;
+    outerror_p[1] = 4;
+    outerror_p[2] = 8;
+    outerror_p[3] = 10;
+    
+    const double* inerror_p = net.back_activate(outerror_p);
+
+    ASSERT_DOUBLE_EQ(2, net.outerror()[0][0]) 
+        << "Networks' outerror not filled correctly.";
+    ASSERT_DOUBLE_EQ(4, net.outerror()[0][1])
+        << "Networks' outerror not filled correctly.";
+    ASSERT_DOUBLE_EQ(8, net.outerror()[0][2])
+        << "Networks' outerror not filled correctly.";
+    ASSERT_DOUBLE_EQ(10, net.outerror()[0][3])
+        << "Networks' outerror not filled correctly.";
+
+    EXPECT_DOUBLE_EQ(40, net.inerror()[0][0]) 
+        << "Backward pass incorrect.";
+    EXPECT_DOUBLE_EQ(24, net.inerror()[0][1])
+        << "Backward pass incorrect.";
+    EXPECT_DOUBLE_EQ(13, net.inerror()[0][2])
+        << "Backward pass incorrect.";
+    EXPECT_DOUBLE_EQ(10, net.inerror()[0][3])
+        << "Backward pass incorrect.";
+    
+    EXPECT_DOUBLE_EQ(net.inerror()[0][0], inerror_p[0]) 
+        << "back_activate copy not correct.";
+    EXPECT_DOUBLE_EQ(net.inerror()[0][1], inerror_p[1])
+        << "back_activate copy not correct.";
+    EXPECT_DOUBLE_EQ(net.inerror()[0][2], inerror_p[2])
+        << "back_activate copy not correct.";
+    EXPECT_DOUBLE_EQ(net.inerror()[0][3], inerror_p[3])
+        << "back_activate copy not correct.";
+}
+
         
 }  // namespace
 

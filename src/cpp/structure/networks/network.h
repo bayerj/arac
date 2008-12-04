@@ -12,6 +12,7 @@
 #include "../component.h"
 #include "../connections/connection.h"
 #include "../modules/module.h"
+#include "basenetwork.h"
 
 
 namespace arac {
@@ -24,7 +25,7 @@ using namespace arac::structure::connections;
 using arac::structure::Component;
 
 
-class Network : public Module
+class Network : public BaseNetwork
 {
     public: 
         
@@ -42,10 +43,6 @@ class Network : public Module
         
         void add_connection(Connection* con_p);
 
-        const double* activate(double* input_p);
-        
-        const double* back_activate(double* error_p);
-        
     protected:
         
         virtual void _forward();
@@ -54,11 +51,10 @@ class Network : public Module
         // Fill count with the amount of incoming edges for every module.
         void incoming_count(std::map<Module*, int>& count);
         
-        void sort();
+        virtual void sort();
         
         void init_buffers();
-        
-        bool _dirty;
+
         std::vector<Module*> _inmodules;
         std::vector<Module*> _outmodules;
         std::vector<Component*> _components_sorted;

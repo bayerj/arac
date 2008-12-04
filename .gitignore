@@ -1,3 +1,6 @@
+.project
+.cproject
+.DS_Store
 *.o
 *.so
 test-arac

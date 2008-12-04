@@ -20,6 +20,8 @@ namespace modules {
 class Module : public arac::structure::Component
 {
     public:
+
+        Module();
         
         // Create a new module and allocate the necessary buffers.
         Module(int insize, int outsize);

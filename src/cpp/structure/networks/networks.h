@@ -7,6 +7,8 @@
 
 
 #include "network.h"
+#include "basenetwork.h"
+#include "mdrnns/mdrnns.h"
 
 
 #endif

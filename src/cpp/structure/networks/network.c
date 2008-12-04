@@ -13,8 +13,7 @@ using arac::structure::networks::Network;
 
 
 Network::Network() :
-    _dirty(true),
-    Module(0, 0)
+    BaseNetwork()
 {
 }
 
@@ -48,34 +47,6 @@ Network::add_connection(Connection* con_p)
     _dirty = true;
     _connections.push_back(con_p);
     _outgoing_connections[con_p->incoming()].push_back(con_p);
-}
-
-
-const double*
-Network::activate(double* input_p)
-{
-    if (_dirty)
-    {
-        sort();
-    }
-    // Copy this input into the inputbuffer.
-    memcpy((void*) input()[_timestep], 
-           (void*) input_p, 
-           sizeof(double) * _insize);
-    forward();
-    return output()[timestep() - 1];
-}
-
-
-const double*
-Network::back_activate(double* error_p)
-{
-    memcpy((void*) outerror()[timestep() - 1], 
-           (void*) error_p, 
-           sizeof(double) * _outsize);
-
-    backward();
-    return inerror()[timestep()];
 }
 
 

@@ -32,6 +32,9 @@ class Component
         
         virtual void forward();
         virtual void backward();
+        
+        virtual void dry_forward();
+        virtual void dry_backward();
 
         // Set the mode of the module.
         virtual void set_mode(Mode mode);
@@ -78,6 +81,14 @@ void
 Component::forward()
 {
     _forward();
+    dry_forward();
+}
+
+
+inline
+void
+Component::dry_forward()
+{
     if (sequential())
     {
         _timestep += 1;
@@ -95,8 +106,14 @@ inline
 void 
 Component::backward()
 {
-    
     _backward();
+    dry_backward();
+}
+
+
+inline void
+Component::dry_backward()
+{
     if (sequential())
     {
         _timestep -= 1;
