@@ -6,6 +6,7 @@
 #define Arac_STRUCTURE_MODULES_MODULES_INCLUDED
 
 
+#include "bias.h"
 #include "linear.h"
 #include "lstm.h"
 #include "mdlstm.h"

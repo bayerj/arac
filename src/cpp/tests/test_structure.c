@@ -74,6 +74,22 @@ TEST(TestCommon, TestBufferMemory) {
 }
 
 
+TEST(TestModules, BiasUnit) {
+    Bias* bias_p = new Bias();
+
+    bias_p->forward();
+
+    ASSERT_DOUBLE_EQ(1, bias_p->output()[0][0])
+        << "Bias forward not working.";
+
+    bias_p->forward();
+
+    ASSERT_DOUBLE_EQ(1, bias_p->output()[0][0])
+        << "Bias forward not working.";
+}
+
+
+
 TEST(TestModules, LinearLayer) {
     LinearLayer* layer_p = new LinearLayer(2);
 

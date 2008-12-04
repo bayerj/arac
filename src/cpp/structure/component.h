@@ -80,6 +80,10 @@ inline
 void
 Component::forward()
 {
+    if (!sequential())
+    {
+        _timestep = 0;
+    }
     _forward();
     dry_forward();
 }
@@ -106,6 +110,10 @@ inline
 void 
 Component::backward()
 {
+    if (!sequential())
+    {
+        _timestep = 1;
+    }
     _backward();
     dry_backward();
 }
