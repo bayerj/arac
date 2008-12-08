@@ -59,6 +59,7 @@ void Buffer::free_memory()
     {
         delete[] *iter;
     }
+    _content.clear();
 }
 
 

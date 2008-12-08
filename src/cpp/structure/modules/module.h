@@ -62,6 +62,7 @@ class Module : public arac::structure::Component
         // Tell if the modules internal pointer points to the last timestep.
         bool last_timestep();
 
+        
     protected:
 
         // Initialize all the buffers.

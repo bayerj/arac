@@ -53,10 +53,12 @@ class Proxy(object):
             code = "delete (%s*) address;" % self.typ
             arac_call(code, {'address': self.address})
         
-    def pcall(self, code, namespace):
+    def pcall(self, code, namespace=None):
         """Call the passed code; a pointer to the proxied object is already
         available as 'p' in the code."""
-        code = "%(typ)s* p = (%(typ)s*) address; \n" + code
+        if namespace is None:
+            namespace = {}
+        code = "%(typ)s* p = (%(typ)s*) address; \n" % {'typ': self.typ} + code 
         namespace['address'] = self.address
         return arac_call(code, namespace)
 
@@ -64,6 +66,11 @@ class Proxy(object):
 class Component(Proxy):
     
     def __init__(self):
+        if self.typ is None:
+            raise ValueError("Attribute .typ has not been set.")
+        self._init_object()
+            
+    def _init_object(self):
         code = """
         %(typ)s* p = new %(typ)s();
         return_val = (int) p;
@@ -90,12 +97,30 @@ class Parametrized(Proxy):
 class Module(Component):
 
     def __init__(self, inpt, outpt, inerror=None, outerror=None):
-        # TODO: implement! ;)
-        pass
+        super(Module, self).__init__()
+        self.inpt = inpt
+        self.outpt = outpt
+        self.inerror = inerror
+        self.outerror = outerror
+        self.init_buffers()
+        
+    def init_buffers(self):
+        self.init_buffer('input', self.inpt)
+        self.init_buffer('output', self.outpt)
+        self.init_buffer('inerror', self.inerror)
+        self.init_buffer('outerror', self.outerror)
+        
+    def init_buffer(self, buffername, arr):
+        self.pcall("p->%s().free_memory();" % buffername)
+        for row in arr:
+            self.append_to_buffer(buffername, row.ctypes.data)
 
     def append_to_buffer(self, buffername, pointer):
         """Append a double pointer to a specified buffer."""
-        code = "p->%s().append((double*) pointer)" % buffername
+        print self.typ, buffername, pointer
+        code = """
+        std::cout << pointer << std::endl;
+        p->%s().append((double*) pointer);""" % buffername
         self.pcall(code, {'pointer': pointer})
 
 
@@ -208,21 +233,16 @@ class Mdrnn(BaseNetwork):
 
 class SimpleLayer(Module):
     
-    def __init__(self, klass, size, inpt, outpt, inerror=None, outerror=None):
-        if not klass.isalnum():
+    def __init__(self, typ, size, inpt, outpt, inerror=None, outerror=None):
+        if not typ.isalnum():
             raise ValueError("Wrong layer identifier.")
-        super(SimpleLayer, self).__init__(inpt, outpt, inerror, outerror)
+        self.typ = typ
         self.size = size
-        self.klass = klass
-        self.inpt = inpt
-        self.outpt = outpt
-        self.inerror = inerror
-        self.outerror = outerror
-        self.init_layer()
+        super(SimpleLayer, self).__init__(inpt, outpt, inerror, outerror)
 
-    def init_layer(self):
+    def _init_object(self):
         code = """
-        %(klass)s* layer_p = new %(klass)s(size);
+        %(typ)s* layer_p = new %(typ)s(size);
         return_val = (int) layer_p;
-        """ % {'klass': self.klass}
+        """ % {'typ': self.typ}
         self.address = arac_call(code, {'size': self.size})

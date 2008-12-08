@@ -8,9 +8,12 @@ __author__ = 'Justin S Bayer, bayer.justin@googlemail.com'
 
 
 import scipy
+import unittest
 
 
-def array_equal(arr1, arr2):
-    arr1 = scipy.array(arr1)
-    arr2 = scipy.array(arr2)
-    return (arr1 == arr2).all()
+
+class TestCase(unittest.TestCase):
+
+    def assertArrayEqual(self, arr1, arr2):
+        for a, b in zip(arr1, arr2):
+            self.assertEqual(a, b)

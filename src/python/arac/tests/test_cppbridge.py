@@ -12,20 +12,21 @@
 __author__ = 'Justin S Bayer, bayer.justin@googlemail.com'
 
 
-import arac.cppbridge as cppbridge
-import scipy
 import unittest
 
-from arac.tests.common import array_equal
+import arac.cppbridge as cppbridge
+import scipy
 
-class AracCall(unittest.TestCase):
+from arac.tests.common import TestCase
+
+class AracCall(TestCase):
     
     def testCall(self):
         result = cppbridge.arac_call("""return_val = 1;""")
         self.assertEqual(result, 1)
 
 
-class TestSimpleLayer(unittest.TestCase):
+class TestSimpleLayer(TestCase):
     
     configurations = {
         'LinearLayer': {
@@ -53,20 +54,19 @@ class TestSimpleLayer(unittest.TestCase):
             'inerror': (2, 4)},
     }
 
-
-
     def run_configuration(self, klass):
         conf = self.configurations[klass]
-        inpt = scipy.empty(2)
-        outpt = scipy.empty(2)
-        inerror = scipy.empty(2)
-        outerror = scipy.empty(2)
+        inpt = scipy.zeros((1, 2))
+        outpt = scipy.zeros((1, 2))
+        inerror = scipy.zeros((1, 2))
+        outerror = scipy.zeros((1, 2))
         layer = cppbridge.SimpleLayer(klass, 2, inpt, outpt, inerror, outerror)
-        inpt[:] = conf['inpt']
+        inpt[0, :] = conf['inpt']
         layer.forward()
-        self.assert_(array_equal(outpt, conf['outpt']))
+        self.assertArrayEqual(outpt[0], conf['outpt'])
+        outerror[0, :] = conf['outerror']
         layer.backward()
-        self.assert_(array_equal(inerror, conf['inerror']))
+        self.assertArrayEqual(inerror[0], conf['inerror'])
     
     def testLinearLayer(self):
         self.run_configuration('LinearLayer')
@@ -79,6 +79,12 @@ class TestSimpleLayer(unittest.TestCase):
 
     def testSoftmaxLayer(self):
         self.run_configuration('SoftmaxLayer')
+
+
+class TestNetwork(TestCase):
+    pass
+    
+    
 
 
 if __name__ == "__main__":

@@ -89,6 +89,7 @@ inline
 void
 Buffer::append(double* row)
 {
+    _owner = false;
     _content.push_back(row);
 }
 
