@@ -15,6 +15,7 @@ using arac::structure::networks::Network;
 Network::Network() :
     BaseNetwork()
 {
+    
 }
 
 
@@ -51,7 +52,6 @@ Network::add_module(Module* module_p, Network::ModuleType type)
     }
 
 }
-
 
 
 void

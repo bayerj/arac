@@ -59,6 +59,9 @@ class Proxy(object):
         if namespace is None:
             namespace = {}
         code = "%(typ)s* p = (%(typ)s*) address; \n" % {'typ': self.typ} + code 
+        # print code
+        # print namespace
+        # print
         namespace['address'] = self.address
         return arac_call(code, namespace)
 
@@ -117,10 +120,7 @@ class Module(Component):
 
     def append_to_buffer(self, buffername, pointer):
         """Append a double pointer to a specified buffer."""
-        print self.typ, buffername, pointer
-        code = """
-        std::cout << pointer << std::endl;
-        p->%s().append((double*) pointer);""" % buffername
+        code = "p->%s().append((double*) pointer);" % buffername
         self.pcall(code, {'pointer': pointer})
 
 
@@ -137,7 +137,7 @@ class Connection(Component):
                 raise ValueError("Either specify all or no slice.") 
             # Code for sliced connections.
             code =  """
-                    %(typ)s* p = new %(typ)s(incoming, outgoing);
+                    %(typ)s* p = new %(typ)s((Module*) incoming, (Module*) outgoing);
                     return_val = (int) p;
                     """ % {'typ': self.typ}
             self.address = arac_call(code, {'incoming': incoming, 
@@ -158,7 +158,7 @@ class Connection(Component):
                                             'outgoingstop': outgoingstop})
             
     
-class IdentityConnection(Component):
+class IdentityConnection(Connection):
     
     typ = 'IdentityConnection'
     
@@ -182,47 +182,49 @@ class FullConnection(Connection):
             incomingstart, incomingstop, 
             outgoingstart, outgoingstop)
         code = """
-        p->set_parameters(parameters_p);
-        p->set_derivatives(derivatives_p);
+        p->set_parameters((double*) parameters_p);
+        p->set_derivatives((double*) derivatives_p);
         """
         self.pcall(code, {'parameters_p': parameters.ctypes.data,
-                          'derivatives_p': derivatives_p.ctypes.data})
+                          'derivatives_p': derivatives.ctypes.data})
         
 
 class BaseNetwork(Module):
     
     def activate(self, arr):
-        return self.pcall('p->activate(input_p);', {'input_p': arr.ctypes.data})
+        if type(arr) != scipy.ndarray:
+            arr = scipy.array(arr, dtype='float64')
+        return self.pcall('p->activate((double*) input_p);', 
+                          {'input_p': arr.ctypes.data})
         
     def back_activate(self, arr):
-        return self.pcall('p->back_activate(error_p);', 
+        if type(arr) != scipy.ndarray:
+            arr = scipy.array(arr)
+        return self.pcall('p->back_activate((double*) error_p);', 
                           {'error_p': arr.ctypes.data})
-                          
-    def sort(self):
-        return self.pcall('p->sort();')
 
     
 class Network(BaseNetwork):
     
-    def add_module(self, module_p, input=False, output=False):
+    typ = 'Network'
+    
+    def add_module(self, module_p, inpt=False, outpt=False):
         inputoutput = {
             (False, False): 0,
             (True, False): 1,
             (False, True): 2,
             (True, True): 3
         }
-        self.pcall('p->add_module(module_p, inputoutput);',
-                   {'module_p': module_p,
-                    'inputoutput': inputoutput})
+        self.pcall(
+        'p->add_module((Module*) module_p, (Network::ModuleType) inputoutput);',
+        {'module_p': module_p,
+         'inputoutput': inputoutput[(inpt, outpt)]})
                     
     def add_connection(self, con_p):
-        self.pcall('p->add_connection(con_p)', {'con_p': con_p})
+        self.pcall('p->add_connection((Connection*) con_p);', {'con_p': con_p})
         
     def clear(self):
         self.pcall('p->clear();')
-        
-    def sort(self):
-        self.pcall('p->sort();')
         
         
 class Mdrnn(BaseNetwork):

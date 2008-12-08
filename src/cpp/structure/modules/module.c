@@ -92,13 +92,13 @@ Module::clear()
 void 
 Module::free_buffers()
 {
-    if (_input_p != 0)
+    if ((_input_p != 0) && (_input_p->owner()))
     {
         delete _input_p;
         _input_p = 0;
     }
     
-    if (_output_p != 0)
+    if ((_output_p != 0) && (_output_p->owner()))
     {
         delete _output_p;
         _output_p = 0;
@@ -106,12 +106,12 @@ Module::free_buffers()
     
     if (!error_agnostic())
     {
-        if (_inerror_p != 0)
+        if ((_inerror_p != 0) && _inerror_p->owner())
         {
             delete _inerror_p;
             _inerror_p = 0;
         }
-        if (_outerror_p != 0)
+        if ((_outerror_p != 0) && _outerror_p->owner())
         {
             delete _outerror_p;
             _outerror_p = 0;
@@ -124,11 +124,23 @@ void
 Module::init_buffers()
 {
     free_buffers();
-    _input_p = new Buffer(_insize);
-    _output_p = new Buffer(_outsize);
+    if ((_input_p == 0) || (_input_p->owner()))
+    {
+        _input_p = new Buffer(_insize);
+    }
+    if ((_output_p == 0) || (_output_p->owner()))
+    {
+        _output_p = new Buffer(_outsize);
+    }
     if (!error_agnostic())
     {
-        _inerror_p = new Buffer(_insize);
-        _outerror_p = new Buffer(_outsize);
+        if ((_inerror_p == 0) || (_inerror_p->owner()))
+        {
+            _inerror_p = new Buffer(_insize);
+        }
+        if ((_outerror_p == 0) || (_outerror_p->owner()))
+        {
+            _outerror_p = new Buffer(_outsize);
+        }
     }
 }

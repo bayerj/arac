@@ -17,3 +17,13 @@ class TestCase(unittest.TestCase):
     def assertArrayEqual(self, arr1, arr2):
         for a, b in zip(arr1, arr2):
             self.assertEqual(a, b)
+
+    def assertArrayNear(self, arr1, arr2):
+        for a, b in zip(arr1, arr2):
+            self.assertNear(a, b)
+            
+    def assertNear(self, a, b, epsilon=0.000001):
+        self.assert_(abs(a - b) < epsilon, 
+                     "|%f - %f| > %f" % (a, b, epsilon))
+        
+        
