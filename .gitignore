@@ -3,5 +3,6 @@
 .DS_Store
 *.o
 *.so
+*.pyc
 test-arac
 
