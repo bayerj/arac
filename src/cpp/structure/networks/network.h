@@ -39,6 +39,8 @@ class Network : public BaseNetwork
         Network();
         virtual ~Network();
         
+        virtual void clear();
+        
         void add_module(Module* module_p, ModuleType type=Simple);
         
         void add_connection(Connection* con_p);

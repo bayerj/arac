@@ -42,7 +42,7 @@ void Buffer::expand()
 }
 
 
-void Buffer::make_zero()
+void Buffer::clear()
 {
     DoublePtrVec::iterator iter;
     for(iter = _content.begin(); iter != _content.end(); iter++)

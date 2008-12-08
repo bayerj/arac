@@ -24,6 +24,8 @@ class Parametrized
         double* get_derivatives() const;
         void set_derivatives(double* derivatives_p);
         
+        void clear_derivatives();
+        
         bool parameters_owner();
         bool derivatives_owner();
         

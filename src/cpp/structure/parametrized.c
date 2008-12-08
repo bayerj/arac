@@ -91,3 +91,11 @@ Parametrized::set_derivatives(double* derivatives_p)
 }
 
 
+void
+Parametrized::clear_derivatives()
+{
+    // TODO: test this
+    memset(_derivatives_p, 0, _size * sizeof(double));
+}
+
+

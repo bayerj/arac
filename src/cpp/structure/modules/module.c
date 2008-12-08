@@ -63,6 +63,32 @@ Module::forward()
 }
 
 
+void
+Module::clear()
+{
+    if (_input_p != 0)
+    {
+        _input_p->clear();
+    }
+    
+    if (_output_p != 0)
+    {
+        _output_p->clear();
+    }
+    
+    if (!error_agnostic())
+    {
+        if (_inerror_p != 0)
+        {
+            _inerror_p->clear();
+        }
+        if (_outerror_p != 0)
+        {
+            _outerror_p->clear();
+        }
+    }
+}
+
 void 
 Module::free_buffers()
 {

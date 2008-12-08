@@ -23,6 +23,19 @@ Network::~Network()
 }
 
 
+// TODO: write a test for this.
+void
+Network::clear()
+{
+    std::map<Module*, ModuleType>::iterator iter;
+    for(iter = _modules.begin(); iter != _modules.end(); iter++)
+    {
+        iter->first->clear();
+    }
+    Module::clear();
+}
+
+
 void
 Network::add_module(Module* module_p, Network::ModuleType type)
 {

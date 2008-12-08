@@ -29,7 +29,7 @@ class Buffer
         void expand();
         
         // Set all the contents to zero. 
-        void make_zero();
+        void clear();
         
         // Free the memory held by the Buffer object.
         void free_memory();

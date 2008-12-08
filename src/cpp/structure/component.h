@@ -45,22 +45,22 @@ class Component
         // Tell if the module is sequential.
         bool sequential();
         
+        // Return the current timestep.
+        int timestep();
+
         // Return the sequence length of the current sequence.
         int sequencelength();
         
         // Tell if the module is error agnostic.
         bool error_agnostic();
         
-        // Return the current timestep.
-        int timestep();
-        
     protected:
 
         virtual void _forward() = 0;
         virtual void _backward() = 0;
         
-        int _sequencelength;
         int _timestep;
+        int _sequencelength;
         Mode _mode;
         
 };
@@ -100,8 +100,8 @@ Component::dry_forward()
     }
     else
     {
-        _sequencelength = 1;
         _timestep = 1;
+        _sequencelength = 1;
     }
 }
 

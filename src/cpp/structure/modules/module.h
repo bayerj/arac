@@ -39,7 +39,7 @@ class Module : public arac::structure::Component
         void add_to_outerror(double* addend_p);
         
         // Clear input, output, inerror and outerror by setting them to zero.
-        void clear();
+        virtual void clear();
         
         // Return the input Buffer.
         arac::common::Buffer& input();

@@ -54,7 +54,7 @@ TEST(TestCommon, TestBuffer) {
     EXPECT_DOUBLE_EQ(2.4, buffer[1][1])
         << "Adding to buffer incorrect.";
 
-    buffer.make_zero();
+    buffer.clear();
     
     EXPECT_DOUBLE_EQ(0, buffer[0][0])
         << "Setting buffer to zero incorrect.";
@@ -207,8 +207,6 @@ TEST(TestModules, LinearLayerSequential) {
     EXPECT_DOUBLE_EQ(-0.6, layer_p->inerror()[0][1])
         << "Backward pass incorrect.";
 }
-
-
 
 
 TEST(TestModules, SigmoidLayer) {
