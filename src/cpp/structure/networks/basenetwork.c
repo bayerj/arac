@@ -45,6 +45,10 @@ BaseNetwork::activate(double* input_p)
     {
         sort();
     }
+    else if (!sequential())
+    {
+        clear();
+    }
     // Copy this input into the inputbuffer.
     memcpy((void*) input()[timestep()], 
            (void*) input_p, 

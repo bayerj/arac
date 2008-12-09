@@ -15,7 +15,6 @@ using arac::structure::networks::Network;
 Network::Network() :
     BaseNetwork()
 {
-    
 }
 
 
@@ -33,7 +32,7 @@ Network::clear()
     {
         iter->first->clear();
     }
-    Module::clear();
+    BaseNetwork::clear();
 }
 
 

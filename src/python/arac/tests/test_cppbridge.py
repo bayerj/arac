@@ -8,11 +8,12 @@ __author__ = 'Justin S Bayer, bayer.justin@googlemail.com'
 
 
 import unittest
-
-import arac.cppbridge as cppbridge
 import scipy
 
+import arac.cppbridge as cppbridge
+
 from arac.tests.common import TestCase
+
 
 class AracCall(TestCase):
     

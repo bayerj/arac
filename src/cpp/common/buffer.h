@@ -31,6 +31,9 @@ class Buffer
         // Set all the contents to zero. 
         void clear();
         
+        // Set all the contents of a specific buffer to zero.
+        void clear_at(int index);
+        
         // Free the memory held by the Buffer object.
         void free_memory();
         

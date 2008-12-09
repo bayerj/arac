@@ -35,7 +35,7 @@ class Component
         
         virtual void dry_forward();
         virtual void dry_backward();
-
+        
         // Set the mode of the module.
         virtual void set_mode(Mode mode);
         
@@ -55,6 +55,12 @@ class Component
         bool error_agnostic();
         
     protected:
+
+        virtual void pre_forward();
+        virtual void pre_backward();
+
+        virtual void post_forward();
+        virtual void post_backward();
 
         virtual void _forward() = 0;
         virtual void _backward() = 0;
@@ -80,18 +86,64 @@ inline
 void
 Component::forward()
 {
-    if (!sequential())
-    {
-        _timestep = 0;
-    }
+    pre_forward();
     _forward();
-    dry_forward();
+    post_forward();
+}
+
+
+inline
+void 
+Component::backward()
+{
+    pre_backward();
+    _backward();
+    post_backward();
 }
 
 
 inline
 void
 Component::dry_forward()
+{
+    pre_forward();
+    post_forward();
+}
+
+
+inline void
+Component::dry_backward()
+{
+    pre_backward();
+    post_backward();
+}
+
+
+inline
+void
+Component::pre_forward()
+{
+    if (!sequential())
+    {
+        _timestep = 0;
+    }
+}
+
+
+inline
+void
+Component::pre_backward()
+{
+    if (!sequential())
+    {
+        _timestep = 1;
+    }
+}
+
+
+inline
+void
+Component::post_forward()
 {
     if (sequential())
     {
@@ -107,20 +159,8 @@ Component::dry_forward()
 
 
 inline
-void 
-Component::backward()
-{
-    if (!sequential())
-    {
-        _timestep = 1;
-    }
-    _backward();
-    dry_backward();
-}
-
-
-inline void
-Component::dry_backward()
+void
+Component::post_backward()
 {
     if (sequential())
     {
@@ -131,7 +171,6 @@ Component::dry_backward()
         _timestep = 0;
     }
 }
-
 
 
 inline 

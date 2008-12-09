@@ -44,11 +44,17 @@ void Buffer::expand()
 
 void Buffer::clear()
 {
-    DoublePtrVec::iterator iter;
-    for(iter = _content.begin(); iter != _content.end(); iter++)
+    for(int i = 0; i < size(); i++)
     {
-        memset((void*) *iter, 0, sizeof(double) * _rowsize);
+        clear_at(i);
     }
+}
+
+// TODO: write a test for this
+void
+Buffer::clear_at(int index)
+{
+    memset((void*) _content[index], 0, sizeof(double) * _rowsize);
 }
 
 

@@ -37,9 +37,30 @@ def arac_call(code, namespace=None):
                        library_dirs=['/Users/bayerj/devel/arac0.3'],
                        support_code=support_code,
                        libraries=libraries,
-                       type_converters=type_converters
+                       type_converters=type_converters,
+                       extra_compile_args=['-g']
     )
     return result
+
+
+class ProxyContainer(object):
+    """Class that handles proxies and deletes the held objects of them when the
+    container is deleted."""
+    
+    def __init__(self):
+        self.clear()
+        
+    def __del__(self):
+        for proxy in self.map.items():
+            proxy.free()
+        
+    def __getitem__(self, key):
+        return self.map[key]
+        
+    def clear(self):
+        """Free the current map and all the held structures."""
+        self.map = {}
+
 
 
 class Proxy(object):
@@ -48,7 +69,7 @@ class Proxy(object):
     typ = None
     address = 0
     
-    def __del__(self):
+    def free(self):
         if self.address:
             code = "delete (%s*) address;" % self.typ
             arac_call(code, {'address': self.address})
@@ -122,6 +143,49 @@ class Module(Component):
         """Append a double pointer to a specified buffer."""
         code = "p->%s().append((double*) pointer);" % buffername
         self.pcall(code, {'pointer': pointer})
+        
+        
+class SimpleLayer(Module):
+    
+    def __init__(self, typ, size, inpt, outpt, inerror=None, outerror=None):
+        if not typ.isalnum():
+            raise ValueError("Wrong layer identifier.")
+        self.typ = typ
+        self.size = size
+        super(SimpleLayer, self).__init__(inpt, outpt, inerror, outerror)
+
+    def _init_object(self):
+        code = """
+        %(typ)s* layer_p = new %(typ)s(size);
+        return_val = (int) layer_p;
+        """ % {'typ': self.typ}
+        self.address = arac_call(code, {'size': self.size})
+        
+        
+class Bias(Module):
+    
+    typ = 'Bias'
+    
+    def __init__(self):
+        Component.__init__(self)
+
+
+class LstmLayer(SimpleLayer):
+    
+    typ = 'LstmLayer'
+    
+    def __init__(self, size, 
+                 inpt, outpt, state,
+                 inerror=None, outerror=None, state_error=None):
+        self.state = state
+        self.state_error = state_error
+        super(LstmLayer, self).__init__(
+            self.typ, size, inpt, outpt, inerror, outerror)
+        
+    def init_buffers(self):
+        self.init_buffer('state', self.state)
+        self.init_buffer('state_error', self.state_error)
+        super(LstmLayer, self).init_buffers()
 
 
 class Connection(Component):
@@ -137,25 +201,33 @@ class Connection(Component):
                 raise ValueError("Either specify all or no slice.") 
             # Code for sliced connections.
             code =  """
-                    %(typ)s* p = new %(typ)s((Module*) incoming, (Module*) outgoing);
+                    %(typ)s* p = new %(typ)s((%(intype)s*) incoming, 
+                                             (%(outtype)s*) outgoing);
                     return_val = (int) p;
-                    """ % {'typ': self.typ}
-            self.address = arac_call(code, {'incoming': incoming, 
-                                            'outgoing': outgoing})
+                    """ % {'typ': self.typ, 
+                           'intype': incoming.typ, 
+                           'outtype': outgoing.typ}
+            self.address = arac_call(code, {'incoming': incoming.address, 
+                                            'outgoing': outgoing.address})
         else:
             # Code for not sliced connections.
             code =  """
-            %(typ)s* p = new %(typ)s(incoming, outgoing, 
+            %(typ)s* p = new %(typ)s((%(intype)s*) incoming, 
+                                     (%(outtype)s*) outgoing, 
                                      incomingstart, incomingstop, 
                                      outgoingstart, outgoingstop);
             return_val = (int) p;
-            """ % {'typ': self.typ}
-            self.address = arac_call(code, {'incoming': incoming,
-                                            'outgoing': outgoing,
+            """ % {'typ': self.typ, 
+                   'intype': incoming.typ, 
+                   'outtype': outgoing.typ}
+            self.address = arac_call(code, {'incoming': incoming.address,
+                                            'outgoing': outgoing.address,
                                             'incomingstart': incomingstart,
                                             'incomingstop': incomingstop,
                                             'outgoingstart': outgoingstart,
                                             'outgoingstop': outgoingstop})
+    def set_recurrent(self, value):
+        self.pcall('p->set_recurrent(value);', {'value': value})
             
     
 class IdentityConnection(Connection):
@@ -194,34 +266,42 @@ class BaseNetwork(Module):
     def activate(self, arr):
         if type(arr) != scipy.ndarray:
             arr = scipy.array(arr, dtype='float64')
-        return self.pcall('p->activate((double*) input_p);', 
-                          {'input_p': arr.ctypes.data})
+        self.pcall('p->activate((double*) input_p);', 
+                   {'input_p': arr.ctypes.data})
         
     def back_activate(self, arr):
         if type(arr) != scipy.ndarray:
             arr = scipy.array(arr)
-        return self.pcall('p->back_activate((double*) error_p);', 
-                          {'error_p': arr.ctypes.data})
+        self.pcall('p->back_activate((double*) error_p);', 
+                   {'error_p': arr.ctypes.data})
 
     
 class Network(BaseNetwork):
     
     typ = 'Network'
     
-    def add_module(self, module_p, inpt=False, outpt=False):
+    def add_module(self, module, inpt=False, outpt=False):
+        if not isinstance(module, Module):
+            raise ValueError(
+                "module has to be Module Proxy, not %s" % type(module))
         inputoutput = {
             (False, False): 0,
             (True, False): 1,
             (False, True): 2,
             (True, True): 3
         }
-        self.pcall(
-        'p->add_module((Module*) module_p, (Network::ModuleType) inputoutput);',
-        {'module_p': module_p,
-         'inputoutput': inputoutput[(inpt, outpt)]})
+        code = """
+        p->add_module((%s*) module_p, (Network::ModuleType) inputoutput);
+        """  % module.typ
+        self.pcall(code, 
+                   {'module_p': module.address,
+                    'inputoutput': inputoutput[(inpt, outpt)]})
                     
-    def add_connection(self, con_p):
-        self.pcall('p->add_connection((Connection*) con_p);', {'con_p': con_p})
+    def add_connection(self, con):
+        if not isinstance(con, Connection):
+            raise ValueError("con has to be Connection Proxy.")
+        self.pcall('p->add_connection((%s*) con_p);' % con.typ, 
+                   {'con_p': con.address})
         
     def clear(self):
         self.pcall('p->clear();')
@@ -233,18 +313,3 @@ class Mdrnn(BaseNetwork):
         pass
         
 
-class SimpleLayer(Module):
-    
-    def __init__(self, typ, size, inpt, outpt, inerror=None, outerror=None):
-        if not typ.isalnum():
-            raise ValueError("Wrong layer identifier.")
-        self.typ = typ
-        self.size = size
-        super(SimpleLayer, self).__init__(inpt, outpt, inerror, outerror)
-
-    def _init_object(self):
-        code = """
-        %(typ)s* layer_p = new %(typ)s(size);
-        return_val = (int) layer_p;
-        """ % {'typ': self.typ}
-        self.address = arac_call(code, {'size': self.size})
