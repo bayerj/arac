@@ -19,7 +19,7 @@ def make_test_suite():
     # file.
     test_path_list = list(os.path.split(__file__)[:-1]) + ['arac/tests/']
     testdir = os.path.join(*test_path_list)
-    
+
     # All unittest modules have to start with 'test_' and have to be, of 
     # course, python files
     module_names = [f[:-3] for f in os.listdir(testdir) 
@@ -35,7 +35,7 @@ def make_test_suite():
     test_package = __import__(test_package_path, fromlist=module_names)
     
     # Put the test modules in a list that can be passed to the testsuite
-    modules = (getattr(test_package, n) for n in module_names)
+    modules = [getattr(test_package, n) for n in module_names]
     
     # Print out a list of tests that are found
     for m in modules:
