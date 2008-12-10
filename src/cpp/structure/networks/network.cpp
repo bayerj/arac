@@ -172,6 +172,10 @@ Network::incoming_count(std::map<Module*, int>& count)
         con_iter != _connections.end();
         con_iter++)
     {
+        if ((*con_iter)->get_recurrent())
+        {
+            continue;
+        }
         count[(*con_iter)->outgoing()]++;
     }
 }
@@ -215,6 +219,10 @@ Network::sort()
             con_iter != _outgoing_connections[current].end();
             con_iter++)
          {
+             if ((*con_iter)->get_recurrent())
+             {
+                 continue;
+             }
              Module* other_p = (*con_iter)->outgoing();
              count[other_p]--;
              if (count[other_p] == 0)
@@ -228,11 +236,11 @@ Network::sort()
     {
         if (count_iter->second != 0)
         {
+            assert(0);
             // FIXME: error handling, graph has cycle.
             ;
         }
     }
-
 
     // Fill the list of sorted components correctly.
     _components_sorted.clear();
@@ -275,5 +283,3 @@ Network::init_buffers()
 
     Module::init_buffers();
 }
-
-        
