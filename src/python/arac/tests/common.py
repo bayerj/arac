@@ -11,7 +11,6 @@ import scipy
 import unittest
 
 
-
 class TestCase(unittest.TestCase):
 
     def assertArrayEqual(self, arr1, arr2):
@@ -19,7 +18,7 @@ class TestCase(unittest.TestCase):
             self.assertEqual(a, b)
 
     def assertArrayNear(self, arr1, arr2):
-        self.assertEqual(arr1.shape, arr2.shape)
+        self.assertEqual(scipy.size(arr1), scipy.size(arr2))
         for a, b in zip(arr1, arr2):
             self.assertNear(a, b)
             

@@ -36,8 +36,8 @@ scipy.random.seed(0)
 class TestNetworkEquivalence(TestCase):
     
     def two_layer_network(self, net):
-        inlayer = SigmoidLayer(2)
-        outlayer = LinearLayer(2)
+        inlayer = SigmoidLayer(2, 'in')
+        outlayer = LinearLayer(2, 'out')
         con = FullConnection(inlayer, outlayer)
         con.params[:] = 1, 2, 3, 4
         net.addInputModule(inlayer)
@@ -46,15 +46,11 @@ class TestNetworkEquivalence(TestCase):
         net.sortModules()
 
     def rec_two_layer_network(self, net):
-        inlayer = SigmoidLayer(2)
-        outlayer = LinearLayer(2)
-        con = FullConnection(inlayer, outlayer)
-        con.params[:] = 1, 2, 3, 4
-        rcon = FullConnection(inlayer, outlayer)
-        rcon.params[:] = 1, 2, 3, 5
+        inlayer = LinearLayer(2, 'in')
+        outlayer = LinearLayer(2, 'out')
+        rcon = IdentityConnection(inlayer, outlayer)
         net.addInputModule(inlayer)
         net.addOutputModule(outlayer)
-        net.addConnection(con)
         net.addRecurrentConnection(rcon)
         net.sortModules()
 
@@ -74,38 +70,90 @@ class TestNetworkEquivalence(TestCase):
         net.sortModules()
         
     def equivalence_feed_forward(self, builder):
-        self._equivalence(builder, 
-                          pybrainbridge._FeedForwardNetwork, 
-                          FeedForwardNetwork)
-                          
-    def equivalence_recurrent(self, builder):
-        self._equivalence(builder,
-                          pybrainbridge._RecurrentNetwork,
-                          RecurrentNetwork)
-
-    def _equivalence(self, builder, aracclass, pybrainclass):
-        _net = aracclass()
+        _net = pybrainbridge._FeedForwardNetwork()
         builder(_net)
-        net = pybrainclass()
+        net = FeedForwardNetwork()
         builder(net)
         
         inpt = scipy.random.random(net.indim)
-        self.assertArrayNear(net.activate(inpt), 
-                             _net.activate(inpt))
+        pybrain_res = net.activate(inpt)
+        arac_res = _net.activate(inpt)
+        self.assertArrayNear(pybrain_res, arac_res)
 
         error = scipy.random.random(net.outdim)
-        self.assertArrayNear(net.backActivate(error), 
-                             _net.backActivate(error))
+        pybrain_res = net.backActivate(error)
+        arac_res = _net.backActivate(error)
+        self.assertArrayNear(pybrain_res, arac_res)
                              
         inpt = scipy.random.random(net.indim)
-        self.assertArrayNear(net.activate(inpt), 
-                             _net.activate(inpt))
+        pybrain_res = net.activate(inpt)
+        arac_res = _net.activate(inpt)
+        self.assertArrayNear(pybrain_res, arac_res)
                              
         error = scipy.random.random(net.outdim)
-        self.assertArrayNear(net.backActivate(error), 
-                             _net.backActivate(error))
+        pybrain_res = net.backActivate(error)
+        arac_res = _net.backActivate(error)
+        self.assertArrayNear(pybrain_res, arac_res)
+                          
+    def equivalence_recurrent(self, builder):
+        _net = pybrainbridge._RecurrentNetwork()
+        builder(_net)
+        net = RecurrentNetwork()
+        builder(net)
         
-    def testTwoLayerNetwork(self):
+        self.assertEqual(_net.proxies[_net].get_mode(), 2, 
+                         "Mode of _RecurrentNetwork is not 'Sequential'.")
+        self.assertEqual(_net.proxies[_net['in']].get_mode(), 2, 
+                         "Mode of input layer is not 'Sequential'.")
+        self.assertEqual(_net.proxies[_net['out']].get_mode(), 2, 
+                         "Mode of output layer is not 'Sequential'.")
+
+        self.assertEqual(net.offset, 0)
+        self.assertEqual(_net.offset, 0)
+        self.assertEqual(_net.proxies[_net['in']].timestep(), 0)
+        self.assertEqual(_net.proxies[_net['out']].timestep(), 0)
+        
+        inpt = range(net.indim)
+        pybrain_res = net.activate(inpt)
+        arac_res = _net.activate(inpt)
+        
+        print _net.inputbuffer
+        print _net.outputbuffer
+        
+        self.assertArrayNear(pybrain_res, arac_res)
+        self.assertEqual(net.offset, 1)
+        self.assertEqual(_net.offset, 1)
+        self.assertEqual(_net.proxies[_net['in']].timestep(), 1)
+        self.assertEqual(_net.proxies[_net['out']].timestep(), 1)
+
+        inpt = range(2, net.indim + 2)
+        pybrain_res = net.activate(inpt)
+        arac_res = _net.activate(inpt)
+
+        print "Network input", _net.inputbuffer
+        print "Network output", _net.outputbuffer
+        print "Inlayer input", _net['in'].inputbuffer
+        print "Inlayer output", _net['in'].outputbuffer
+        print "Outlayer input", _net['out'].inputbuffer
+        print "Outlayer output", _net['out'].outputbuffer
+
+        self.assertEqual(net.offset, 2)
+        self.assertEqual(_net.offset, 2)
+        self.assertArrayNear(pybrain_res, arac_res)
+        self.assertEqual(_net.proxies[_net['in']].timestep(), 2)
+        self.assertEqual(_net.proxies[_net['out']].timestep(), 2)
+
+        error = range(net.outdim)
+        pybrain_res = net.backActivate(error)
+        arac_res = _net.backActivate(error)
+        self.assertArrayNear(pybrain_res, arac_res)
+                             
+        error = range(net.outdim)[::-1]
+        pybrain_res = net.backActivate(error)
+        arac_res = _net.backActivate(error)
+        self.assertArrayNear(pybrain_res, arac_res)
+
+    def _testTwoLayerNetwork(self):
         self.equivalence_feed_forward(self.two_layer_network)
 
     def testRecTwoLayerNetwork(self):

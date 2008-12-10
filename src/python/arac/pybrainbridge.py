@@ -45,26 +45,55 @@ class PybrainAracMapper(cppbridge.ProxyContainer):
     handlers to create new ones from pybrain objects."""
 
     def _network_handler(self, network):
-        return cppbridge.Network(
-            network.inputbuffer, network.outputbuffer, 
-            network.inputerror, network.outputerror)
+        # See if there already is a proxy:
+        try: 
+            proxy = self.map[network]
+            proxy.init_buffer('input', network.inputbuffer)
+            proxy.init_buffer('output', network.outputbuffer)
+            proxy.init_buffer('inerror', network.inputerror)
+            proxy.init_buffer('outerror', network.outputerror)
+        except KeyError:
+            proxy = cppbridge.Network(
+                        network.inputbuffer, network.outputbuffer, 
+                        network.inputerror, network.outputerror)
+        return proxy
 
     def _simple_layer_handler(self, layer):
-        s = str(type(layer))
-        s = s[s.rfind('.') + 1:s.rfind("'")]
-        return cppbridge.SimpleLayer(
-            s, layer.dim, 
-            layer.inputbuffer, layer.outputbuffer, 
-            layer.inputerror, layer.outputerror)
+        try:
+            proxy = self.map[layer]
+            proxy.init_buffer('input', layer.inputbuffer)
+            proxy.init_buffer('output', layer.outputbuffer)
+            proxy.init_buffer('inerror', layer.inputerror)
+            proxy.init_buffer('outerror', layer.outputerror)
+        except KeyError:
+            s = str(type(layer))
+            s = s[s.rfind('.') + 1:s.rfind("'")]
+            proxy = cppbridge.SimpleLayer(
+                        s, layer.dim, 
+                        layer.inputbuffer, layer.outputbuffer, 
+                        layer.inputerror, layer.outputerror)
+        return proxy
         
     def _bias_handler(self, bias):
         return cppbridge.Bias()
         
     def _lstm_handler(self, layer):
-        return cppbridge.LstmLayer(layer.dim, 
-                                   layer.inputbuffer, layer.outputbuffer, layer.state,
-                                   layer.inputerror, layer.outputerror, layer.stateError)
-        
+        # See if there already is a proxy:
+        try: 
+            proxy = self.map[layer]
+            proxy.init_buffer('input', layer.inputbuffer)
+            proxy.init_buffer('output', layer.outputbuffer)
+            proxy.init_buffer('inerror', layer.inputerror)
+            proxy.init_buffer('outerror', layer.outputerror)
+            proxy.init_buffer('state', layer.state)
+            proxy.init_buffer('state_error', layer.stateError)
+        except KeyError:
+            proxy = cppbridge.LstmLayer(
+                        layer.dim, 
+                        layer.inputbuffer, layer.outputbuffer, layer.state,
+                        layer.inputerror, layer.outputerror, layer.stateError)
+        return proxy
+
     def _full_connection_handler(self, con):
         try:
             incoming = self.map[con.inmod]
@@ -84,7 +113,6 @@ class PybrainAracMapper(cppbridge.ProxyContainer):
             incoming, outgoing, 
             con.inSliceFrom, con.inSliceTo,
             con.outSliceFrom, con.outSliceTo)
-        
         
     def handle(self, obj):
         handlers = {
@@ -113,14 +141,18 @@ class _Network(Network):
     method. The only way to propagate the error back is .backActivate().
     """
 
-    offset = 0
+    @property
+    def offset(self):
+        return self.proxies[self].timestep()
 
     def __init__(self, *args, **kwargs):
         super(_Network, self).__init__(*args, **kwargs)
         # Mapping the components of the network to their proxies.
+        self.proxies = PybrainAracMapper()
 
     def reset(self):
-        self.proxies[self].clear()
+        # self.proxies[self].clear()
+        pass
         
     def _growBuffers(self):
         super(_Network, self)._growBuffers()
@@ -137,7 +169,6 @@ class _Network(Network):
         """Build up a C++-network."""
         # We first add all the modules, since we have to know about them before
         # we can add connections.
-        self.proxies = PybrainAracMapper()
         net_proxy = self.proxies.handle(self)
         
         for module in self.modules:
@@ -152,7 +183,7 @@ class _Network(Network):
         
     def activate(self, inputbuffer):
         self.proxies[self].activate(inputbuffer)
-        return self.outputbuffer[self.offset]
+        return self.outputbuffer[self.offset - 1]
         
     def backActivate(self, outerr):
         self.proxies[self].back_activate(outerr)
@@ -181,9 +212,15 @@ class _RecurrentNetwork(RecurrentNetworkComponent, _Network):
     def __init__(self, *args, **kwargs):
         _Network.__init__(self, *args, **kwargs)        
         RecurrentNetworkComponent.__init__(self, *args, **kwargs)
-        # TODO: make the network a sequential one.
 
     def activate(self, inputbuffer):
+        while True:
+            # Grow buffers until they have the correct size.
+            if self.offset < self.outputbuffer.shape[0]:
+                break
+            # TODO: _growBuffers() is called more than once.
+            print "growing buffers"
+            self._growBuffers()
         result = _Network.activate(self, inputbuffer)
         return result
 
@@ -195,7 +232,10 @@ class _RecurrentNetwork(RecurrentNetworkComponent, _Network):
         """Build up a module-graph of c structs in memory."""
         _Network.buildCStructure(self)
         net_proxy = self.proxies[self]
+        net_proxy.set_mode('Sequential')
         for connection in self.recurrentConns:
             con_proxy = self.proxies.handle(connection)
             con_proxy.set_recurrent(1)
             net_proxy.add_connection(con_proxy)
+        for component in self.proxies.map.values():
+            component.set_mode('Sequential')

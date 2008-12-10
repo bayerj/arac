@@ -54,6 +54,7 @@ BaseNetwork::activate(double* input_p)
            (void*) input_p, 
            sizeof(double) * _insize);
     forward();
+    assert(timestep() > 0);
     return output()[timestep() - 1];
 }
 

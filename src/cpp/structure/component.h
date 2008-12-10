@@ -54,6 +54,7 @@ class Component
         // Tell if the module is error agnostic.
         bool error_agnostic();
         
+        
     protected:
 
         virtual void pre_forward();
@@ -219,7 +220,8 @@ Component::timestep()
 {
     return _timestep;
 }
-    
+
+
 }
 }
 

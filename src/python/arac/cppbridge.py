@@ -33,6 +33,7 @@ def arac_call(code, namespace=None):
     libraries = ['arac']
     type_converters = scipy.weave.converters.blitz
     result = scipy.weave.inline(code, namespace.keys(), namespace,
+                       force=False,
                        include_dirs=['/Users/bayerj/devel/arac0.3/src/cpp'],
                        library_dirs=['/Users/bayerj/devel/arac0.3'],
                        support_code=support_code,
@@ -51,7 +52,7 @@ class ProxyContainer(object):
         self.clear()
         
     def __del__(self):
-        for proxy in self.map.items():
+        for proxy in self.map.values():
             proxy.free()
         
     def __getitem__(self, key):
@@ -80,14 +81,19 @@ class Proxy(object):
         if namespace is None:
             namespace = {}
         code = "%(typ)s* p = (%(typ)s*) address; \n" % {'typ': self.typ} + code 
-        # print code
-        # print namespace
-        # print
         namespace['address'] = self.address
         return arac_call(code, namespace)
 
 
 class Component(Proxy):
+    
+    modes = {
+        'Simple': 0,
+        'ErrorAgnostic': 1,
+        'Sequential': 2,
+        
+        'SequentialErrorAgnostic': 3,
+    }
     
     def __init__(self):
         if self.typ is None:
@@ -108,7 +114,22 @@ class Component(Proxy):
     def backward(self):
         code = "p->backward();"
         self.pcall(code)
+        
+    def set_mode(self, mode):
+        try: 
+            mode = self.modes[mode]
+        except KeyError:
+            pass
+        if not isinstance(mode, int):
+            raise ValueError('Unknown mode: %s' % mode)
+        self.pcall("p->set_mode((Component::Mode) mode);", {'mode': mode})
+        
+    def get_mode(self):
+        return self.pcall("return_val = p->get_mode();")
     
+    def timestep(self):
+        return self.pcall("return_val = p->timestep();")
+        
     
 class Parametrized(Proxy):
 
@@ -120,21 +141,16 @@ class Parametrized(Proxy):
 
 class Module(Component):
 
-    def __init__(self, inpt, outpt, inerror=None, outerror=None):
+    def __init__(self, inpt, outpt, inerror, outerror):
         super(Module, self).__init__()
-        self.inpt = inpt
-        self.outpt = outpt
-        self.inerror = inerror
-        self.outerror = outerror
-        self.init_buffers()
-        
-    def init_buffers(self):
-        self.init_buffer('input', self.inpt)
-        self.init_buffer('output', self.outpt)
-        self.init_buffer('inerror', self.inerror)
-        self.init_buffer('outerror', self.outerror)
+        self.buffer_arrays = {}
+        self.init_buffer('input', inpt)
+        self.init_buffer('output', outpt)
+        self.init_buffer('inerror', inerror)
+        self.init_buffer('outerror', outerror)
         
     def init_buffer(self, buffername, arr):
+        self.buffer_arrays[buffername] = arr
         self.pcall("p->%s().free_memory();" % buffername)
         for row in arr:
             self.append_to_buffer(buffername, row.ctypes.data)
@@ -175,19 +191,13 @@ class LstmLayer(SimpleLayer):
     typ = 'LstmLayer'
     
     def __init__(self, size, 
-                 inpt, outpt, state,
-                 inerror=None, outerror=None, state_error=None):
-        self.state = state
-        self.state_error = state_error
-        super(LstmLayer, self).__init__(
-            self.typ, size, inpt, outpt, inerror, outerror)
-        
-    def init_buffers(self):
+                 inpt, outpt, state, inerror, outerror, state_error):
+        super(LstmLayer, self
+            ).__init__(self.typ, size, inpt, outpt, inerror, outerror)
         self.init_buffer('state', self.state)
         self.init_buffer('state_error', self.state_error)
-        super(LstmLayer, self).init_buffers()
-
-
+        
+        
 class Connection(Component):
     
     typ = 'Connection'
@@ -228,6 +238,9 @@ class Connection(Component):
                                             'outgoingstop': outgoingstop})
     def set_recurrent(self, value):
         self.pcall('p->set_recurrent(value);', {'value': value})
+        
+    def get_recurrent(self):
+        return self.pcall('return_val = p->get_recurrent();')
             
     
 class IdentityConnection(Connection):
@@ -305,11 +318,3 @@ class Network(BaseNetwork):
         
     def clear(self):
         self.pcall('p->clear();')
-        
-        
-class Mdrnn(BaseNetwork):
-    
-    def __init__(self, layerklass, timedim, hiddensize):
-        pass
-        
-

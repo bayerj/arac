@@ -243,6 +243,8 @@ Network::sort()
     }
 
     // Fill the list of sorted components correctly.
+    // TODO: connections should be ordered by recurrency in descending order and
+    // and then added in the front of the sorted components vector.
     _components_sorted.clear();
     for(mod_iter = sorted.begin(); mod_iter != sorted.end(); mod_iter++)
     {

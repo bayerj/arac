@@ -99,7 +99,7 @@ class TestConnection(TestCase):
             outlayer_input, outlayer_output, 
             outlayer_inerror, outlayer_outerror)
             
-        con = cppbridge.IdentityConnection(inlayer.address, outlayer.address)
+        con = cppbridge.IdentityConnection(inlayer, outlayer)
             
         inlayer_input[0, :] = 2., 3.
         
@@ -119,6 +119,68 @@ class TestConnection(TestCase):
         inlayer.backward()
         
         self.assertArrayNear(inlayer_inerror[0], (0.5, 1.2))
+        
+    def testRecurrentIdentityConnection(self):
+        inlayer_input = scipy.zeros((2, 2), dtype='float64')
+        inlayer_output = scipy.zeros((2, 2), dtype='float64')
+        inlayer_inerror = scipy.zeros((2, 2), dtype='float64')
+        inlayer_outerror = scipy.zeros((2, 2), dtype='float64')
+        outlayer_input = scipy.zeros((2, 2), dtype='float64')
+        outlayer_output = scipy.zeros((2, 2), dtype='float64')
+        outlayer_inerror = scipy.zeros((2, 2), dtype='float64')
+        outlayer_outerror = scipy.zeros((2, 2), dtype='float64')
+
+        inlayer = cppbridge.SimpleLayer(
+            'LinearLayer', 2, 
+            inlayer_input, inlayer_output, 
+            inlayer_inerror, inlayer_outerror)
+        inlayer.set_mode('Sequential')
+            
+        outlayer = cppbridge.SimpleLayer(
+            'LinearLayer', 2,
+            outlayer_input, outlayer_output, 
+            outlayer_inerror, outlayer_outerror)
+        outlayer.set_mode('Sequential')
+            
+        con = cppbridge.IdentityConnection(inlayer, outlayer)
+        con.set_mode('Sequential')
+        con.set_recurrent(1)
+            
+        inlayer_input[0, :] = 2., 3.
+        inlayer_input[1, :] = 0.5, 3.2
+        
+        inlayer.forward()
+        self.assertArrayNear(inlayer_output[0], (2, 3))
+        
+        con.forward()
+        self.assertArrayNear(outlayer_input[0], (0, 0))
+
+        outlayer.forward()
+        self.assertArrayNear(outlayer_output[0], (0, 0))
+
+        inlayer.forward()
+        self.assertArrayNear(inlayer_output[1], (0.5, 3.2))
+        
+        con.forward()
+        self.assertArrayNear(outlayer_input[1], (2, 3))
+
+        outlayer.forward()
+        self.assertArrayNear(outlayer_output[1], (2, 3))
+
+        outlayer_outerror[1, :] = 0.5, 1.2
+        
+        outlayer.backward()
+        con.backward()
+        inlayer.backward()
+        
+        self.assertArrayNear(inlayer_inerror[1], (0, 0))
+
+        outlayer.backward()
+        con.backward()
+        inlayer.backward()
+        
+        self.assertArrayNear(inlayer_inerror[0], (0.5, 1.2))
+
         
     def testFullConnection(self):
         inlayer_input = scipy.zeros((1, 2), dtype='float64')
@@ -144,7 +206,7 @@ class TestConnection(TestCase):
         derivatives = scipy.zeros(6, dtype='float64')
         
         con = cppbridge.FullConnection(
-            inlayer.address, outlayer.address, 
+            inlayer, outlayer, 
             parameters, derivatives)
             
         inlayer_input[0, :] = 2., 3.
@@ -200,14 +262,14 @@ class TestNetwork(TestCase):
         derivatives = scipy.zeros(6, dtype='float64')
         
         con = cppbridge.FullConnection(
-            inlayer.address, outlayer.address, 
+            inlayer, outlayer,
             parameters, derivatives)
             
         net = cppbridge.Network(network_input, network_output, 
                                 network_inerror, network_outerror)
-        net.add_module(inlayer.address, inpt=True)
-        net.add_module(outlayer.address, outpt=True)    
-        net.add_connection(con.address)
+        net.add_module(inlayer, inpt=True)
+        net.add_module(outlayer, outpt=True)    
+        net.add_connection(con)
         
         net.activate((2, 3))
         
@@ -223,6 +285,105 @@ class TestNetwork(TestCase):
         self.assertArrayNear(network_outerror[0], (0.5, 1.2, 3.4))
         self.assertArrayNear(inlayer_inerror[0], (16, 21.1))
         self.assertArrayNear(network_inerror[0], (16, 21.1))
+        self.assertArrayNear(derivatives, (1, 1.5, 2.4, 3.6, 6.8, 10.2))
+        
+    def testRecTwoLayerNetwork(self):
+        network_input = scipy.zeros((2, 2), dtype='float64')
+        network_inerror = scipy.zeros((2, 2), dtype='float64')
+        network_output = scipy.zeros((2, 3), dtype='float64')
+        network_outerror = scipy.zeros((2, 3), dtype='float64')
+        
+        inlayer_input = scipy.zeros((2, 2), dtype='float64')
+        inlayer_output = scipy.zeros((2, 2), dtype='float64')
+        inlayer_inerror = scipy.zeros((2, 2), dtype='float64')
+        inlayer_outerror = scipy.zeros((2, 2), dtype='float64')
+        
+        outlayer_input = scipy.zeros((2, 3), dtype='float64')
+        outlayer_output = scipy.zeros((2, 3), dtype='float64')
+        outlayer_inerror = scipy.zeros((2, 3), dtype='float64')
+        outlayer_outerror = scipy.zeros((2, 3), dtype='float64')
+
+        inlayer = cppbridge.SimpleLayer(
+            'LinearLayer', 2, 
+            inlayer_input, inlayer_output, 
+            inlayer_inerror, inlayer_outerror)
+        inlayer.set_mode('Sequential')
+            
+        outlayer = cppbridge.SimpleLayer(
+            'LinearLayer', 3,
+            outlayer_input, outlayer_output, 
+            outlayer_inerror, outlayer_outerror)
+        outlayer.set_mode('Sequential')
+
+        parameters = scipy.array((0, 1, 2, 3, 4, 5), dtype='float64')
+        derivatives = scipy.zeros(6, dtype='float64')
+        
+        con = cppbridge.FullConnection(
+            inlayer, outlayer, 
+            parameters, derivatives)
+        con.set_mode('Sequential')
+        con.set_recurrent(1)
+            
+        net = cppbridge.Network(network_input, network_output, 
+                                network_inerror, network_outerror)
+        net.set_mode('Sequential')
+
+        net.add_module(inlayer, inpt=True)
+        net.add_module(outlayer, outpt=True)    
+        net.add_connection(con)
+        
+        self.assertEqual(net.timestep(), 0)
+        self.assertEqual(inlayer.timestep(), 0)
+        self.assertEqual(outlayer.timestep(), 0)
+        self.assertEqual(con.timestep(), 0)
+        
+        net.activate((2, 3))
+
+        self.assertEqual(net.timestep(), 1)
+        self.assertEqual(inlayer.timestep(), 1)
+        self.assertEqual(outlayer.timestep(), 1)
+        self.assertEqual(con.timestep(), 1)
+        
+        self.assertArrayNear(network_input[0], (2, 3))
+        self.assertArrayNear(inlayer_input[0], (2, 3))
+        self.assertArrayNear(inlayer_output[0], (2, 3))
+        self.assertArrayNear(outlayer_input[0], (0, 0, 0))
+        self.assertArrayNear(outlayer_output[0], (0, 0, 0))
+        self.assertArrayNear(network_output[0], (0, 0, 0))
+
+        net.activate((1, 2))
+
+        self.assertEqual(net.timestep(), 2)
+        self.assertEqual(inlayer.timestep(), 2)
+        self.assertEqual(outlayer.timestep(), 2)
+        self.assertEqual(con.timestep(), 2)
+        
+        self.assertArrayNear(network_input[1], (1, 2))
+        self.assertArrayNear(inlayer_input[1], (1, 2))
+        self.assertArrayNear(inlayer_output[1], (1, 2))
+        self.assertArrayNear(outlayer_input[1], (3, 13, 23))
+        self.assertArrayNear(outlayer_output[1], (3, 13, 23))
+        self.assertArrayNear(network_output[1], (3, 13, 23))
+
+        net.back_activate((0.5, 1.2, 3.4))
+        
+        self.assertArrayNear(network_outerror[1], (0.5, 1.2, 3.4))
+        self.assertArrayNear(outlayer_outerror[1], (0.5, 1.2, 3.4))
+        self.assertArrayNear(outlayer_inerror[1], (0.5, 1.2, 3.4))
+        self.assertArrayNear(inlayer_outerror[1], (0, 0))
+        self.assertArrayNear(inlayer_inerror[1], (0, 0))
+        self.assertArrayNear(network_inerror[1], (0, 0))
+        self.assertArrayNear(derivatives, (0, 0, 0, 0, 0, 0))
+        
+        net.back_activate((1, 1.4, -3.4))
+
+        self.assertArrayNear(network_outerror[0], (1, 1.4, -3.4))
+        self.assertArrayNear(outlayer_outerror[0], (1, 1.4, -3.4))
+        self.assertArrayNear(outlayer_inerror[0], (1, 1.4, -3.4))
+        self.assertArrayNear(inlayer_outerror[0], (16, 21.1))
+        self.assertArrayNear(inlayer_inerror[0], (16, 21.1))
+        self.assertArrayNear(network_inerror[0], (16, 21.1))
+        
         self.assertArrayNear(derivatives, (1, 1.5, 2.4, 3.6, 6.8, 10.2))
 
 
