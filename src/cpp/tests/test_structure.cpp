@@ -89,7 +89,6 @@ TEST(TestModules, BiasUnit) {
 }
 
 
-
 TEST(TestModules, LinearLayer) {
     LinearLayer* layer_p = new LinearLayer(2);
 
@@ -1164,6 +1163,69 @@ TEST(TestNetwork, TestTwoLayerNetwork) {
     EXPECT_DOUBLE_EQ(-8, con_p->get_derivatives()[3])
         << "Derivatives incorrect.";
 }
+ 
+        
+TEST(TestNetwork, TestRecurrentLayerNetwork) {
+    Network* net_p = new Network();
+    net_p->set_mode(Component::Sequential);
+    
+    LinearLayer* inlayer_p = new LinearLayer(2);
+    inlayer_p->set_mode(Component::Sequential);
+
+    LinearLayer* outlayer_p = new LinearLayer(2);
+    outlayer_p->set_mode(Component::Sequential);
+
+    IdentityConnection* con_p = new IdentityConnection(inlayer_p, outlayer_p);
+    con_p->set_mode(Component::Sequential);
+
+    IdentityConnection* rcon_p = new IdentityConnection(inlayer_p, outlayer_p);
+    rcon_p->set_mode(Component::Sequential);
+    rcon_p->set_recurrent(1);
+    
+    net_p->add_module(inlayer_p, Network::InputModule);
+    net_p->add_module(outlayer_p, Network::OutputModule);
+    net_p->add_connection(con_p);
+    net_p->add_connection(rcon_p);
+    
+    double* input_p = new double[2];
+    input_p[0] = 2;
+    input_p[1] = 4;
+    
+    net_p->activate(input_p);
+
+    EXPECT_DOUBLE_EQ(2, outlayer_p->output()[0][0])
+        << "Forward pass incorrect.";
+    EXPECT_DOUBLE_EQ(4, outlayer_p->output()[0][1])
+        << "Forward pass incorrect.";
+
+    input_p[0] = 3;
+    input_p[1] = 6;
+    net_p->activate(input_p);
+
+    EXPECT_DOUBLE_EQ(5, outlayer_p->output()[1][0])
+        << "Forward pass incorrect.";
+    EXPECT_DOUBLE_EQ(10, outlayer_p->output()[1][1])
+        << "Forward pass incorrect.";
+
+    double* outerror_p = new double[2];
+    outerror_p[0] = 3;
+    outerror_p[1] = -2;
+    net_p->back_activate(outerror_p);
+
+    EXPECT_DOUBLE_EQ(3, net_p->inerror()[1][0])
+        << "Error not copied into network inerror buffer.";
+    EXPECT_DOUBLE_EQ(-2, net_p->inerror()[1][1])
+        << "Error not copied into network inerror buffer.";
+
+    outerror_p[0] = 6;
+    outerror_p[1] = -3;
+    net_p->back_activate(outerror_p);
+
+    EXPECT_DOUBLE_EQ(9, net_p->inerror()[0][0])
+        << "Error not returned correctly.";
+    EXPECT_DOUBLE_EQ(-5, net_p->inerror()[0][1])
+        << "Error not returned correctly.";
+}
         
         
 TEST(TestNetwork, TestRecurrentNetworkTimesteps) {
@@ -1259,6 +1321,9 @@ TEST(TestNetwork, TestRecurrentNetworkTimesteps) {
         << "Wrong timestep.";
 
 }
+
+
+
 
         
         
