@@ -19,8 +19,7 @@ Buffer::Buffer(int rowsize, bool owner) :
 
 Buffer::~Buffer()
 {
-    if (owner())
-        free_memory();
+    free_memory();
 }
 
 
@@ -60,10 +59,13 @@ Buffer::clear_at(int index)
 
 void Buffer::free_memory()
 {
-    DoublePtrVec::iterator iter;
-    for(iter = _content.begin(); iter != _content.end(); iter++)
+    if (owner())
     {
-        delete[] *iter;
+        DoublePtrVec::iterator iter;
+        for(iter = _content.begin(); iter != _content.end(); iter++)
+        {
+            delete[] *iter;
+        }
     }
     _content.clear();
 }
