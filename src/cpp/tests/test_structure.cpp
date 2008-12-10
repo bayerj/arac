@@ -1166,6 +1166,102 @@ TEST(TestNetwork, TestTwoLayerNetwork) {
 }
         
         
+TEST(TestNetwork, TestRecurrentNetworkTimesteps) {
+    Network* net_p = new Network();
+    
+    LinearLayer* inlayer_p = new LinearLayer(2);
+    LinearLayer* outlayer_p = new LinearLayer(2);
+    FullConnection* con_p = new FullConnection(inlayer_p, outlayer_p);
+    
+    net_p->add_module(inlayer_p, Network::InputModule);
+    net_p->add_module(outlayer_p, Network::OutputModule);
+    net_p->add_connection(con_p);
+    
+    net_p->set_mode(Component::Sequential);
+    inlayer_p->set_mode(Component::Sequential);
+    outlayer_p->set_mode(Component::Sequential);
+    con_p->set_mode(Component::Sequential);
+    
+    double* input_p = new double[3];
+    input_p[0] = 2;
+    input_p[1] = 4;
+    input_p[1] = 6;
+
+    ASSERT_EQ(0, net_p->timestep())
+        << "Wrong timestep.";
+    ASSERT_EQ(0, inlayer_p->timestep())
+        << "Wrong timestep.";
+    ASSERT_EQ(0, outlayer_p->timestep())
+        << "Wrong timestep.";
+    ASSERT_EQ(0, con_p->timestep())
+        << "Wrong timestep.";
+
+    net_p->activate(input_p);
+    ASSERT_EQ(1, net_p->timestep())
+        << "Wrong timestep.";
+    ASSERT_EQ(1, inlayer_p->timestep())
+        << "Wrong timestep.";
+    ASSERT_EQ(1, outlayer_p->timestep())
+        << "Wrong timestep.";
+    ASSERT_EQ(1, con_p->timestep())
+        << "Wrong timestep.";
+
+    net_p->activate(input_p);
+    ASSERT_EQ(2, net_p->timestep())
+        << "Wrong timestep.";
+    ASSERT_EQ(2, inlayer_p->timestep())
+        << "Wrong timestep.";
+    ASSERT_EQ(2, outlayer_p->timestep())
+        << "Wrong timestep.";
+    ASSERT_EQ(2, con_p->timestep())
+        << "Wrong timestep.";
+
+    net_p->activate(input_p);
+    ASSERT_EQ(3, net_p->timestep())
+        << "Wrong timestep.";
+    ASSERT_EQ(3, inlayer_p->timestep())
+        << "Wrong timestep.";
+    ASSERT_EQ(3, outlayer_p->timestep())
+        << "Wrong timestep.";
+    ASSERT_EQ(3, con_p->timestep())
+        << "Wrong timestep.";
+
+    net_p->back_activate(input_p);
+    ASSERT_EQ(2, net_p->timestep())
+        << "Wrong timestep.";
+    ASSERT_EQ(2, inlayer_p->timestep())
+        << "Wrong timestep.";
+    ASSERT_EQ(2, outlayer_p->timestep())
+        << "Wrong timestep.";
+    ASSERT_EQ(2, con_p->timestep())
+        << "Wrong timestep.";
+
+    net_p->back_activate(input_p);
+    ASSERT_EQ(1, net_p->timestep())
+        << "Wrong timestep.";
+    ASSERT_EQ(1, net_p->timestep())
+        << "Wrong timestep.";
+    ASSERT_EQ(1, inlayer_p->timestep())
+        << "Wrong timestep.";
+    ASSERT_EQ(1, outlayer_p->timestep())
+        << "Wrong timestep.";
+    ASSERT_EQ(1, con_p->timestep())
+        << "Wrong timestep.";
+
+    net_p->back_activate(input_p);
+    ASSERT_EQ(0, net_p->timestep())
+        << "Wrong timestep.";
+    ASSERT_EQ(0, inlayer_p->timestep())
+        << "Wrong timestep.";
+    ASSERT_EQ(0, outlayer_p->timestep())
+        << "Wrong timestep.";
+    ASSERT_EQ(0, con_p->timestep())
+        << "Wrong timestep.";
+
+}
+
+        
+        
 TEST(TestNetwork, TestMdrnn)
 {
     Mdrnn<LinearLayer> net(2, 1);
