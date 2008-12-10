@@ -40,19 +40,22 @@ IdentityConnection::~IdentityConnection()
 void
 IdentityConnection::_forward()
 {
-    if ((_recurrent) && (_timestep == 0))
+    if ((_recurrent) && (timestep() == 0))
     {
         // Don't use recurrent cons in the first timestep.
         return;
     }
     
-    double* sourcebuffer_p = _recurrent ? _incoming_p->output()[_timestep - 1] :
-                                          _incoming_p->output()[_timestep];
+    double* sourcebuffer_p = _recurrent ? _incoming_p->output()[timestep() - 1] :
+                                          _incoming_p->output()[timestep()];
     sourcebuffer_p += _incomingstart;
     
     double* sinkbuffer_p = _outgoing_p->input()[_timestep] + _outgoingstart;
-    int size = (_incomingstop - _incomingstart) * sizeof(double);
-    memcpy((void*) sinkbuffer_p, (void*) sourcebuffer_p, size);
+    int size = (_incomingstop - _incomingstart);
+    for(int i = 0; i < size; i++)
+    {
+        sinkbuffer_p[i] += sourcebuffer_p[i];
+    }
 }
 
 
@@ -69,6 +72,9 @@ IdentityConnection::_backward()
     sinkbuffer_p += _incomingstart;
 
     double* sourcebuffer_p = _outgoing_p->inerror()[this_timestep  + get_recurrent()] + _outgoingstart;
-    int size = (_incomingstop - _incomingstart) * sizeof(double);
-    memcpy((void*) sinkbuffer_p, (void*) sourcebuffer_p, size);
+    int size = (_incomingstop - _incomingstart);
+    for(int i = 0; i < size; i++)
+    {
+        sinkbuffer_p[i] += sourcebuffer_p[i];
+    }
 }
