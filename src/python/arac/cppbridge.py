@@ -20,6 +20,10 @@ import scipy.weave
 import scipy.weave.converters
 
 
+class AracUsageException(Exception):
+    pass
+
+
 def arac_call(code, namespace=None):
     if namespace is None:
         namespace = {}
@@ -57,6 +61,9 @@ class ProxyContainer(object):
         
     def __getitem__(self, key):
         return self.map[key]
+        
+    def __contains__(self, key):
+        return key in self.map
         
     def clear(self):
         """Free the current map and all the held structures."""
@@ -194,8 +201,8 @@ class LstmLayer(SimpleLayer):
                  inpt, outpt, state, inerror, outerror, state_error):
         super(LstmLayer, self
             ).__init__(self.typ, size, inpt, outpt, inerror, outerror)
-        self.init_buffer('state', self.state)
-        self.init_buffer('state_error', self.state_error)
+        self.init_buffer('state', state)
+        self.init_buffer('state_error', state_error)
         
         
 class Connection(Component):
@@ -277,14 +284,18 @@ class FullConnection(Connection):
 class BaseNetwork(Module):
     
     def activate(self, arr):
-        if type(arr) != scipy.ndarray:
-            arr = scipy.array(arr, dtype='float64')
+        if not isinstance(arr, scipy.ndarray):
+            arr = scipy.array(arr)
+        arr = arr.astype('float64')
         self.pcall('p->activate((double*) input_p);', 
                    {'input_p': arr.ctypes.data})
         
     def back_activate(self, arr):
-        if type(arr) != scipy.ndarray:
+        if self.timestep() < 1:
+            raise AracUsageException("Cannot backward in timestep 0.")
+        if not isinstance(arr, scipy.ndarray):
             arr = scipy.array(arr)
+        arr = arr.astype('float64')
         self.pcall('p->back_activate((double*) error_p);', 
                    {'error_p': arr.ctypes.data})
 

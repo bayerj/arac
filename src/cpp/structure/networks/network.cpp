@@ -49,7 +49,6 @@ Network::add_module(Module* module_p, Network::ModuleType type)
     {
         _outmodules.push_back(module_p);
     }
-
 }
 
 
