@@ -66,7 +66,7 @@ Module::forward()
 void
 Module::clear()
 {
-    _timestep = 0;
+    Component::clear();
     if (_input_p != 0)
     {
         _input_p->clear();

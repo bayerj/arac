@@ -28,7 +28,7 @@ def arac_call(code, namespace=None):
     if namespace is None:
         namespace = {}
     support_code = """
-    #include "/Users/bayerj/devel/arac0.3/src/cpp/arac.h"
+    #include "/Users/bayerj/devel/arac/src/cpp/arac.h"
     
     using namespace arac::structure::networks;
     using namespace arac::structure::modules;
@@ -38,8 +38,8 @@ def arac_call(code, namespace=None):
     type_converters = scipy.weave.converters.blitz
     result = scipy.weave.inline(code, namespace.keys(), namespace,
                        force=False,
-                       include_dirs=['/Users/bayerj/devel/arac0.3/src/cpp'],
-                       library_dirs=['/Users/bayerj/devel/arac0.3'],
+                       include_dirs=['/Users/bayerj/devel/arac/src/cpp'],
+                       library_dirs=['/Users/bayerj/devel/arac'],
                        support_code=support_code,
                        libraries=libraries,
                        type_converters=type_converters,
@@ -144,6 +144,11 @@ class Parametrized(Proxy):
         parameters = arr.ctypes.data
         code = "p->set_parameters((double*) parameters);"
         self.pcall(code, {'parameters': parameters})
+
+    def set_derivatives(self, arr):
+        derivatives = arr.ctypes.data
+        code = "p->set_derivatives((double*) derivatives);"
+        self.pcall(code, {'derivatives': derivatives})
     
 
 class Module(Component):

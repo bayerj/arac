@@ -1,5 +1,5 @@
 #! /usr/bin/env python2.5
-# -*- coding: utf-8 -*
+# -*- coding: utf-8 -*-
 
 """This module provides a bridge from arac to PyBrain.
 
@@ -150,10 +150,6 @@ class _Network(Network):
         # Mapping the components of the network to their proxies.
         self.proxies = PybrainAracMapper()
 
-    def reset(self):
-        # self.proxies[self].clear()
-        pass
-        
     def _growBuffers(self):
         super(_Network, self)._growBuffers()
         self._rebuild()
@@ -164,6 +160,10 @@ class _Network(Network):
 
     def _rebuild(self):
         self.buildCStructure()
+        
+    def reset(self):
+        net_proxy = self.proxies.handle(self)
+        net_proxy.clear()
 
     def buildCStructure(self):
         """Build up a C++-network."""
