@@ -188,8 +188,20 @@ class TestNetworkEquivalence(TestCase):
         for proxy in proxies:
             self.assertEqual(proxy.timestep(), 2)
 
-    def testTwoLayerNetwork(self):
-        self.equivalence_feed_forward(self.two_layer_network)
+        _net.backActivate((0, 0))
+        self.assertEqual(_net.offset, 2)
+        for proxy in proxies:
+            self.assertEqual(proxy.timestep(), 2)
+
+        _net.backActivate((0, 0))
+        self.assertEqual(_net.offset, 1)
+        for proxy in proxies:
+            self.assertEqual(proxy.timestep(), 1)
+
+        _net.backActivate((0, 0))
+        self.assertEqual(_net.offset, 0)
+        for proxy in proxies:
+            self.assertEqual(proxy.timestep(), 0)
 
     def testLstmNetwork(self):
         self.equivalence_recurrent(self.lstm_network)

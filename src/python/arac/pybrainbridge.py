@@ -26,6 +26,7 @@ from pybrain.structure import (
     SoftmaxLayer,
     PartialSoftmaxLayer,
     IdentityConnection, 
+    LinearConnection, 
     FullConnection,
     Network,
     RecurrentNetwork,
