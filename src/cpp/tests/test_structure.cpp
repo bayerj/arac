@@ -794,6 +794,44 @@ TEST(TestConnections, FullConnection) {
 }
 
 
+TEST(TestConnections, LinearConnection) {
+    LinearLayer* inlayer_p = new LinearLayer(2);
+    LinearLayer* outlayer_p = new LinearLayer(2);
+    
+    inlayer_p->input()[0][0] = 2.;
+    inlayer_p->input()[0][1] = 3.;
+    
+    LinearConnection* con_p = new LinearConnection(inlayer_p, outlayer_p);
+    con_p->get_parameters()[0] = 1.5; 
+    con_p->get_parameters()[1] = 2; 
+    
+    inlayer_p->forward();
+    con_p->forward();
+    
+    EXPECT_DOUBLE_EQ(3, outlayer_p->input()[0][0])
+        << "Forward pass not working.";
+    EXPECT_DOUBLE_EQ(6, outlayer_p->input()[0][1])
+        << "Forward pass not working.";
+    
+    outlayer_p->forward();
+    outlayer_p->outerror()[0][0] = 0.5;
+    outlayer_p->outerror()[0][1] = 1.2;
+    outlayer_p->backward();
+    con_p->backward();
+    
+    EXPECT_DOUBLE_EQ(0.75, inlayer_p->outerror()[0][0])
+            << "Backward pass incorrect.";
+    EXPECT_DOUBLE_EQ(2.4, inlayer_p->outerror()[0][1])
+            << "Backward pass incorrect.";
+
+    EXPECT_DOUBLE_EQ(1, con_p->get_derivatives()[0])
+        << "Backward pass not working.";
+    EXPECT_DOUBLE_EQ(3.6, con_p->get_derivatives()[1])
+        << "Backward pass not working.";
+}
+
+
+
 TEST(TestConnections, FullConnectionSliced) {
     LinearLayer* inlayer_p = new LinearLayer(2);
     LinearLayer* outlayer_p = new LinearLayer(3);
