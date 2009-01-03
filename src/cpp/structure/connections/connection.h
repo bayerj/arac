@@ -20,6 +20,7 @@ namespace connections {
     
 using namespace arac::structure::modules;
 
+// TODO: document.
 
 class Connection : public arac::structure::Component
 {

@@ -10,6 +10,8 @@ namespace arac {
 namespace structure {
     
 
+// TODO: document.
+
 class Parametrized 
 {
     public: 

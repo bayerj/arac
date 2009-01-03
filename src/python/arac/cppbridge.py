@@ -210,6 +210,13 @@ class LstmLayer(SimpleLayer):
         self.init_buffer('state_error', state_error)
         
         
+class Mdrnn(Module):
+    
+    typ = 'Mdrnn'
+    
+    
+        
+        
 class Connection(Component):
     
     typ = 'Connection'
