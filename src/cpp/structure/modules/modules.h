@@ -7,6 +7,7 @@
 
 
 #include "bias.h"
+#include "gate.h"
 #include "linear.h"
 #include "lstm.h"
 #include "mdlstm.h"

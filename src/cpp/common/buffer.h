@@ -14,6 +14,15 @@
 namespace arac {
 namespace common {
 
+//
+// Buffer objects hold pointers to arrays which are serving as 
+// inputs/outputs/errors/etc. to modules. 
+//
+// A buffer is organized in different rows which are held as a vector of double
+// pointers. 
+// A buffer may either "own" its arrays or not own them. In the first case, the 
+// buffer frees the memory of the arrays on destruction. 
+//
 
 class Buffer
 {

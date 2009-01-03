@@ -14,6 +14,8 @@ namespace structure {
 namespace modules {
 
 
+// TODO: document.
+
 class MdlstmLayer : public arac::structure::modules::Module
 {
     public:

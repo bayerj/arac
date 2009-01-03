@@ -25,6 +25,8 @@ using namespace arac::structure::connections;
 using arac::structure::Component;
 
 
+// TODO: document.
+
 class Network : public BaseNetwork
 {
     public: 

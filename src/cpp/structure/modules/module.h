@@ -17,6 +17,8 @@ namespace structure {
 namespace modules {
     
 
+// TODO: document.
+
 class Module : public arac::structure::Component
 {
     public:

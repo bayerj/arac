@@ -2,8 +2,8 @@
 // (c) 2008 by Justin S Bayer, <bayer.justin@googlemail.com>
 
 
-#ifndef Arac_STRUCTURE_MODULES_LINEAR_INCLUDED
-#define Arac_STRUCTURE_MODULES_LINEAR_INCLUDED
+#ifndef Arac_STRUCTURE_MODULES_GATE_INCLUDED
+#define Arac_STRUCTURE_MODULES_GATE_INCLUDED
 
 
 #include "module.h"
@@ -19,12 +19,12 @@ using arac::structure::modules::Module;
 
 // TODO: document.
 
-class LinearLayer : public Module
+class GateLayer : public Module
 {
     public:
 
-        LinearLayer(int size);
-        virtual ~LinearLayer();
+        GateLayer(int size);
+        virtual ~GateLayer();
 
     protected:
 
@@ -33,11 +33,11 @@ class LinearLayer : public Module
 };
 
 
-inline LinearLayer::~LinearLayer() {}
+inline GateLayer::~GateLayer() {}
 
 
-inline LinearLayer::LinearLayer(int size) :
-    Module(size, size)
+inline GateLayer::GateLayer(int size) :
+    Module(size * 2, size)
 {
 }
 

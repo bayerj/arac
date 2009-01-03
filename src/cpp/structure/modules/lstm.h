@@ -16,6 +16,8 @@ namespace structure {
 namespace modules {
 
 
+// TODO: document.
+
 class LstmLayer : public Module
 {
     public:

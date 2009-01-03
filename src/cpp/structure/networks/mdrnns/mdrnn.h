@@ -10,6 +10,7 @@
 
 #include "basemdrnn.h"
 #include "../../connections/connections.h"
+#include "../../modules/modules.h"
 #include "../../parametrized.h"
 
 
@@ -214,6 +215,7 @@ Mdrnn<module_type>::index_by_coords(int& index, double* coords_p)
 //      http://yosefk.com/c++fqa/templates.html#fqa-35.13
 //
 //  for details.
+
 #include "mdrnn.cpp"
 
 #endif

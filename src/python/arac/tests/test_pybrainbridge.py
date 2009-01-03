@@ -44,20 +44,23 @@ class TestNetworkEquivalence(TestCase):
         net.addOutputModule(outlayer)
         net.addConnection(con)
         net.sortModules()
-
+        
     def rec_two_layer_network(self, net):
         inlayer = LinearLayer(2, 'in')
         outlayer = LinearLayer(2, 'out')
+        con = IdentityConnection(inlayer, outlayer)
         rcon = IdentityConnection(inlayer, outlayer)
         net.addInputModule(inlayer)
         net.addOutputModule(outlayer)
+        net.addConnection(con)
         net.addRecurrentConnection(rcon)
         net.sortModules()
 
     def lstm_network(self, net):
-        i = LinearLayer(1)
-        h = LSTMLayer(1)
-        o = LinearLayer(1)
+        scipy.random.seed(2)
+        i = LinearLayer(1, 'in')
+        h = LSTMLayer(2, name='hidden')
+        o = LinearLayer(1, 'out')
         b = BiasUnit()
         net.addModule(b)
         net.addOutputModule(o)
@@ -65,8 +68,22 @@ class TestNetworkEquivalence(TestCase):
         net.addModule(h)
         net.addConnection(FullConnection(i, h))
         net.addConnection(FullConnection(b, h))
-        net.addRecurrentConnection(FullConnection(h, h))
+        # net.addRecurrentConnection(FullConnection(h, h))
         net.addConnection(FullConnection(h, o))
+        net.sortModules()
+        net.params[:] = scipy.random.random(18)
+        
+    def rec_three_layer_network(self, net):
+        inlayer = TanhLayer(2, 'in')
+        hiddenlayer = TanhLayer(hiddensize, 'hidden')
+        outlayer = LinearLayer(2, 'out')
+        con1 = FullConnection(inlayer, hiddenlayer)
+        con2 = FullConnection(hiddenlayer, outlayer)
+        net.addInputModule(inlayer)
+        net.addModule(hiddenlayer)
+        net.addOutputModule(outlayer)
+        net.addConnection(con1)
+        net.addConnection(con2)
         net.sortModules()
         
     def equivalence_feed_forward(self, builder):
@@ -84,6 +101,7 @@ class TestNetworkEquivalence(TestCase):
         pybrain_res = net.backActivate(error)
         arac_res = _net.backActivate(error)
         self.assertArrayNear(pybrain_res, arac_res)
+        self.assertArrayNear(_net.derivs, net.derivs)
                              
         inpt = scipy.random.random(net.indim)
         pybrain_res = net.activate(inpt)
@@ -94,60 +112,84 @@ class TestNetworkEquivalence(TestCase):
         pybrain_res = net.backActivate(error)
         arac_res = _net.backActivate(error)
         self.assertArrayNear(pybrain_res, arac_res)
+        self.assertArrayNear(_net.derivs, net.derivs)
                           
     def equivalence_recurrent(self, builder):
+        scipy.random.seed(0)
+        runs = 5
+
         _net = pybrainbridge._RecurrentNetwork()
         builder(_net)
         net = RecurrentNetwork()
         builder(net)
         
-        self.assertEqual(_net.proxies[_net].get_mode(), 2, 
-                         "Mode of _RecurrentNetwork is not 'Sequential'.")
-        self.assertEqual(_net.proxies[_net['in']].get_mode(), 2, 
-                         "Mode of input layer is not 'Sequential'.")
-        self.assertEqual(_net.proxies[_net['out']].get_mode(), 2, 
-                         "Mode of output layer is not 'Sequential'.")
+        for _ in xrange(runs):
+            inpt = scipy.random.random(net.indim)
+            pybrain_res = net.activate(inpt)
+            arac_res = _net.activate(inpt)
+            self.assertArrayNear(pybrain_res, arac_res)
 
-        self.assertEqual(net.offset, 0)
-        self.assertEqual(_net.offset, 0)
-        self.assertEqual(_net.proxies[_net['in']].timestep(), 0)
-        self.assertEqual(_net.proxies[_net['out']].timestep(), 0)
-        
-        inpt = range(net.indim)
-        pybrain_res = net.activate(inpt)
-        arac_res = _net.activate(inpt)
-        
-        self.assertArrayNear(pybrain_res, arac_res)
-        self.assertEqual(net.offset, 1)
-        self.assertEqual(_net.offset, 1)
-        self.assertEqual(_net.proxies[_net['in']].timestep(), 1)
-        self.assertEqual(_net.proxies[_net['out']].timestep(), 1)
-
-        inpt = range(2, net.indim + 2)
-        pybrain_res = net.activate(inpt)
-        arac_res = _net.activate(inpt)
-
-        self.assertEqual(net.offset, 2)
-        self.assertEqual(_net.offset, 2)
-        self.assertArrayNear(pybrain_res, arac_res)
-        self.assertEqual(_net.proxies[_net['in']].timestep(), 2)
-        self.assertEqual(_net.proxies[_net['out']].timestep(), 2)
-
-        error = range(net.outdim)
-        pybrain_res = net.backActivate(error)
-        arac_res = _net.backActivate(error)
-        self.assertArrayNear(pybrain_res, arac_res)
-                             
-        error = range(net.outdim)[::-1]
-        pybrain_res = net.backActivate(error)
-        arac_res = _net.backActivate(error)
-        self.assertArrayNear(pybrain_res, arac_res)
-
+        for _ in xrange(runs):
+            error = scipy.random.random(net.outdim)
+            pybrain_res = net.backActivate(error)
+            arac_res = _net.backActivate(error)
+            self.assertArrayNear(pybrain_res, arac_res)
+            if hasattr(_net, '_derivs'):
+                self.assertArrayNear(_net.derivs, net.derivs)
+                
     def testTwoLayerNetwork(self):
         self.equivalence_feed_forward(self.two_layer_network)
 
     def testRecTwoLayerNetwork(self):
         self.equivalence_recurrent(self.rec_two_layer_network)
+        
+    def testParametersDerivatives(self):
+        rnet = pybrainbridge._RecurrentNetwork()
+        self.lstm_network(rnet)
+        self.assert_(getattr(rnet, '_derivs', None) is not None)
+
+        fnet = pybrainbridge._FeedForwardNetwork()
+        self.two_layer_network(fnet)
+        self.assert_(getattr(fnet, '_derivs', None) is not None)
+        
+    def testTimesteps(self):
+        _net = pybrainbridge._RecurrentNetwork()
+        self.rec_two_layer_network(_net)
+        
+        netproxy = _net.proxies[_net]
+        inproxy = _net.proxies[_net['in']]
+        outproxy = _net.proxies[_net['out']]
+        conproxy = _net.proxies[_net.connections[_net['in']][0]]
+        rconproxy = _net.proxies[_net.recurrentConns[0]]
+        
+        proxies = netproxy, inproxy, outproxy, conproxy, rconproxy
+        for proxy in proxies:
+            self.assertEqual(proxy.get_mode(), 2)
+            
+        self.assertEqual(_net.offset, 0)
+        for proxy in proxies:
+            self.assertEqual(proxy.timestep(), 0,
+                             "%s has wrong timestep." % proxy)
+
+        _net.activate((0, 0))
+        for proxy in proxies:
+            self.assertEqual(proxy.timestep(), 1)
+
+        _net.activate((0, 0))
+        for proxy in proxies:
+            self.assertEqual(proxy.timestep(), 2)
+
+        _net.activate((0, 0))
+        for proxy in proxies:
+            self.assertEqual(proxy.timestep(), 3)
+
+        _net.backActivate((0, 0))
+        self.assertEqual(_net.offset, 2)
+        for proxy in proxies:
+            self.assertEqual(proxy.timestep(), 2)
+
+    def testTwoLayerNetwork(self):
+        self.equivalence_feed_forward(self.two_layer_network)
 
     def testLstmNetwork(self):
         self.equivalence_recurrent(self.lstm_network)

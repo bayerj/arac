@@ -79,7 +79,7 @@ Mdrnn<module_type>::sort()
     _module_p = new module_type(_hiddensize * _blocksize);
     _module_p->set_mode(Component::Sequential);
     
-    // Initialize connections.
+    // Initialize recurrent self connections.
     int recurrency = 1;
     for(int i = 0; i < _timedim; i++)
     {

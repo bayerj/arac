@@ -17,6 +17,8 @@ namespace modules {
 using arac::structure::modules::Module;
 
 
+// TODO: document.
+
 class Bias : public Module
 {
 

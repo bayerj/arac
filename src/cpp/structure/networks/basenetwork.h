@@ -14,6 +14,8 @@ namespace structure {
 namespace networks {
 
 
+// TODO: document.
+
 class BaseNetwork : public arac::structure::modules::Module
 {
 
