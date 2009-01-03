@@ -34,7 +34,7 @@ class FullConnection : public Connection, public Parametrized
                        double* parameters_p, double* derivatives_p,
                        int incomingstart, int incomingstop, 
                        int outgoingstart, int outgoingstop);
-        ~FullConnection();
+        virtual ~FullConnection();
         
     protected:
         
