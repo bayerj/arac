@@ -117,9 +117,6 @@ class TestNetworkEquivalence(TestCase):
         pybrain_res = net.activate(inpt)
         arac_res = _net.activate(inpt)
         
-        print _net.inputbuffer
-        print _net.outputbuffer
-        
         self.assertArrayNear(pybrain_res, arac_res)
         self.assertEqual(net.offset, 1)
         self.assertEqual(_net.offset, 1)
@@ -129,13 +126,6 @@ class TestNetworkEquivalence(TestCase):
         inpt = range(2, net.indim + 2)
         pybrain_res = net.activate(inpt)
         arac_res = _net.activate(inpt)
-
-        print "Network input", _net.inputbuffer
-        print "Network output", _net.outputbuffer
-        print "Inlayer input", _net['in'].inputbuffer
-        print "Inlayer output", _net['in'].outputbuffer
-        print "Outlayer input", _net['out'].inputbuffer
-        print "Outlayer output", _net['out'].outputbuffer
 
         self.assertEqual(net.offset, 2)
         self.assertEqual(_net.offset, 2)
@@ -153,13 +143,13 @@ class TestNetworkEquivalence(TestCase):
         arac_res = _net.backActivate(error)
         self.assertArrayNear(pybrain_res, arac_res)
 
-    def _testTwoLayerNetwork(self):
+    def testTwoLayerNetwork(self):
         self.equivalence_feed_forward(self.two_layer_network)
 
     def testRecTwoLayerNetwork(self):
         self.equivalence_recurrent(self.rec_two_layer_network)
 
-    def _testLstmNetwork(self):
+    def testLstmNetwork(self):
         self.equivalence_recurrent(self.lstm_network)
 
 

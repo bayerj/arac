@@ -219,7 +219,6 @@ class _RecurrentNetwork(RecurrentNetworkComponent, _Network):
             if self.offset < self.outputbuffer.shape[0]:
                 break
             # TODO: _growBuffers() is called more than once.
-            print "growing buffers"
             self._growBuffers()
         result = _Network.activate(self, inputbuffer)
         return result
