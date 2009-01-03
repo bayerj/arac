@@ -106,6 +106,18 @@ class PybrainAracMapper(cppbridge.ProxyContainer):
             con.inSliceFrom, con.inSliceTo,
             con.outSliceFrom, con.outSliceTo)
             
+    def _linear_connection_handler(self, con):
+        try:
+            incoming = self.map[con.inmod]
+            outgoing = self.map[con.outmod]
+        except KeyError, e:
+            raise ValueError("Unknown module: %s" % e)
+        return cppbridge.LinearConnection(
+            incoming, outgoing, 
+            con.params, con.derivs,
+            con.inSliceFrom, con.inSliceTo,
+            con.outSliceFrom, con.outSliceTo)
+            
     def _identity_connection_handler(self, con):
         incoming = self.map[con.inmod]
         outgoing = self.map[con.outmod]
@@ -124,6 +136,7 @@ class PybrainAracMapper(cppbridge.ProxyContainer):
             TanhLayer: self._simple_layer_handler,
             IdentityConnection: self._identity_connection_handler, 
             FullConnection: self._full_connection_handler,
+            LinearConnection: self._linear_connection_handler,
             Network: self._network_handler,
             RecurrentNetwork: self._network_handler,
             FeedForwardNetwork: self._network_handler,
