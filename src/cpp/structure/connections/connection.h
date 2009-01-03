@@ -30,7 +30,7 @@ class Connection : public arac::structure::Component
                    int incomingstart, int incomingstop, 
                    int outgoingstart, int outgoingstop);
         Connection(Module* incoming, Module* outgoing);
-        ~Connection();
+        virtual ~Connection();
         
         void set_incomingstart(int n);
         void set_incomingstop(int n);

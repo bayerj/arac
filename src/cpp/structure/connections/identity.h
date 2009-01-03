@@ -29,7 +29,7 @@ class IdentityConnection : public Connection
         IdentityConnection(Module* incoming_p, Module* outgoing_p,
                            int incomingstart, int incomingstop, 
                            int outgoingstart, int outgoingstop);
-        ~IdentityConnection();
+        virtual ~IdentityConnection();
     
     protected:
         
