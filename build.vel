@@ -67,6 +67,10 @@ targets (
 		$ ./test-arac
 	]
 	
+	test.py.run [
+	   $ python ./src/python/runtests.py
+	]
+	
 	test []
 	
 	clean [

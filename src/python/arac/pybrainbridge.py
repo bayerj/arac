@@ -172,14 +172,18 @@ class _Network(Network):
         net_proxy = self.proxies.handle(self)
         
         for module in self.modules:
+            add = not module in self.proxies
             mod_proxy = self.proxies.handle(module)
-            net_proxy.add_module(mod_proxy,
-                                 inpt=(module in self.inmodules),
-                                 outpt=(module in self.outmodules))
+            if add:
+                net_proxy.add_module(mod_proxy,
+                                     inpt=(module in self.inmodules),
+                                     outpt=(module in self.outmodules))
         for connectionlist in self.connections.values():
             for connection in connectionlist:
+                add = not connection in self.proxies
                 con_proxy = self.proxies.handle(connection)
-                net_proxy.add_connection(con_proxy)
+                if add:
+                    net_proxy.add_connection(con_proxy)
         
     def activate(self, inputbuffer):
         self.proxies[self].activate(inputbuffer)
@@ -233,8 +237,10 @@ class _RecurrentNetwork(RecurrentNetworkComponent, _Network):
         net_proxy = self.proxies[self]
         net_proxy.set_mode('Sequential')
         for connection in self.recurrentConns:
+            add = not connection in self.proxies
             con_proxy = self.proxies.handle(connection)
             con_proxy.set_recurrent(1)
-            net_proxy.add_connection(con_proxy)
+            if add:
+                net_proxy.add_connection(con_proxy)
         for component in self.proxies.map.values():
             component.set_mode('Sequential')
