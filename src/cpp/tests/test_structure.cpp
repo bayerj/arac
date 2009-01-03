@@ -362,6 +362,51 @@ TEST(TestModules, SoftmaxLayer) {
 }
 
 
+TEST(TestModules, GateLayer) {
+    GateLayer* layer_p = new GateLayer(2);
+    
+    double* input_p = new double[4];
+    input_p[0] = 1;
+    input_p[1] = 2;
+    input_p[2] = 3;
+    input_p[3] = 4;
+    
+    layer_p->add_to_input(input_p);
+    
+    EXPECT_DOUBLE_EQ(1, layer_p->input()[0][0])
+        << "add_to_input not working.";
+    EXPECT_DOUBLE_EQ(2, layer_p->input()[0][1])
+        << "add_to_input not working.";
+    EXPECT_DOUBLE_EQ(3, layer_p->input()[0][2])
+        << "add_to_input not working.";
+    EXPECT_DOUBLE_EQ(4, layer_p->input()[0][3])
+        << "add_to_input not working.";
+    
+    layer_p->forward();
+    
+    EXPECT_DOUBLE_EQ(2.1931757358900148, layer_p->output()[0][0])
+        << "Forward pass incorrect.";
+    EXPECT_DOUBLE_EQ(3.5231883119115293, layer_p->output()[0][1])
+        << "Forward pass incorrect.";
+    
+    double* outerror_p = new double[2];
+    outerror_p[0] = -1;
+    outerror_p[1] = 1;
+    
+    layer_p->add_to_outerror(outerror_p);
+    layer_p->backward();
+    
+    EXPECT_DOUBLE_EQ(-0.045176659730911999, layer_p->inerror()[0][0])
+        << "Backward pass incorrect.";
+    EXPECT_DOUBLE_EQ(0.035325412426582214, layer_p->inerror()[0][1])
+        << "Backward pass incorrect.";
+    EXPECT_DOUBLE_EQ(-0.7310585786300049, layer_p->inerror()[0][2])
+        << "Backward pass incorrect.";
+    EXPECT_DOUBLE_EQ(0.88079707797788231, layer_p->inerror()[0][3])
+        << "Backward pass incorrect.";
+}
+
+
 TEST(TestModules, PartialSoftmaxLayer) {
     PartialSoftmaxLayer* layer_p = new PartialSoftmaxLayer(4, 2);
     
