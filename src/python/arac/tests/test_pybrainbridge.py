@@ -189,11 +189,6 @@ class TestNetworkEquivalence(TestCase):
             self.assertEqual(proxy.timestep(), 2)
 
         _net.backActivate((0, 0))
-        self.assertEqual(_net.offset, 2)
-        for proxy in proxies:
-            self.assertEqual(proxy.timestep(), 2)
-
-        _net.backActivate((0, 0))
         self.assertEqual(_net.offset, 1)
         for proxy in proxies:
             self.assertEqual(proxy.timestep(), 1)
