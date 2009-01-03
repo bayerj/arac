@@ -1321,10 +1321,6 @@ TEST(TestNetwork, TestRecurrentNetworkTimesteps) {
         << "Wrong timestep.";
 
 }
-
-
-
-
         
         
 TEST(TestNetwork, TestMdrnn)
@@ -1402,6 +1398,7 @@ TEST(TestNetwork, TestMdrnn)
         << "back_activate copy not correct.";
 }
 
+       
         
 }  // namespace
 

@@ -39,6 +39,9 @@ class Component
         // Set the mode of the module.
         virtual void set_mode(Mode mode);
         
+        // Set the timestep to zero.
+        virtual void clear();
+        
         // Get the mode of the module.
         Mode get_mode();
         
@@ -187,6 +190,14 @@ void
 Component::set_mode(Component::Mode mode)
 {
     _mode = mode;
+}
+
+
+inline
+void
+Component::clear()
+{
+    // _timestep = 0;
 }
 
 
