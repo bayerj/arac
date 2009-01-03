@@ -135,9 +135,6 @@ class TestNetworkEquivalence(TestCase):
             arac_res = _net.backActivate(error)
             self.assertArrayNear(pybrain_res, arac_res)
             if hasattr(_net, '_derivs'):
-                print _net.derivs
-                print net.derivs
-                print "-" * 80
                 self.assertArrayNear(_net.derivs, net.derivs)
                 
     def testTwoLayerNetwork(self):
