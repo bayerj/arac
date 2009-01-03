@@ -273,16 +273,15 @@ class IdentityConnection(Connection):
             incoming, outgoing, 
             incomingstart, incomingstop, 
             outgoingstart, outgoingstop)
-    
+ 
 
-class FullConnection(Connection):
-    
-    typ = 'FullConnection'
+class ParametrizedConnection(Connection):
     
     def __init__(self, incoming, outgoing, parameters, derivatives,
                  incomingstart=None, incomingstop=None, 
                  outgoingstart=None, outgoingstop=None):
-        super(FullConnection, self).__init__(incoming, outgoing, 
+        super(ParametrizedConnection, self).__init__(
+            incoming, outgoing, 
             incomingstart, incomingstop, 
             outgoingstart, outgoingstop)
         code = """
@@ -291,8 +290,18 @@ class FullConnection(Connection):
         """
         self.pcall(code, {'parameters_p': parameters.ctypes.data,
                           'derivatives_p': derivatives.ctypes.data})
-        
 
+
+class FullConnection(ParametrizedConnection):
+    
+    typ = 'FullConnection'
+    
+        
+class LinearConnection(ParametrizedConnection):
+    
+    typ = 'LinearConnection'
+
+    
 class BaseNetwork(Module):
     
     def activate(self, arr):
