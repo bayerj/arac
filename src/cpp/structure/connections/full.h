@@ -20,6 +20,8 @@ using namespace arac::structure::modules;
 using arac::structure::Parametrized;
 
 
+// TODO: document.
+
 class FullConnection : public Connection, public Parametrized
 {
     public: 

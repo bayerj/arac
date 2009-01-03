@@ -11,7 +11,22 @@
 
 namespace arac {
 namespace structure {
-    
+
+
+// 
+// A Component object is the very basic part of an arac architecture. 
+//
+// Its basic functionality are the forward and backward methods. A forward 
+// method is used to calculate the output of the network that a component is in,
+// while the backward method is meant to implement the learning itself buy 
+// calculating errors and derivatives.
+//
+// A component has a mode, which is a combination of the error-agnostic flag and
+// the sequential-flag; e.g. recurrent connections need to be sequential and 
+// components in a evolutionary framework do not necessarily have the concept of
+// errors.
+//
+
 
 class Component 
 {
@@ -30,10 +45,16 @@ class Component
         
         virtual ~Component();
         
+        // Run the forward pass of a component.
         virtual void forward();
+        
+        // Run the forward pass of a component.
         virtual void backward();
         
+        // Run the side effects of a components forward pass.
         virtual void dry_forward();
+        
+        // Run the side effects of a components backward pass.
         virtual void dry_backward();
         
         // Set the mode of the module.

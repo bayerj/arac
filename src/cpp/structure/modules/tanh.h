@@ -15,6 +15,9 @@ namespace modules {
 
 using arac::structure::modules::Module;
 
+
+// TODO: document.
+
 class TanhLayer : public Module
 {
     public:

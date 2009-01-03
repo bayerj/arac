@@ -19,6 +19,8 @@ using namespace arac::structure::modules;
 using arac::structure::Component;
 
 
+// TODO: document.
+
 class IdentityConnection : public Connection 
 {
     public:
