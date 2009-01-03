@@ -29,4 +29,19 @@ GateLayer::_forward()
 void
 GateLayer::_backward()
 {
+    // Shortcuts.
+    double* inerror_p = inerror()[timestep() - 1];
+    double* outerror_p = outerror()[timestep() - 1];
+    double* input_p = input()[timestep() - 1];
+
+    for (int i = 0; i < outsize(); i++)
+    {
+        inerror_p[i] = sigmoidprime(input_p[i + outsize()]) 
+                       * input_p[i] 
+                       * outerror_p[i];
+    }
+    for(int i = 0; i < outsize(); i++)
+    {
+        inerror_p[i + outsize()] = sigmoid(input_p[i]) * outerror_p[i];
+    }
 }
