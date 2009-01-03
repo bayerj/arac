@@ -9,6 +9,7 @@
 #include "connection.h"
 #include "full.h"
 #include "identity.h"
+#include "linear.h"
 
 
 #endif

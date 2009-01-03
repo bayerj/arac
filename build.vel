@@ -42,6 +42,7 @@ targets (
 		$ %(compiler)s %(flags)s -c src/cpp/structure/modules/modules.cpp -o src/cpp/structure/modules/modules.o
 		$ %(compiler)s %(flags)s -c src/cpp/structure/connections/connection.cpp -o src/cpp/structure/connections/connection.o
 		$ %(compiler)s %(flags)s -c src/cpp/structure/connections/full.cpp -o src/cpp/structure/connections/full.o
+		$ %(compiler)s %(flags)s -c src/cpp/structure/connections/linear.cpp -o src/cpp/structure/connections/linear.o
 		$ %(compiler)s %(flags)s -c src/cpp/structure/connections/identity.cpp -o src/cpp/structure/connections/identity.o
 		$ %(compiler)s %(flags)s -c src/cpp/structure/connections/connections.cpp -o src/cpp/structure/connections/connections.o
 		$ %(compiler)s %(flags)s -c src/cpp/structure/networks/basenetwork.cpp -o src/cpp/structure/networks/basenetwork.o
@@ -56,7 +57,7 @@ targets (
 	]
 
 	lib [
-		$ %(compiler)s %(flags)s %(lnflags)s -dynamiclib -shared -o libarac.so src/cpp/common/buffer.o src/cpp/structure/modules/module.o src/cpp/structure/modules/gate.o src/cpp/structure/modules/linear.o src/cpp/structure/modules/bias.o src/cpp/structure/modules/mdlstm.o src/cpp/structure/modules/lstm.o src/cpp/structure/modules/partialsoftmax.o src/cpp/structure/modules/softmax.o src/cpp/structure/modules/sigmoid.o src/cpp/structure/modules/tanh.o src/cpp/structure/modules/modules.o src/cpp/structure/connections/connection.o src/cpp/structure/connections/identity.o src/cpp/structure/connections/full.o src/cpp/structure/connections/connections.o src/cpp/structure/networks/basenetwork.o src/cpp/structure/networks/network.o src/cpp/structure/networks/networks.o src/cpp/structure/networks/mdrnns/basemdrnn.o src/cpp/structure/networks/mdrnns/mdrnn.o src/cpp/structure/component.o src/cpp/structure/parametrized.o src/cpp/structure/structure.o src/cpp/arac.o
+		$ %(compiler)s %(flags)s %(lnflags)s -dynamiclib -shared -o libarac.so src/cpp/common/buffer.o src/cpp/structure/modules/module.o src/cpp/structure/modules/gate.o src/cpp/structure/modules/linear.o src/cpp/structure/modules/bias.o src/cpp/structure/modules/mdlstm.o src/cpp/structure/modules/lstm.o src/cpp/structure/modules/partialsoftmax.o src/cpp/structure/modules/softmax.o src/cpp/structure/modules/sigmoid.o src/cpp/structure/modules/tanh.o src/cpp/structure/modules/modules.o src/cpp/structure/connections/connection.o src/cpp/structure/connections/identity.o src/cpp/structure/connections/linear.o src/cpp/structure/connections/full.o src/cpp/structure/connections/connections.o src/cpp/structure/networks/basenetwork.o src/cpp/structure/networks/network.o src/cpp/structure/networks/networks.o src/cpp/structure/networks/mdrnns/basemdrnn.o src/cpp/structure/networks/mdrnns/mdrnn.o src/cpp/structure/component.o src/cpp/structure/parametrized.o src/cpp/structure/structure.o src/cpp/arac.o
 	]
 	
 	test.c.build [
