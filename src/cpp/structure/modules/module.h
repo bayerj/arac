@@ -6,8 +6,6 @@
 #define Arac_STRUCTURE_MODULES_MODULE_INCLUDED
 
 
-#include <iostream>
-
 #include "../component.h"
 #include "../../common/common.h"
 

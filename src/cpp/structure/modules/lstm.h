@@ -25,7 +25,7 @@ class LstmLayer : public Module
         LstmLayer(int size);
         virtual ~LstmLayer();
         
-        virtual void set_mode(Mode mode);
+        virtual void set_mode(arac::structure::Component::Mode mode);
         
         arac::common::Buffer& state();
         arac::common::Buffer& state_error();

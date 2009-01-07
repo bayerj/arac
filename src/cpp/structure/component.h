@@ -6,9 +6,6 @@
 #define Arac_STRUCTURE_COMPONENT_INCLUDED
 
 
-#include <cassert>
-
-
 namespace arac {
 namespace structure {
 
