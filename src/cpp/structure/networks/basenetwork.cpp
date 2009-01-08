@@ -87,8 +87,6 @@ BaseNetwork::back_activate(double* outerror_p, double* inerror_p)
 }
 
 
-
-
 }
 }
 }
