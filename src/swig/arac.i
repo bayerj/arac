@@ -4,8 +4,6 @@
     
 #include "../cpp/arac.h"
 #include <numpy/arrayobject.h>
-#include "numpydesert.h"
-
 
 using namespace arac::structure;
 using namespace arac::structure::connections;
@@ -15,27 +13,8 @@ using namespace arac::structure::networks;
 
 %include "numpy.i"
 %init %{
-import_array();
+    import_array();
 %}
-
-
-%typecheck(SWIG_TYPECHECK_DOUBLE_ARRAY)
-  (double* BLA)
-{
-  $1 = is_array($input) || PySequence_Check($input);
-}
-%typemap(in)
-  (double* BLA)
-  (PyArrayObject* array=NULL, int is_new_object=0)
-{
-  array = obj_to_array_contiguous_allow_conversion($input, NPY_DOUBLE,
-                                                   &is_new_object);
-  if (!array || !require_dimensions(array, 1)) SWIG_fail;
-  $1 = (double*) array_data(array);
-}
-
-
-%apply (double* BLA) {(double* addend_p)}
 
 
 class Component 
@@ -160,6 +139,11 @@ class SigmoidLayer : public Module
 };
 
 
+%apply (double* INPLACE_ARRAY1, int DIM1) {(double* input_p, int inlength), 
+                                           (double* output_p, int outlength)};
+%apply (double* INPLACE_ARRAY1, int DIM1) {(double* outerror_p, int outlength), 
+                                           (double* inerror_p, int inlength)};
+
 class BaseNetwork : public Module
 {
     
@@ -167,8 +151,8 @@ class BaseNetwork : public Module
         BaseNetwork();
         virtual ~BaseNetwork();
     
-        virtual const double* activate(double* input_p);
-        virtual const double* back_activate(double* error_p);
+        virtual void activate(double* input_p, double* output_p);
+        virtual void back_activate(double* outerror_p, double* inerror_p);
         virtual void forward();
         
     protected:
@@ -192,4 +176,30 @@ class Network : public BaseNetwork
         virtual void clear();
         void add_module(Module* module_p, ModuleType type=Simple);
         void add_connection(Connection* con_p);
+};        
+        
+        
+%extend Network
+{
+    virtual void activate(double* input_p, int inlength, 
+                          double* output_p, int outlength)
+    {
+        if (inlength != outlength) {
+            PyErr_Format(PyExc_ValueError, "Arrays of lengths (%d,%d) given",
+                         inlength, outlength);
+            return;
+        }
+        $self->activate(input_p, output_p);
+    }
+
+    virtual void back_activate(double* outerror_p, int outlength, 
+                               double* inerror_p, int inlength)
+    {
+        if (inlength != outlength) {
+            PyErr_Format(PyExc_ValueError, "Arrays of lengths (%d,%d) given",
+                         inlength, outlength);
+            return;
+        }
+        $self->back_activate(outerror_p, inerror_p);
+    }
 };
