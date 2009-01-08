@@ -13,8 +13,6 @@ namespace arac {
 namespace common {
 
 
-class Module;   // Forward declaration.
-    
 typedef std::vector<double*> DoublePtrVec;
 
 
