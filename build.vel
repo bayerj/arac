@@ -7,7 +7,10 @@ options (
 
 	compiler "g++"
 	flags "-g -I/usr/local/include -I/usr/include -I/sw/include" 
-   lnflags "-L/usr/local/lib -L/usr/lib -lm -lblas"
+    lnflags "-L/usr/local/lib -L/usr/lib -lm -lblas"
+    numy_swig_dir "/Users/bayerj/devel/thirdparty/numpy/doc/swig"
+    swig_dir "src/swig"
+    py_dir "src/python/arac"
 )
 
 
@@ -75,9 +78,11 @@ targets (
 	test []
 	
 	swig [
-	   $ swig -Wall -python -outdir src/swig -c++ -o src/swig/arac_wrap.cxx src/swig/arac.i
-	   $ gcc -larac -L. -c -Wno-long-double src/swig/arac_wrap.cxx -Isrc/cpp/ -I/usr/local/include/python2.6 -I/usr/local/lib/python2.6/config -I/usr/local//lib/python2.6/site-packages/numpy/core/include -o src/swig/arac_wrap.o
-       $ gcc -larac -L. -Wno-long-double -bundle -undefined suppress -flat_namespace src/swig/arac_wrap.o -o src/swig/_arac.so
+	   $ swig -Wall -python -c++ -outdir %(swig_dir)s -I%(numy_swig_dir)s -o %(swig_dir)s/cppbridge_wrap.cpp %(swig_dir)s/cppbridge.i
+	   $ gcc -larac -L. -c -Wno-long-double %(swig_dir)s/cppbridge_wrap.cpp -Isrc/cpp/ -I/usr/local/include/python2.6 -I/usr/local/lib/python2.6/config -I/usr/local//lib/python2.6/site-packages/numpy/core/include -o %(swig_dir)s/cppbridge_wrap.o
+       $ gcc -larac -L. -Wno-long-double -bundle -undefined suppress -flat_namespace %(swig_dir)s/cppbridge_wrap.o -o %(swig_dir)s/_cppbridge.so
+       $ cp %(swig_dir)s/cppbridge.py %(py_dir)s/
+       $ cp %(swig_dir)s/_cppbridge.so %(py_dir)s/
    ]
 	
 	clean [
