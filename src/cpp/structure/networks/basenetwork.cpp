@@ -59,6 +59,14 @@ BaseNetwork::activate(double* input_p)
 }
 
 
+void
+BaseNetwork::activate(double* input_p, double* output_p)
+{
+    const double* result_p = activate(input_p);
+    memcpy(output_p, result_p, sizeof(double) * outsize());
+}
+
+
 const double*
 BaseNetwork::back_activate(double* error_p)
 {
@@ -69,6 +77,17 @@ BaseNetwork::back_activate(double* error_p)
     backward();
     return inerror()[timestep()];
 }
+
+
+void
+BaseNetwork::back_activate(double* outerror_p, double* inerror_p)
+{
+    const double* result_p = back_activate(outerror_p);
+    memcpy(inerror_p, result_p, sizeof(double) * insize());
+}
+
+
+
 
 }
 }
