@@ -1,10 +1,15 @@
-%module arac
+%module cppbridge
 %{
 #define SWIG_FILE_WITH_INIT
     
-#include "../cpp/arac.h"
+#include <iostream>
+
 #include <numpy/arrayobject.h>
 
+#include "../cpp/arac.h"
+
+
+using namespace arac::common;
 using namespace arac::structure;
 using namespace arac::structure::connections;
 using namespace arac::structure::modules;
@@ -181,7 +186,7 @@ class Network : public BaseNetwork
         
 %extend Network
 {
-    virtual void activate(double* input_p, int inlength, 
+    void activate(double* input_p, int inlength, 
                           double* output_p, int outlength)
     {
         if (inlength != outlength) {
