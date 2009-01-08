@@ -1,14 +1,41 @@
 %module arac
 %{
+#define SWIG_FILE_WITH_INIT
+    
 #include "../cpp/arac.h"
+#include <numpy/arrayobject.h>
+#include "numpydesert.h"
+
 
 using namespace arac::structure;
 using namespace arac::structure::connections;
 using namespace arac::structure::modules;
 using namespace arac::structure::networks;
-
-
 %}
+
+%include "numpy.i"
+%init %{
+import_array();
+%}
+
+
+%typecheck(SWIG_TYPECHECK_DOUBLE_ARRAY)
+  (double* BLA)
+{
+  $1 = is_array($input) || PySequence_Check($input);
+}
+%typemap(in)
+  (double* BLA)
+  (PyArrayObject* array=NULL, int is_new_object=0)
+{
+  array = obj_to_array_contiguous_allow_conversion($input, NPY_DOUBLE,
+                                                   &is_new_object);
+  if (!array || !require_dimensions(array, 1)) SWIG_fail;
+  $1 = (double*) array_data(array);
+}
+
+
+%apply (double* BLA) {(double* addend_p)}
 
 
 class Component 
@@ -135,6 +162,7 @@ class SigmoidLayer : public Module
 
 class BaseNetwork : public Module
 {
+    
     public:
         BaseNetwork();
         virtual ~BaseNetwork();
@@ -165,7 +193,3 @@ class Network : public BaseNetwork
         void add_module(Module* module_p, ModuleType type=Simple);
         void add_connection(Connection* con_p);
 };
-
-
-
-
