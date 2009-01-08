@@ -1164,6 +1164,35 @@ TEST(TestConnections, DeepRecurrentFullConnection) {
 }
 
 
+TEST(TestNetwork, TestCopyResult) {
+    Network* net_p = new Network();
+    
+    LinearLayer* inlayer_p = new LinearLayer(2);
+    LinearLayer* outlayer_p = new LinearLayer(2);
+    IdentityConnection* con_p = new IdentityConnection(inlayer_p, outlayer_p);
+
+        net_p->add_module(inlayer_p, Network::InputModule);
+    net_p->add_module(outlayer_p, Network::OutputModule);
+    net_p->add_connection(con_p);
+    
+    double* input_p = new double[2];
+    input_p[0] = 2;
+    input_p[1] = 4;
+
+    double* output_p = new double[2];
+    output_p[0] = 0;
+    output_p[1] = 0;
+    
+    net_p->activate(input_p, output_p);
+    
+    ASSERT_DOUBLE_EQ(2, output_p[0])
+        << "Data not copied correctly into inmodule.";
+    ASSERT_DOUBLE_EQ(4, output_p[1])
+        << "Data not copied correctly into inmodule.";
+}
+
+
+
 TEST(TestNetwork, TestTwoLayerNetwork) {
     Network* net_p = new Network();
     

@@ -27,8 +27,6 @@ class BaseNetwork : public arac::structure::modules::Module
         virtual const double* activate(double* input_p);
         virtual const double* back_activate(double* error_p);
 
-        // TODO: add tests for these methods.
-        
         virtual void activate(double* input_p, double* output_p);
         virtual void back_activate(double* outerror_p, double* inerror_p);
         
