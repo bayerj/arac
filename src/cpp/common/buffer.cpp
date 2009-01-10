@@ -35,6 +35,10 @@ void Buffer::add(double* addend_p, int index)
 
 void Buffer::expand()
 {
+    if (!owner())
+    {
+        return;
+    }
     double* new_chunk = new double[_rowsize];
     memset((void*) new_chunk, 0, sizeof(double) * _rowsize);
     _content.push_back(new_chunk);
