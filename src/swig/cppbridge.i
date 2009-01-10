@@ -15,6 +15,7 @@ using namespace arac::structure::connections;
 using namespace arac::structure::modules;
 using namespace arac::structure::networks;
 
+
 void init_buffer(Buffer& buffer, double* content_p, int length, int rowsize)
 {
     for(int i = 0; i < length; i++)
@@ -439,6 +440,7 @@ class Network : public BaseNetwork
     void activate(double* input_p, int inlength, 
                   double* output_p, int outlength)
     {
+        // TODO: check bounds of in and output
         if (inlength != outlength) {
             PyErr_Format(PyExc_ValueError, "Arrays of lengths (%d,%d) given",
                          inlength, outlength);
