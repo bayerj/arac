@@ -242,14 +242,6 @@ Component::error_agnostic()
 }
 
 
-inline
-int
-Component::timestep()
-{
-    return _timestep;
-}
-
-
 }
 }
 

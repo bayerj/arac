@@ -93,9 +93,12 @@ targets (
 		$ rm libarac.so
 		$ rm test-arac
 		$ rm src/swig/*.so
-		$ rm src/swig/*.cxx
+		$ rm src/swig/*.cpp
 		$ rm src/swig/*.o
 		$ rm src/swig/*.py
 		$ rm src/swig/*.pyc
+		$ rm src/python/arac/cppbridge.py
+		$ rm src/python/arac/*.pyc
+		$ rm src/python/arac/tests/*.pyc
 	]
 )

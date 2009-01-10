@@ -215,7 +215,6 @@ class _Network(Network):
         # We first add all the modules, since we have to know about them before
         # we can add connections.
         net_proxy = self.proxies.handle(self)
-        
         for module in self.modules:
             add = not module in self.proxies
             mod_proxy = self.proxies.handle(module)
@@ -236,14 +235,17 @@ class _Network(Network):
                 if add:
                     net_proxy.add_connection(con_proxy)
         
-    def activate(self, inputbuffer):
+    def activate(self, inpt):
+        inpt = scipy.asarray(inpt)
         result = scipy.zeros(self.outdim)
-        self.proxies[self].activate(inputbuffer, result)
+        self.proxies[self].activate(inpt, result)
         return result
         
     def backActivate(self, outerr):
-        self.proxies[self].back_activate(outerr)
-        return self.inputerror[self.offset]
+        outerr = scipy.asarray(outerr)
+        inerror = scipy.zeros(self.indim)
+        self.proxies[self].back_activate(outerr, inerror)
+        return inerror
 
         
 class _FeedForwardNetwork(FeedForwardNetworkComponent, _Network):
@@ -286,7 +288,7 @@ class _RecurrentNetwork(RecurrentNetworkComponent, _Network):
     def buildCStructure(self):
         """Build up a module-graph of c structs in memory."""
         _Network.buildCStructure(self)
-        net_proxy = self.proxies[self]
+        net_proxy = self.proxies.handle(self)
         net_proxy.set_mode(cppbridge.Component.Sequential)
         for connection in self.recurrentConns:
             add = not connection in self.proxies
@@ -296,6 +298,7 @@ class _RecurrentNetwork(RecurrentNetworkComponent, _Network):
             if add:
                 net_proxy.add_connection(con_proxy)
         # FIXME: This is actually done more often than necessary, basically all 
-        # connections are already sequential.
+        # recurrent connections are set to sequential already in the previous 
+        # loop.
         for component in self.proxies.map.values():
             component.set_mode(cppbridge.Component.Sequential)

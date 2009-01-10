@@ -46,8 +46,7 @@ class TestStructure(TestCase):
         inpt = scipy.array((3., 4.))
         result = scipy.zeros(2)
         net.activate(inpt, result)
-        print result
-        # self.assertArrayNear(result, scipy.array((9, 28)))
+        self.assertArrayNear(result, scipy.array((11, 25)))
 
 
 if __name__ == "__main__":

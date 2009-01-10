@@ -71,7 +71,8 @@ Network::_forward()
     }
     // Copy the input into the inbuffers of the modules.
     std::vector<Module*>::iterator mod_iter;
-    double* input_p = input()[timestep()];
+    int n_timestep = timestep();
+    double* input_p = input()[n_timestep];
     for(mod_iter = _inmodules.begin();
         mod_iter != _inmodules.end();
         mod_iter++)

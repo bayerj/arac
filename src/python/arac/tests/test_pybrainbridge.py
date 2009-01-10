@@ -140,10 +140,10 @@ class TestNetworkEquivalence(TestCase):
     def testTwoLayerNetwork(self):
         self.equivalence_feed_forward(self.two_layer_network)
 
-    def _testRecTwoLayerNetwork(self):
+    def testRecTwoLayerNetwork(self):
         self.equivalence_recurrent(self.rec_two_layer_network)
         
-    def _testParametersDerivatives(self):
+    def testParametersDerivatives(self):
         rnet = pybrainbridge._RecurrentNetwork()
         self.lstm_network(rnet)
         self.assert_(getattr(rnet, '_derivs', None) is not None)
@@ -152,7 +152,7 @@ class TestNetworkEquivalence(TestCase):
         self.two_layer_network(fnet)
         self.assert_(getattr(fnet, '_derivs', None) is not None)
         
-    def _testTimesteps(self):
+    def testTimesteps(self):
         _net = pybrainbridge._RecurrentNetwork()
         self.rec_two_layer_network(_net)
         
@@ -171,34 +171,34 @@ class TestNetworkEquivalence(TestCase):
             self.assertEqual(proxy.timestep(), 0,
                              "%s has wrong timestep." % proxy)
 
-        _net.activate((0, 0))
+        _net.activate((0., 0.))
         for proxy in proxies:
             self.assertEqual(proxy.timestep(), 1)
 
-        _net.activate((0, 0))
+        _net.activate((0., 0.))
         for proxy in proxies:
             self.assertEqual(proxy.timestep(), 2)
 
-        _net.activate((0, 0))
+        _net.activate((0., 0.))
         for proxy in proxies:
             self.assertEqual(proxy.timestep(), 3)
 
-        _net.backActivate((0, 0))
+        _net.backActivate((0., 0.))
         self.assertEqual(_net.offset, 2)
         for proxy in proxies:
             self.assertEqual(proxy.timestep(), 2)
 
-        _net.backActivate((0, 0))
+        _net.backActivate((0., 0.))
         self.assertEqual(_net.offset, 1)
         for proxy in proxies:
             self.assertEqual(proxy.timestep(), 1)
 
-        _net.backActivate((0, 0))
+        _net.backActivate((0., 0.))
         self.assertEqual(_net.offset, 0)
         for proxy in proxies:
             self.assertEqual(proxy.timestep(), 0)
 
-    def _testLstmNetwork(self):
+    def testLstmNetwork(self):
         self.equivalence_recurrent(self.lstm_network)
 
 
