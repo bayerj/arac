@@ -239,18 +239,21 @@ class _Network(Network):
                     net_proxy.add_connection(con_proxy)
         
     def activate(self, inpt):
-        result = scipy.zeros(self.outdim)
+        inpt = scipy.asarray(inpt)
         # We reshape here in order to make sure that the array has the correct
         # dimensions when passed to the Swig-Proxy.
-        self.proxies[self].activate(inpt.reshape(self.indim), result)
+        inpt.shape = self.indim,
+        result = scipy.zeros(self.outdim)
+        self.proxies[self].activate(inpt, result)
         return result
         
     def backActivate(self, outerr):
         outerr = scipy.asarray(outerr)
-        inerror = scipy.zeros(self.indim)
         # We reshape here in order to make sure that the array has the correct
         # dimensions when passed to the Swig-Proxy.
-        self.proxies[self].back_activate(outerr.reshape(self.outdim), inerror)
+        outerr.shape = self.outdim,
+        inerror = scipy.zeros(self.indim)
+        self.proxies[self].back_activate(outerr, inerror)
         return inerror
 
         
