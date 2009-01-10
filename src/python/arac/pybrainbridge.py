@@ -22,6 +22,7 @@ import scipy
 from pybrain.structure import (
     BiasUnit,
     LinearLayer, 
+    GateLayer,
     LSTMLayer,
     SigmoidLayer, 
     TanhLayer,
@@ -50,6 +51,7 @@ class PybrainAracMapper(object):
     classmapping = {
         BiasUnit: cppbridge.Bias,
         LinearLayer: cppbridge.LinearLayer, 
+        GateLayer: cppbridge.GateLayer, 
         LSTMLayer: cppbridge.LstmLayer,
         SigmoidLayer: cppbridge.SigmoidLayer, 
         SoftmaxLayer: cppbridge.SoftmaxLayer,
@@ -162,6 +164,7 @@ class PybrainAracMapper(object):
         handlers = {
             BiasUnit: self._bias_handler,
             LinearLayer: self._simple_layer_handler, 
+            GateLayer: self._simple_layer_handler, 
             LSTMLayer: self._lstm_handler,
             SigmoidLayer: self._simple_layer_handler, 
             SoftmaxLayer: self._simple_layer_handler,
@@ -236,15 +239,18 @@ class _Network(Network):
                     net_proxy.add_connection(con_proxy)
         
     def activate(self, inpt):
-        inpt = scipy.asarray(inpt)
         result = scipy.zeros(self.outdim)
-        self.proxies[self].activate(inpt, result)
+        # We reshape here in order to make sure that the array has the correct
+        # dimensions when passed to the Swig-Proxy.
+        self.proxies[self].activate(inpt.reshape(self.indim), result)
         return result
         
     def backActivate(self, outerr):
         outerr = scipy.asarray(outerr)
         inerror = scipy.zeros(self.indim)
-        self.proxies[self].back_activate(outerr, inerror)
+        # We reshape here in order to make sure that the array has the correct
+        # dimensions when passed to the Swig-Proxy.
+        self.proxies[self].back_activate(outerr.reshape(self.outdim), inerror)
         return inerror
 
         

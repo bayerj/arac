@@ -361,8 +361,7 @@ class FullConnection : public Connection, public Parametrized
 };    
 
 
-
-
+%feature("notabstract") LinearConnection;
 class LinearConnection : public Connection, public Parametrized
 {
     public: 
@@ -376,45 +375,49 @@ class LinearConnection : public Connection, public Parametrized
                        int incomingstart, int incomingstop, 
                        int outgoingstart, int outgoingstop);
         virtual ~LinearConnection();
+        
+        %extend
+        {
+            LinearConnection(Module* incoming_p, Module* outgoing_p,
+                           double* parameters_p, int parameter_size,
+                           double* derivatives_p, int derivative_size,
+                           int incomingstart, int incomingstop, 
+                           int outgoingstart, int outgoingstop)
+            {
+                int required_size = incomingstop - incomingstart;
+                if (outgoingstop - outgoingstart != required_size)
+                {
+                    PyErr_Format(PyExc_ValueError, 
+                         "Slice sizes are not equal. (%d, %d).",
+                         required_size, outgoingstop - outgoingstart);
+                    return 0;
+                }
+                if (parameter_size != required_size)
+                {
+                    PyErr_Format(PyExc_ValueError, 
+                         "Parameters have wrong size: should be %d instead of %d.",
+                         required_size, parameter_size);
+                    return 0;
+                }
+                if (derivative_size != incomingstop - incomingstart)
+                {
+                    PyErr_Format(PyExc_ValueError, 
+                         "Derivatives have wrong size: should be %d instead of %d.",
+                         required_size, parameter_size);
+                    return 0;
+                }
+                
+                LinearConnection* con = new LinearConnection(
+                                            incoming_p, outgoing_p, 
+                                            parameters_p, derivatives_p,
+                                            incomingstart, incomingstop,
+                                            outgoingstart, outgoingstop);
+                return con;
+            }
+        }
 };    
 
 
-%extend LinearConnection
-{
-    LinearConnection(Module* incoming_p, Module* outgoing_p,
-                   double* parameters_p, int parameter_size,
-                   double* derivatives_p, int derivative_size,
-                   int incomingstart, int incomingstop, 
-                   int outgoingstart, int outgoingstop) :
-    LinearConnection(incoming_p, outgoing_p, 
-                   parameters_p, derivatives_p,
-                   incomingstart, incomingstop,
-                   outgoingstart, outgoingstop)
-    {
-        int required_size = incomingstop - incomingstart
-        if (outgoingstop - outgoingstart != required_size)
-        {
-            PyErr_Format(PyExc_ValueError, 
-                 "Slice sizes are not equal. (%d, %d).",
-                 required_size, outgoingstop - outgoingstart);
-            return;
-        }
-        if (parameter_size != required_size)
-        {
-            PyErr_Format(PyExc_ValueError, 
-                 "Parameters have wrong size: should be %d instead of %d.",
-                 required_size, parameter_size);
-            return;
-        }
-        if (derivative_size != incomingstop - incomingstart)
-        {
-            PyErr_Format(PyExc_ValueError, 
-                 "Derivatives have wrong size: should be %d instead of %d.",
-                 required_size, parameter_size);
-            return;
-        }
-    }
-}
 
 
 %feature("notabstract") Network;
@@ -442,18 +445,26 @@ class Network : public BaseNetwork
                   double* output_p, int outlength)
     {
         // TODO: check bounds of in and output
-        if (inlength != outlength) {
-            PyErr_Format(PyExc_ValueError, "Arrays of lengths (%d,%d) given",
-                         inlength, outlength);
-            return;
-        }
+        // if (inlength != $self->insize()) {
+        //     PyErr_Format(PyExc_ValueError, 
+        //                  "Input has wrong size: %d instead of %d",
+        //                  inlength, $self->insize());
+        //     return;
+        // }
+        // if (outlength != $self->outsize()) {
+        //     PyErr_Format(PyExc_ValueError, 
+        //                  "Output has wrong size: %d instead of %d",
+        //                  outlength, $self->outsize());
+        //     return;
+        // }
+
         $self->activate(input_p, output_p);
     }
 
     virtual void back_activate(double* outerror_p, int outlength, 
                                double* inerror_p, int inlength)
     {
-        if (inlength != outlength) {
+        if (inlength != $self->insize() or outlength != $self->outsize()) {
             PyErr_Format(PyExc_ValueError, "Arrays of lengths (%d,%d) given",
                          inlength, outlength);
             return;

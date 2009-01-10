@@ -40,7 +40,7 @@ LinearConnection::LinearConnection(Module* incoming_p, Module* outgoing_p,
     Connection(incoming_p, outgoing_p, 
                incomingstart, incomingstop,
                outgoingstart, outgoingstop),
-    Parametrized((incomingstop - incomingstart))           
+    Parametrized((incomingstop - incomingstart), parameters_p, derivatives_p)           
 {
     // TODO: make sure the sizes of the modules and slices are correct.
 }   
