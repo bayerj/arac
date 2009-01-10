@@ -33,7 +33,9 @@ Parametrized::Parametrized(int size,
                            double* derivatives_p) :
 _size(size),
 _parameters_p(parameters_p),
-_derivatives_p(derivatives_p)
+_derivatives_p(derivatives_p),
+_parameters_owner(false),
+_derivatives_owner(false)
 {
     
 }                         
