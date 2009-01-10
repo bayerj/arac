@@ -140,7 +140,6 @@ class PybrainAracMapper(object):
                           con.params, con.derivs,
                           con.inSliceFrom, con.inSliceTo,
                           con.outSliceFrom, con.outSliceTo)
-            print proxy
             self.map[con] = proxy
         return proxy
             
@@ -235,7 +234,6 @@ class _Network(Network):
                 add = not connection in self.proxies
                 con_proxy = self.proxies.handle(connection)
                 if add:
-                    print con_proxy
                     net_proxy.add_connection(con_proxy)
         
     def activate(self, inputbuffer):
