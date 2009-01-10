@@ -140,10 +140,10 @@ class TestNetworkEquivalence(TestCase):
     def testTwoLayerNetwork(self):
         self.equivalence_feed_forward(self.two_layer_network)
 
-    def testRecTwoLayerNetwork(self):
+    def _testRecTwoLayerNetwork(self):
         self.equivalence_recurrent(self.rec_two_layer_network)
         
-    def testParametersDerivatives(self):
+    def _testParametersDerivatives(self):
         rnet = pybrainbridge._RecurrentNetwork()
         self.lstm_network(rnet)
         self.assert_(getattr(rnet, '_derivs', None) is not None)
@@ -152,7 +152,7 @@ class TestNetworkEquivalence(TestCase):
         self.two_layer_network(fnet)
         self.assert_(getattr(fnet, '_derivs', None) is not None)
         
-    def testTimesteps(self):
+    def _testTimesteps(self):
         _net = pybrainbridge._RecurrentNetwork()
         self.rec_two_layer_network(_net)
         
@@ -198,7 +198,7 @@ class TestNetworkEquivalence(TestCase):
         for proxy in proxies:
             self.assertEqual(proxy.timestep(), 0)
 
-    def testLstmNetwork(self):
+    def _testLstmNetwork(self):
         self.equivalence_recurrent(self.lstm_network)
 
 

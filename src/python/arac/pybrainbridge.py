@@ -17,6 +17,8 @@ counterparts.
 __author__ = 'Justin S Bayer, bayer.justin@googlemail.com'
 
 
+import scipy
+
 from pybrain.structure import (
     BiasUnit,
     LinearLayer, 
@@ -41,91 +43,121 @@ from pybrain.structure.networks.recurrent import RecurrentNetworkComponent, \
 import arac.cppbridge as cppbridge
 
 
-class PybrainAracMapper(cppbridge.ProxyContainer):
+class PybrainAracMapper(object):
     """Class that holds pybrain objects mapped to arac objects and provides 
     handlers to create new ones from pybrain objects."""
+    
+    classmapping = {
+        BiasUnit: cppbridge.Bias,
+        LinearLayer: cppbridge.LinearLayer, 
+        LSTMLayer: cppbridge.LstmLayer,
+        SigmoidLayer: cppbridge.SigmoidLayer, 
+        SoftmaxLayer: cppbridge.SoftmaxLayer,
+        TanhLayer: cppbridge.TanhLayer,
+        IdentityConnection: cppbridge.IdentityConnection, 
+        FullConnection: cppbridge.FullConnection,
+        LinearConnection: cppbridge.LinearConnection,
+    }
+
+    def __init__(self):
+        self.clear()
+    
+    def __del__(self):
+        self.clear()
+        
+    def __getitem__(self, key):
+        return self.map[key]
+        
+    def __setitem__(self, key, value):
+        self.map[key] = value
+    
+    def __contains__(self, key):
+        return key in self.map
+    
+    def clear(self):
+        """Free the current map and all the held structures."""
+        self.map = {}
 
     def _network_handler(self, network):
         # See if there already is a proxy:
         try: 
-            proxy = self.map[network]
-            proxy.init_buffer('input', network.inputbuffer)
-            proxy.init_buffer('output', network.outputbuffer)
-            proxy.init_buffer('inerror', network.inputerror)
-            proxy.init_buffer('outerror', network.outputerror)
+            proxy = self[network]
         except KeyError:
-            proxy = cppbridge.Network(
-                        network.inputbuffer, network.outputbuffer, 
-                        network.inputerror, network.outputerror)
+            proxy = cppbridge.Network()
+            self[network] = proxy
+        proxy.init_input(network.inputbuffer)
+        proxy.init_output(network.outputbuffer)
+        proxy.init_inerror(network.inputerror)
+        proxy.init_outerror(network.outputerror)
         return proxy
 
     def _simple_layer_handler(self, layer):
         try:
-            proxy = self.map[layer]
-            proxy.init_buffer('input', layer.inputbuffer)
-            proxy.init_buffer('output', layer.outputbuffer)
-            proxy.init_buffer('inerror', layer.inputerror)
-            proxy.init_buffer('outerror', layer.outputerror)
+            proxy = self[layer]
         except KeyError:
-            s = str(type(layer))
-            s = s[s.rfind('.') + 1:s.rfind("'")]
-            proxy = cppbridge.SimpleLayer(
-                        s, layer.dim, 
-                        layer.inputbuffer, layer.outputbuffer, 
-                        layer.inputerror, layer.outputerror)
+            proxy = self.classmapping[layer.__class__](layer.dim)
+            self[layer] = proxy
+        proxy.init_input(layer.inputbuffer)
+        proxy.init_output(layer.outputbuffer)
+        proxy.init_inerror(layer.inputerror)
+        proxy.init_outerror(layer.outputerror)
         return proxy
         
     def _bias_handler(self, bias):
-        return cppbridge.Bias()
+        try:
+            proxy = self[bias]
+        except KeyError:
+            proxy = cppbridge.Bias()
+            self[bias] = proxy
+        return proxy
         
     def _lstm_handler(self, layer):
         # See if there already is a proxy:
         try: 
             proxy = self.map[layer]
-            proxy.init_buffer('input', layer.inputbuffer)
-            proxy.init_buffer('output', layer.outputbuffer)
-            proxy.init_buffer('inerror', layer.inputerror)
-            proxy.init_buffer('outerror', layer.outputerror)
-            proxy.init_buffer('state', layer.state)
-            proxy.init_buffer('state_error', layer.stateError)
         except KeyError:
-            proxy = cppbridge.LstmLayer(
-                        layer.dim, 
-                        layer.inputbuffer, layer.outputbuffer, layer.state,
-                        layer.inputerror, layer.outputerror, layer.stateError)
+            proxy = cppbridge.LstmLayer(layer.dim)
+            self[layer] = proxy
+        proxy.init_input(layer.inputbuffer)
+        proxy.init_output(layer.outputbuffer)
+        proxy.init_state(layer.state)
+        proxy.init_inerror(layer.inputerror)
+        proxy.init_outerror(layer.outputerror)
+        proxy.init_state_error(layer.stateError)
         return proxy
 
-    def _full_connection_handler(self, con):
+    def _parametrized_connection_handler(self, con):
         try:
             incoming = self.map[con.inmod]
             outgoing = self.map[con.outmod]
         except KeyError, e:
-            raise ValueError("Unknown module: %s" % e)
-        return cppbridge.FullConnection(
-            incoming, outgoing, 
-            con.params, con.derivs,
-            con.inSliceFrom, con.inSliceTo,
-            con.outSliceFrom, con.outSliceTo)
-            
-    def _linear_connection_handler(self, con):
+            raise ValueError("Connection of unknown modules: %s" % e)
         try:
-            incoming = self.map[con.inmod]
-            outgoing = self.map[con.outmod]
-        except KeyError, e:
-            raise ValueError("Unknown module: %s" % e)
-        return cppbridge.LinearConnection(
-            incoming, outgoing, 
-            con.params, con.derivs,
-            con.inSliceFrom, con.inSliceTo,
-            con.outSliceFrom, con.outSliceTo)
+            proxy = self.map[con]
+        except KeyError:
+            klass = self.classmapping[type(con)]
+            proxy = klass(incoming, outgoing, 
+                          con.params, con.derivs,
+                          con.inSliceFrom, con.inSliceTo,
+                          con.outSliceFrom, con.outSliceTo)
+            print proxy
+            self.map[con] = proxy
+        return proxy
             
     def _identity_connection_handler(self, con):
-        incoming = self.map[con.inmod]
-        outgoing = self.map[con.outmod]
-        return cppbridge.IdentityConnection(
-            incoming, outgoing, 
-            con.inSliceFrom, con.inSliceTo,
-            con.outSliceFrom, con.outSliceTo)
+        try:
+            incoming = self.map[con.inmod]
+            outgoing = self.map[con.outmod]
+        except KeyError, e:
+            raise ValueError("Connection of unknown modules: %s" % e)
+        try:
+            proxy = self.map[con]
+        except KeyError:
+            proxy = cppbridge.IdentityConnection(incoming, outgoing, 
+                                                 con.inSliceFrom, con.inSliceTo,
+                                                 con.outSliceFrom, con.outSliceTo)
+            self.map[con] = proxy
+        return proxy
         
     def handle(self, obj):
         handlers = {
@@ -136,8 +168,8 @@ class PybrainAracMapper(cppbridge.ProxyContainer):
             SoftmaxLayer: self._simple_layer_handler,
             TanhLayer: self._simple_layer_handler,
             IdentityConnection: self._identity_connection_handler, 
-            FullConnection: self._full_connection_handler,
-            LinearConnection: self._linear_connection_handler,
+            FullConnection: self._parametrized_connection_handler,
+            LinearConnection: self._parametrized_connection_handler,
             Network: self._network_handler,
             RecurrentNetwork: self._network_handler,
             FeedForwardNetwork: self._network_handler,
@@ -189,19 +221,27 @@ class _Network(Network):
             add = not module in self.proxies
             mod_proxy = self.proxies.handle(module)
             if add:
-                net_proxy.add_module(mod_proxy,
-                                     inpt=(module in self.inmodules),
-                                     outpt=(module in self.outmodules))
+                inpt = module in self.inmodules
+                outpt = module in self.outmodules
+                mode = {
+                    (False, False): cppbridge.Network.Simple,
+                    (True, False): cppbridge.Network.InputModule,
+                    (False, True): cppbridge.Network.OutputModule,
+                    (True, True): cppbridge.Network.InputOutputModule,
+                }[inpt, outpt]
+                net_proxy.add_module(mod_proxy, mode)
         for connectionlist in self.connections.values():
             for connection in connectionlist:
                 add = not connection in self.proxies
                 con_proxy = self.proxies.handle(connection)
                 if add:
+                    print con_proxy
                     net_proxy.add_connection(con_proxy)
         
     def activate(self, inputbuffer):
-        self.proxies[self].activate(inputbuffer)
-        return self.outputbuffer[self.offset - 1]
+        result = scipy.zeros(self.outdim)
+        self.proxies[self].activate(inputbuffer, result)
+        return result
         
     def backActivate(self, outerr):
         self.proxies[self].back_activate(outerr)
@@ -249,12 +289,15 @@ class _RecurrentNetwork(RecurrentNetworkComponent, _Network):
         """Build up a module-graph of c structs in memory."""
         _Network.buildCStructure(self)
         net_proxy = self.proxies[self]
-        net_proxy.set_mode('Sequential')
+        net_proxy.set_mode(cppbridge.Component.Sequential)
         for connection in self.recurrentConns:
             add = not connection in self.proxies
             con_proxy = self.proxies.handle(connection)
+            con_proxy.set_mode(cppbridge.Component.Sequential)
             con_proxy.set_recurrent(1)
             if add:
                 net_proxy.add_connection(con_proxy)
+        # FIXME: This is actually done more often than necessary, basically all 
+        # connections are already sequential.
         for component in self.proxies.map.values():
-            component.set_mode('Sequential')
+            component.set_mode(cppbridge.Component.Sequential)

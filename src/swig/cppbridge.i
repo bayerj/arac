@@ -14,12 +14,59 @@ using namespace arac::structure;
 using namespace arac::structure::connections;
 using namespace arac::structure::modules;
 using namespace arac::structure::networks;
-%}
 
+void init_buffer(Buffer& buffer, double* content_p, int length, int rowsize)
+{
+    for(int i = 0; i < length; i++)
+    {
+        buffer.append(content_p + i * rowsize);
+    }
+}
+
+
+%}
 %include "numpy.i"
 %init %{
     import_array();
 %}
+
+
+%apply (double* INPLACE_ARRAY1, int DIM1) {(double* input_p, int inlength), 
+                                           (double* output_p, int outlength)};
+%apply (double* INPLACE_ARRAY1, int DIM1) {(double* outerror_p, int outlength), 
+                                           (double* inerror_p, int inlength)};
+%apply (double* INPLACE_ARRAY1, int DIM1) {(double* parameters_p, int parameter_size), 
+                                           (double* derivatives_p, int derivative_size)};
+%apply (double* INPLACE_ARRAY1, int DIM1) {(double* outerror_p, int outlength), 
+                                           (double* inerror_p, int inlength)};
+%apply (double* INPLACE_ARRAY2, int DIM1, int DIM2) {
+    (double* content_p, int length, int rowsize)};
+
+
+
+
+
+%nodefaultctor Buffer;
+class Buffer
+{
+    // Add the given pointer as a row.
+    void append(double* row);
+};
+
+
+%extend Buffer 
+{
+    void append(double* row_p, int this_size)
+    {
+        if (this_size != $self->rowsize()) {
+            PyErr_Format(PyExc_ValueError, "Row has wrong length: (%d,%d) given",
+                         this_size, $self->rowsize());
+            return;
+        }
+        $self->free_memory();
+        $self->append(row_p);
+    }
+};
 
 
 class Component 
@@ -71,6 +118,30 @@ class Module : public Component
         int outsize();
         bool last_timestep();
 };
+
+
+%extend Module 
+{
+    void init_input(double* content_p, int length, int rowsize)
+    {
+        init_buffer($self->input(), content_p, length, rowsize);
+    }
+
+    void init_output(double* content_p, int length, int rowsize)
+    {
+        init_buffer($self->output(), content_p, length, rowsize);
+    }
+    
+    void init_inerror(double* content_p, int length, int rowsize)
+    {
+        init_buffer($self->inerror(), content_p, length, rowsize);
+    }
+
+    void init_outerror(double* content_p, int length, int rowsize)
+    {
+        init_buffer($self->outerror(), content_p, length, rowsize);
+    }
+}
 
 
 class Parametrized 
@@ -126,12 +197,71 @@ class IdentityConnection : public Connection
 };
 
 
+%feature("notabstract") Bias;
+class Bias : public Module
+{
+    public:
+        Bias();
+        virtual ~Bias();
+};
+
+
+%feature("notabstract") GateLayer;
+class GateLayer : public Module
+{
+    public:
+        GateLayer(int size);
+        virtual ~GateLayer();
+};
+
+
 %feature("notabstract") LinearLayer;
 class LinearLayer : public Module
 {
     public:
         LinearLayer(int size);
         virtual ~LinearLayer();
+};
+
+
+%feature("notabstract") LstmLayer;
+class LstmLayer : public Module
+{
+    public:
+        LstmLayer(int size);
+        virtual ~LstmLayer();
+};
+
+
+%extend LstmLayer {
+
+    void init_state(double* content_p, int length, int rowsize)
+    {
+        init_buffer($self->state(), content_p, length, rowsize);
+    }
+
+    void init_state_error(double* content_p, int length, int rowsize)
+    {
+        init_buffer($self->state_error(), content_p, length, rowsize);
+    }
+}
+
+
+%feature("notabstract") MdlstmLayer;
+class MdlstmLayer : public Module
+{
+    public:
+        MdlstmLayer(int timedim, int size);
+        virtual ~MdlstmLayer();
+};
+
+
+%feature("notabstract") PartialSoftmaxLayer;
+class PartialSoftmaxLayer : public Module
+{
+    public:
+        PartialSoftmaxLayer(int size, int slicelength);
+        virtual ~PartialSoftmaxLayer();
 };
 
 
@@ -144,10 +274,23 @@ class SigmoidLayer : public Module
 };
 
 
-%apply (double* INPLACE_ARRAY1, int DIM1) {(double* input_p, int inlength), 
-                                           (double* output_p, int outlength)};
-%apply (double* INPLACE_ARRAY1, int DIM1) {(double* outerror_p, int outlength), 
-                                           (double* inerror_p, int inlength)};
+%feature("notabstract") SoftmaxLayer;
+class SoftmaxLayer : public Module
+{
+    public:
+        SoftmaxLayer(int size);
+        virtual ~SoftmaxLayer();
+};
+
+
+%feature("notabstract") TanhLayer;
+class TanhLayer : public Module
+{
+    public:
+        TanhLayer(int size);
+        virtual ~TanhLayer();
+};
+
 
 class BaseNetwork : public Module
 {
@@ -163,6 +306,113 @@ class BaseNetwork : public Module
     protected:
         virtual void sort() = 0;
 };
+
+
+%feature("notabstract") FullConnection;
+class FullConnection : public Connection, public Parametrized
+{
+    public: 
+        
+        FullConnection(Module* incoming_p, Module* outgoing_p);
+        FullConnection(Module* incoming_p, Module* outgoing_p,
+                       int incomingstart, int incomingstop, 
+                       int outgoingstart, int outgoingstop);
+        FullConnection(Module* incoming_p, Module* outgoing_p,
+                       double* parameters_p, double* derivatives_p,
+                       int incomingstart, int incomingstop, 
+                       int outgoingstart, int outgoingstop);
+        virtual ~FullConnection();
+        
+        %extend 
+        {
+            FullConnection(Module* incoming_p, Module* outgoing_p,
+                           double* parameters_p, int parameter_size,
+                           double* derivatives_p, int derivative_size,
+                           int incomingstart, int incomingstop, 
+                           int outgoingstart, int outgoingstop)
+    
+            {
+                int required_size = \
+                    (incomingstop - incomingstart) * (outgoingstop - outgoingstart);
+                if (parameter_size != required_size)
+                {
+                    PyErr_Format(PyExc_ValueError, 
+                         "Parameters have wrong size: should be %d instead of %d.",
+                         required_size, parameter_size);
+                    return 0;
+                }
+                if (derivative_size != required_size)
+                {
+                    PyErr_Format(PyExc_ValueError, 
+                         "Derivatives have wrong size: should be %d instead of %d.",
+                         required_size, parameter_size);
+                    return 0;
+                }
+        
+                FullConnection* con = new FullConnection(incoming_p, outgoing_p, 
+                                                         parameters_p, derivatives_p,
+                                                         incomingstart, incomingstop,
+                                                         outgoingstart, outgoingstop);
+                return con;
+            }
+        }
+};    
+
+
+
+
+class LinearConnection : public Connection, public Parametrized
+{
+    public: 
+        
+        LinearConnection(Module* incoming_p, Module* outgoing_p);
+        LinearConnection(Module* incoming_p, Module* outgoing_p,
+                       int incomingstart, int incomingstop, 
+                       int outgoingstart, int outgoingstop);
+        LinearConnection(Module* incoming_p, Module* outgoing_p,
+                       double* parameters_p, double* derivatives_p,
+                       int incomingstart, int incomingstop, 
+                       int outgoingstart, int outgoingstop);
+        virtual ~LinearConnection();
+};    
+
+
+%extend LinearConnection
+{
+    LinearConnection(Module* incoming_p, Module* outgoing_p,
+                   double* parameters_p, int parameter_size,
+                   double* derivatives_p, int derivative_size,
+                   int incomingstart, int incomingstop, 
+                   int outgoingstart, int outgoingstop) :
+    LinearConnection(incoming_p, outgoing_p, 
+                   parameters_p, derivatives_p,
+                   incomingstart, incomingstop,
+                   outgoingstart, outgoingstop)
+    {
+        int required_size = incomingstop - incomingstart
+        if (outgoingstop - outgoingstart != required_size)
+        {
+            PyErr_Format(PyExc_ValueError, 
+                 "Slice sizes are not equal. (%d, %d).",
+                 required_size, outgoingstop - outgoingstart);
+            return;
+        }
+        if (parameter_size != required_size)
+        {
+            PyErr_Format(PyExc_ValueError, 
+                 "Parameters have wrong size: should be %d instead of %d.",
+                 required_size, parameter_size);
+            return;
+        }
+        if (derivative_size != incomingstop - incomingstart)
+        {
+            PyErr_Format(PyExc_ValueError, 
+                 "Derivatives have wrong size: should be %d instead of %d.",
+                 required_size, parameter_size);
+            return;
+        }
+    }
+}
 
 
 %feature("notabstract") Network;
@@ -187,7 +437,7 @@ class Network : public BaseNetwork
 %extend Network
 {
     void activate(double* input_p, int inlength, 
-                          double* output_p, int outlength)
+                  double* output_p, int outlength)
     {
         if (inlength != outlength) {
             PyErr_Format(PyExc_ValueError, "Arrays of lengths (%d,%d) given",
