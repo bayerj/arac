@@ -18,6 +18,7 @@ class Parametrized
     
         Parametrized();
         Parametrized(int size);
+        Parametrized(int size, double* parameters_p, double* derivatives_p);
         virtual ~Parametrized();
         
         double* get_parameters() const;

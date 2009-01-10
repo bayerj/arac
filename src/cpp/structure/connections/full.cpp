@@ -45,7 +45,8 @@ FullConnection::FullConnection(Module* incoming_p, Module* outgoing_p,
     Connection(incoming_p, outgoing_p, 
                incomingstart, incomingstop,
                outgoingstart, outgoingstop),
-    Parametrized((incomingstop - incomingstart) * (outgoingstop - outgoingstart))           
+    Parametrized((incomingstop - incomingstart) * (outgoingstop - outgoingstart),
+                 parameters_p, derivatives_p)           
 {
 }   
 
@@ -71,6 +72,7 @@ void FullConnection::_forward()
     {
         return;
     }
+    
 
     int indim = _incomingstop - _incomingstart;
     int outdim = _outgoingstop - _outgoingstart;

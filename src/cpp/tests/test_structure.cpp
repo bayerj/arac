@@ -1171,7 +1171,7 @@ TEST(TestNetwork, TestCopyResult) {
     LinearLayer* outlayer_p = new LinearLayer(2);
     IdentityConnection* con_p = new IdentityConnection(inlayer_p, outlayer_p);
 
-        net_p->add_module(inlayer_p, Network::InputModule);
+    net_p->add_module(inlayer_p, Network::InputModule);
     net_p->add_module(outlayer_p, Network::OutputModule);
     net_p->add_connection(con_p);
     

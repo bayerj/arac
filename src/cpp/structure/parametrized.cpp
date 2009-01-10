@@ -16,7 +16,8 @@ Parametrized::Parametrized()
 }
 
 
-Parametrized::Parametrized(int size) {
+Parametrized::Parametrized(int size) 
+{
     _parameters_p = new double[size];
     _derivatives_p = new double[size];
 
@@ -25,6 +26,17 @@ Parametrized::Parametrized(int size) {
 
     _size = size;
 }
+
+
+Parametrized::Parametrized(int size, 
+                           double* parameters_p, 
+                           double* derivatives_p) :
+_size(size),
+_parameters_p(parameters_p),
+_derivatives_p(derivatives_p)
+{
+    
+}                         
 
 
 Parametrized::~Parametrized() {
