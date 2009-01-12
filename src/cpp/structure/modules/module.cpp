@@ -1,6 +1,8 @@
 // Part of Arac Neural Network Composition Library.
 // (c) 2008 by Justin S Bayer, <bayer.justin@googlemail.com>
 
+#include <iostream>
+
 #include "module.h"
 
 
@@ -55,6 +57,8 @@ Module::expand()
 void
 Module::forward()
 {
+    assert(input().size() >= timestep());
+    assert(output().size() >= timestep());
     Component::forward();
     if (sequential())
     {

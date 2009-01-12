@@ -48,6 +48,24 @@ class TestStructure(TestCase):
         net.activate(inpt, result)
         self.assertArrayNear(result, scipy.array((11, 25)))
 
+    def testNetworkClear(self):
+        net = arac.cppbridge.Network()
+        l = arac.cppbridge.LinearLayer(1)
+        net.add_module(l, arac.cppbridge.Network.InputOutputModule)
+        inputbuffer = scipy.ones((1, 1))
+        outputbuffer = scipy.ones((1, 1))
+        inputerror = scipy.ones((1, 1))
+        outputerror = scipy.ones((1, 1))
+        net.init_input(inputbuffer)
+        net.init_output(outputbuffer)
+        net.init_inerror(inputerror)
+        net.init_outerror(outputerror)
+        net.clear()
+        self.assert_((inputbuffer == 0).all())
+        self.assert_((outputbuffer == 0).all())
+        self.assert_((inputerror == 0).all())
+        self.assert_((outputerror == 0).all())
+
 
 if __name__ == "__main__":
     unittest.main()  

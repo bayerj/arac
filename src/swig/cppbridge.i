@@ -19,6 +19,7 @@ using namespace arac::structure::networks;
 void init_buffer(Buffer& buffer, double* content_p, int length, int rowsize)
 {
     buffer.free_memory();
+    buffer.set_rowsize(rowsize);
     for(int i = 0; i < length; i++)
     {
         buffer.append(content_p + i * rowsize);

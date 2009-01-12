@@ -58,6 +58,9 @@ class Buffer
         // Return the size of a single row in the Buffer.
         int rowsize();
         
+        // Set the size of a specific row.
+        void set_rowsize(int value);
+        
         // Return the number of rows in the buffer.
         int size();
         
@@ -78,6 +81,14 @@ int
 Buffer::rowsize()
 {
     return _rowsize;
+}
+
+
+inline 
+void
+Buffer::set_rowsize(int value)
+{
+    _rowsize = value;
 }
 
 

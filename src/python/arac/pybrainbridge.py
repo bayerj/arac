@@ -239,7 +239,7 @@ class _Network(Network):
                     net_proxy.add_connection(con_proxy)
         
     def activate(self, inpt):
-        inpt = scipy.asarray(inpt)
+        inpt = scipy.asarray(inpt, dtype='float64')
         # We reshape here in order to make sure that the array has the correct
         # dimensions when passed to the Swig-Proxy.
         inpt.shape = self.indim,
@@ -248,7 +248,7 @@ class _Network(Network):
         return result
         
     def backActivate(self, outerr):
-        outerr = scipy.asarray(outerr)
+        outerr = scipy.asarray(outerr, dtype='float64')
         # We reshape here in order to make sure that the array has the correct
         # dimensions when passed to the Swig-Proxy.
         outerr.shape = self.outdim,

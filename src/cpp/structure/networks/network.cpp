@@ -27,12 +27,12 @@ Network::~Network()
 void
 Network::clear()
 {
+    BaseNetwork::clear();
     std::map<Module*, ModuleType>::iterator iter;
     for(iter = _modules.begin(); iter != _modules.end(); iter++)
     {
         iter->first->clear();
     }
-    BaseNetwork::clear();
 }
 
 

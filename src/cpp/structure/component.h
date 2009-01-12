@@ -214,7 +214,7 @@ inline
 void
 Component::clear()
 {
-    // _timestep = 0;
+    _timestep = 0;
 }
 
 

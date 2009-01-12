@@ -55,6 +55,22 @@ class TestNetworkEquivalence(TestCase):
         net.addConnection(con)
         net.addRecurrentConnection(rcon)
         net.sortModules()
+        
+    def sliced_connection_network(self, net):
+        inlayer = LinearLayer(2, 'in')
+        outlayer = LinearLayer(2, 'out')
+        con = IdentityConnection(inlayer, outlayer, 
+                                 inSliceFrom=0, inSliceTo=1,
+                                 outSliceFrom=1, outSliceTo=2,
+                                 )
+        con = IdentityConnection(inlayer, outlayer, 
+                         inSliceFrom=1, inSliceTo=2,
+                         outSliceFrom=0, outSliceTo=1,
+                         )
+        net.addInputModule(inlayer)
+        net.addOutputModule(outlayer)
+        net.addConnection(con)
+        net.sortModules()
 
     def lstm_network(self, net):
         scipy.random.seed(2)
@@ -87,36 +103,29 @@ class TestNetworkEquivalence(TestCase):
         net.sortModules()
         
     def equivalence_feed_forward(self, builder):
+        scipy.random.seed(0)
+        runs = 5
+
         _net = pybrainbridge._FeedForwardNetwork()
         builder(_net)
         net = FeedForwardNetwork()
         builder(net)
         
-        inpt = scipy.random.random(net.indim)
-        pybrain_res = net.activate(inpt)
-        arac_res = _net.activate(inpt)
-        self.assertArrayNear(pybrain_res, arac_res)
+        for _ in xrange(runs):
+            inpt = scipy.random.random(net.indim)
+            pybrain_res = net.activate(inpt)
+            arac_res = _net.activate(inpt)
+            self.assertArrayNear(pybrain_res, arac_res)
+            error = scipy.random.random(net.outdim)
+            pybrain_res = net.backActivate(error)
+            arac_res = _net.backActivate(error)
+            self.assertArrayNear(pybrain_res, arac_res)
+            if hasattr(_net, '_derivs'):
+                self.assertArrayNear(_net.derivs, net.derivs)
 
-        error = scipy.random.random(net.outdim)
-        pybrain_res = net.backActivate(error)
-        arac_res = _net.backActivate(error)
-        self.assertArrayNear(pybrain_res, arac_res)
-        self.assertArrayNear(_net.derivs, net.derivs)
-                             
-        inpt = scipy.random.random(net.indim)
-        pybrain_res = net.activate(inpt)
-        arac_res = _net.activate(inpt)
-        self.assertArrayNear(pybrain_res, arac_res)
-                             
-        error = scipy.random.random(net.outdim)
-        pybrain_res = net.backActivate(error)
-        arac_res = _net.backActivate(error)
-        self.assertArrayNear(pybrain_res, arac_res)
-        self.assertArrayNear(_net.derivs, net.derivs)
-                          
     def equivalence_recurrent(self, builder):
         scipy.random.seed(0)
-        runs = 5
+        runs = 10
 
         _net = pybrainbridge._RecurrentNetwork()
         builder(_net)
@@ -137,8 +146,29 @@ class TestNetworkEquivalence(TestCase):
             if hasattr(_net, '_derivs'):
                 self.assertArrayNear(_net.derivs, net.derivs)
                 
+        net.reset()
+        _net.reset()
+        self.assert_((_net.inputbuffer == 0.).all())
+        
+        for _ in xrange(runs):
+            inpt = scipy.random.random(net.indim)
+            pybrain_res = net.activate(inpt)
+            arac_res = _net.activate(inpt)
+            self.assertArrayNear(pybrain_res, arac_res)
+
+        for _ in xrange(runs):
+            error = scipy.random.random(net.outdim)
+            pybrain_res = net.backActivate(error)
+            arac_res = _net.backActivate(error)
+            self.assertArrayNear(pybrain_res, arac_res)
+            if hasattr(_net, '_derivs'):
+                self.assertArrayNear(_net.derivs, net.derivs)
+                
     def testTwoLayerNetwork(self):
         self.equivalence_feed_forward(self.two_layer_network)
+
+    def testSlicedNetwork(self):
+        self.equivalence_feed_forward(self.sliced_connection_network)
 
     def testRecTwoLayerNetwork(self):
         self.equivalence_recurrent(self.rec_two_layer_network)

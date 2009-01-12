@@ -68,6 +68,8 @@ FullConnection::~FullConnection()
 
 void FullConnection::_forward()
 {
+    assert(outgoing()->input().size() >= timestep());
+    
     if (timestep() - get_recurrent() < 0)
     {
         return;

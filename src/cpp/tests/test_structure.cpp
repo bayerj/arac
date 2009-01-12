@@ -69,8 +69,62 @@ TEST(TestCommon, TestBuffer) {
 
 TEST(TestCommon, TestBufferMemory) {
     Buffer* buffer_p = new Buffer(2);
-    
     buffer_p->free_memory();
+}
+
+
+TEST(TestCommon, TestBufferClear) {
+    Buffer buffer(2);
+    double* content_p = new double[2];
+    content_p[0] = 1;
+    content_p[1] = 1;
+    buffer.add(content_p);
+    buffer.expand();
+    buffer.add(content_p);
+    EXPECT_DOUBLE_EQ(1, buffer[0][0])
+        << "Adding buffer values did not work.";
+    EXPECT_DOUBLE_EQ(1, buffer[0][1])
+        << "Adding buffer values did not work.";
+    EXPECT_DOUBLE_EQ(1, buffer[1][0])
+        << "Adding buffer values did not work.";
+    EXPECT_DOUBLE_EQ(1, buffer[1][1])
+        << "Adding buffer values did not work.";
+    buffer.clear_at(0);
+    EXPECT_DOUBLE_EQ(0, buffer[0][0])
+        << "Clearing buffer incorrect.";
+    EXPECT_DOUBLE_EQ(0, buffer[0][1])
+        << "Clearing buffer incorrect.";
+    buffer.clear();
+    EXPECT_DOUBLE_EQ(0, buffer[0][0])
+        << "Clearing buffer incorrect.";
+    EXPECT_DOUBLE_EQ(0, buffer[0][1])
+        << "Clearing buffer incorrect.";
+    EXPECT_DOUBLE_EQ(0, buffer[1][0])
+        << "Clearing buffer incorrect.";
+    EXPECT_DOUBLE_EQ(0, buffer[1][1])
+        << "Clearing buffer incorrect.";
+}
+
+
+TEST(TestModules, TestModuleClear) {
+    LinearLayer layer(2);
+    Buffer& buffer = layer.input();
+    double* content_p = new double[2];
+    content_p[0] = 1;
+    content_p[1] = 1;
+    
+    layer.add_to_input(content_p);
+    EXPECT_DOUBLE_EQ(1, buffer[0][0])
+        << "Adding values did not work.";
+    EXPECT_DOUBLE_EQ(1, buffer[0][1])
+        << "Adding values did not work.";
+        
+    layer.clear();
+    
+    EXPECT_DOUBLE_EQ(0, buffer[0][0])
+        << "Clearing Module incorrect.";
+    EXPECT_DOUBLE_EQ(0, buffer[0][1])
+        << "Clearing Module incorrect.";
 }
 
 
@@ -831,7 +885,6 @@ TEST(TestConnections, LinearConnection) {
 }
 
 
-
 TEST(TestConnections, FullConnectionSliced) {
     LinearLayer* inlayer_p = new LinearLayer(2);
     LinearLayer* outlayer_p = new LinearLayer(3);
@@ -1192,7 +1245,6 @@ TEST(TestNetwork, TestCopyResult) {
 }
 
 
-
 TEST(TestNetwork, TestTwoLayerNetwork) {
     Network* net_p = new Network();
     
@@ -1274,6 +1326,18 @@ TEST(TestNetwork, TestTwoLayerNetwork) {
         << "Derivatives incorrect.";
     EXPECT_DOUBLE_EQ(-8, con_p->get_derivatives()[3])
         << "Derivatives incorrect.";
+
+    net_p->clear();
+    
+    for (int i = 0; i < net_p->input().size(); i++)
+    {
+        for (int j = 0; j < net_p->input().rowsize(); j++)
+        {
+            ASSERT_DOUBLE_EQ(0, net_p->input()[i][j])
+                << "Buffer has not been set to zero at " << i << " " << j;
+            
+        }
+    }
 }
  
         
