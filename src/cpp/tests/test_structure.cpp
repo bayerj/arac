@@ -450,9 +450,9 @@ TEST(TestModules, GateLayer) {
     layer_p->add_to_outerror(outerror_p);
     layer_p->backward();
     
-    EXPECT_DOUBLE_EQ(-0.045176659730911999, layer_p->inerror()[0][0])
+    EXPECT_DOUBLE_EQ(-0.58983579972444555, layer_p->inerror()[0][0])
         << "Backward pass incorrect.";
-    EXPECT_DOUBLE_EQ(0.035325412426582214, layer_p->inerror()[0][1])
+    EXPECT_DOUBLE_EQ(0.41997434161402647, layer_p->inerror()[0][1])
         << "Backward pass incorrect.";
     EXPECT_DOUBLE_EQ(-0.7310585786300049, layer_p->inerror()[0][2])
         << "Backward pass incorrect.";
@@ -1599,7 +1599,6 @@ TEST(TestNetwork, NetworkClearConnection)
         << "Timestep was not reseted.";
 }
 
-       
         
 }  // namespace
 

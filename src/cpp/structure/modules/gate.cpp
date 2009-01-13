@@ -37,8 +37,8 @@ GateLayer::_backward()
 
     for (int i = 0; i < outsize(); i++)
     {
-        inerror_p[i] = sigmoidprime(input_p[i + outsize()]) 
-                       * input_p[i] 
+        inerror_p[i] = sigmoidprime(input_p[i]) 
+                       * input_p[i + outsize()] 
                        * outerror_p[i];
     }
     for(int i = 0; i < outsize(); i++)
