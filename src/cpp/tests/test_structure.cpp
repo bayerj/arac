@@ -1495,7 +1495,6 @@ TEST(TestNetwork, TestRecurrentNetworkTimesteps) {
         << "Wrong timestep.";
     ASSERT_EQ(0, con_p->timestep())
         << "Wrong timestep.";
-
 }
         
         
@@ -1572,6 +1571,32 @@ TEST(TestNetwork, TestMdrnn)
         << "back_activate copy not correct.";
     EXPECT_DOUBLE_EQ(net.inerror()[0][3], inerror_p[3])
         << "back_activate copy not correct.";
+}
+
+
+TEST(TestNetwork, NetworkClearConnection)
+{
+    Network* net_p = new Network();
+    LinearLayer* input = new LinearLayer(1);
+    LinearLayer* output = new LinearLayer(1);
+    FullConnection* con = \
+        new FullConnection(input, output);
+        
+    double* input_p = new double[1];
+        
+    net_p->add_module(input, Network::InputModule);
+    net_p->add_module(output, Network::OutputModule);
+    net_p->add_connection(con);
+    net_p->activate(input_p);
+    net_p->clear();
+    EXPECT_EQ(0, net_p->timestep())
+        << "Timestep was not reseted.";
+    EXPECT_EQ(0, input->timestep())
+        << "Timestep was not reseted.";
+    EXPECT_EQ(0, output->timestep())
+        << "Timestep was not reseted.";
+    EXPECT_EQ(0, con->timestep())
+        << "Timestep was not reseted.";
 }
 
        

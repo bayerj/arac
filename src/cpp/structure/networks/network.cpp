@@ -28,10 +28,12 @@ void
 Network::clear()
 {
     BaseNetwork::clear();
-    std::map<Module*, ModuleType>::iterator iter;
-    for(iter = _modules.begin(); iter != _modules.end(); iter++)
+    std::vector<Component*>::iterator comp_iter;
+    for(comp_iter = _components_sorted.begin(); 
+        comp_iter != _components_sorted.end();
+        ++comp_iter)
     {
-        iter->first->clear();
+        (*comp_iter)->clear();
     }
 }
 
