@@ -137,6 +137,28 @@ class TestNetworkEquivalence(TestCase):
         
         net.sortModules()
         
+    def weird_network(self, net):
+        bias = BiasUnit(name='bias')
+        inlayer = TanhLayer(1, name='input')
+        outlayer = TanhLayer(1, name='output')
+        gatelayer = GateLayer(1, name='gate')
+        con1 = FullConnection(bias, gatelayer, outSliceFrom=0, outSliceTo=1)
+        con2 = FullConnection(bias, gatelayer, outSliceFrom=1, outSliceTo=2)
+        con3 = FullConnection(inlayer, gatelayer, outSliceFrom=0, outSliceTo=1)
+        con4 = FullConnection(inlayer, gatelayer, outSliceFrom=1, outSliceTo=2)
+        con5 = FullConnection(gatelayer, outlayer)
+        net.addInputModule(inlayer)
+        net.addModule(bias)
+        net.addModule(gatelayer)
+        net.addOutputModule(outlayer)
+        net.addConnection(con1)
+        net.addConnection(con2)
+        net.addConnection(con3)
+        net.addConnection(con4)
+        net.addConnection(con5)
+        net.sortModules()
+        net.params[:] = 1, 2, 3, 4, 5
+        
     def rec_three_layer_network(self, net):
         inlayer = TanhLayer(2, 'in')
         hiddenlayer = TanhLayer(hiddensize, 'hidden')
@@ -163,6 +185,15 @@ class TestNetworkEquivalence(TestCase):
             inpt = scipy.random.random(net.indim)
             pybrain_res = net.activate(inpt)
             arac_res = _net.activate(inpt)
+            
+            # for module in net.modulesSorted:
+            #     print module.name
+            #     for bn, _ in module.bufferlist:
+            #         print getattr(net[module.name], bn)
+            #         print getattr(_net[module.name], bn)
+            #         print "-" * 5
+            #     print "=" * 20
+            
             self.assertArrayNear(pybrain_res, arac_res)
             error = scipy.random.random(net.outdim)
             pybrain_res = net.backActivate(error)
@@ -212,16 +243,16 @@ class TestNetworkEquivalence(TestCase):
             if hasattr(_net, '_derivs'):
                 self.assertArrayNear(_net.derivs, net.derivs)
                 
-    def testTwoLayerNetwork(self):
+    def _testTwoLayerNetwork(self):
         self.equivalence_feed_forward(self.two_layer_network)
 
-    def testSlicedNetwork(self):
+    def _testSlicedNetwork(self):
         self.equivalence_feed_forward(self.sliced_connection_network)
 
-    def testRecTwoLayerNetwork(self):
+    def _testRecTwoLayerNetwork(self):
         self.equivalence_recurrent(self.rec_two_layer_network)
         
-    def testParametersDerivatives(self):
+    def _testParametersDerivatives(self):
         rnet = pybrainbridge._RecurrentNetwork()
         self.lstm_network(rnet)
         self.assert_(getattr(rnet, '_derivs', None) is not None)
@@ -230,7 +261,7 @@ class TestNetworkEquivalence(TestCase):
         self.two_layer_network(fnet)
         self.assert_(getattr(fnet, '_derivs', None) is not None)
         
-    def testTimesteps(self):
+    def _testTimesteps(self):
         _net = pybrainbridge._RecurrentNetwork()
         self.rec_two_layer_network(_net)
         
@@ -276,11 +307,15 @@ class TestNetworkEquivalence(TestCase):
         for proxy in proxies:
             self.assertEqual(proxy.timestep(), 0)
 
-    def testLstmNetwork(self):
+    def _testLstmNetwork(self):
         self.equivalence_recurrent(self.lstm_network)
 
-    def testLstmCell(self):
+    def _testLstmCell(self):
         self.equivalence_recurrent(self.lstm_cell)
+
+    def testWeirdNetwork(self):
+        self.equivalence_feed_forward(self.weird_network)
+        self.equivalence_recurrent(self.weird_network)
 
 
 

@@ -5,7 +5,7 @@
 #ifndef Arac_STRUCTURE_MODULES_BIAS_INCLUDED
 #define Arac_STRUCTURE_MODULES_BIAS_INCLUDED
 
-
+#include <iostream>
 #include "module.h"
 
 

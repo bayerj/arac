@@ -111,6 +111,10 @@ class PybrainAracMapper(object):
         except KeyError:
             proxy = cppbridge.Bias()
             self[bias] = proxy
+        proxy.init_input(bias.inputbuffer)
+        proxy.init_output(bias.outputbuffer)
+        proxy.init_inerror(bias.inputerror)
+        proxy.init_outerror(bias.outputerror)
         return proxy
         
     def _lstm_handler(self, layer):

@@ -76,9 +76,9 @@ void FullConnection::_forward()
     int indim = _incomingstop - _incomingstart;
     int outdim = _outgoingstop - _outgoingstart;
 
-    double* sink_p = _outgoing_p->input()[timestep()] + _incomingstart;
+    double* sink_p = _outgoing_p->input()[timestep()] + _outgoingstart;
     double* source_p = _incoming_p->output()[timestep() - get_recurrent()];
-    source_p += _outgoingstart;
+    source_p += _incomingstart;
 
     cblas_dgemv(CblasRowMajor, 
                 // Transpose the matrix since we want to multiply from the right
