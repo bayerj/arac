@@ -243,16 +243,16 @@ class TestNetworkEquivalence(TestCase):
             if hasattr(_net, '_derivs'):
                 self.assertArrayNear(_net.derivs, net.derivs)
                 
-    def _testTwoLayerNetwork(self):
+    def testTwoLayerNetwork(self):
         self.equivalence_feed_forward(self.two_layer_network)
 
-    def _testSlicedNetwork(self):
+    def testSlicedNetwork(self):
         self.equivalence_feed_forward(self.sliced_connection_network)
 
-    def _testRecTwoLayerNetwork(self):
+    def testRecTwoLayerNetwork(self):
         self.equivalence_recurrent(self.rec_two_layer_network)
         
-    def _testParametersDerivatives(self):
+    def testParametersDerivatives(self):
         rnet = pybrainbridge._RecurrentNetwork()
         self.lstm_network(rnet)
         self.assert_(getattr(rnet, '_derivs', None) is not None)
@@ -261,7 +261,7 @@ class TestNetworkEquivalence(TestCase):
         self.two_layer_network(fnet)
         self.assert_(getattr(fnet, '_derivs', None) is not None)
         
-    def _testTimesteps(self):
+    def testTimesteps(self):
         _net = pybrainbridge._RecurrentNetwork()
         self.rec_two_layer_network(_net)
         
@@ -307,10 +307,10 @@ class TestNetworkEquivalence(TestCase):
         for proxy in proxies:
             self.assertEqual(proxy.timestep(), 0)
 
-    def _testLstmNetwork(self):
+    def testLstmNetwork(self):
         self.equivalence_recurrent(self.lstm_network)
 
-    def _testLstmCell(self):
+    def testLstmCell(self):
         self.equivalence_recurrent(self.lstm_cell)
 
     def testWeirdNetwork(self):
