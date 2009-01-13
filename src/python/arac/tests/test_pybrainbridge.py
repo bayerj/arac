@@ -18,6 +18,7 @@ from pybrain.structure import (
     LinearLayer, 
     BiasUnit,
     SigmoidLayer, 
+    GateLayer,
     TanhLayer,
     LSTMLayer,
     SoftmaxLayer,
@@ -89,6 +90,53 @@ class TestNetworkEquivalence(TestCase):
         net.sortModules()
         net.params[:] = scipy.random.random(18)
         
+    def lstm_cell(self, net):
+        inpt = LinearLayer(4, 'inpt')
+        forgetgate = GateLayer(1, 'forgetgate')
+        ingate = GateLayer(1, 'ingate')
+        outgate = GateLayer(1, 'outgate')
+        state = LinearLayer(1, 'state')
+        
+        in_to_fg = IdentityConnection(inpt, forgetgate, 
+                                      inSliceFrom=0, inSliceTo=1,
+                                      outSliceFrom=0, outSliceTo=1,
+                                      name='in_to_fg')
+        in_to_og = IdentityConnection(inpt, outgate, 
+                                      inSliceFrom=1, inSliceTo=2,
+                                      outSliceFrom=1, outSliceTo=2,
+                                      name='in_to_og')
+        in_to_ig = IdentityConnection(inpt, ingate,
+                                      inSliceFrom=2, inSliceTo=4,
+                                      outSliceFrom=0, outSliceTo=2,
+                                      name='in_to_ig')
+        fg_to_st = IdentityConnection(forgetgate, state,
+                                      name='fg_to_st')
+        st_to_fg = IdentityConnection(state, forgetgate, 
+                                      outSliceFrom=1, outSliceTo=2,
+                                      name='st_to_fg'
+                                      )
+        st_to_og = IdentityConnection(state, outgate,
+                                     outSliceFrom=1, outSliceTo=2,
+                                     name='st_to_og'
+                                     )
+        ig_to_st = IdentityConnection(ingate, state, name='ig_to_st')
+        
+        net.addInputModule(inpt)
+        net.addModule(forgetgate)
+        net.addModule(ingate)
+        net.addModule(state)
+        net.addOutputModule(outgate)
+        
+        net.addConnection(in_to_fg)
+        net.addConnection(in_to_og)
+        net.addConnection(in_to_ig)
+        net.addConnection(fg_to_st)
+        net.addRecurrentConnection(st_to_fg)
+        net.addConnection(st_to_og)
+        net.addConnection(ig_to_st)
+        
+        net.sortModules()
+        
     def rec_three_layer_network(self, net):
         inlayer = TanhLayer(2, 'in')
         hiddenlayer = TanhLayer(hiddensize, 'hidden')
@@ -132,7 +180,7 @@ class TestNetworkEquivalence(TestCase):
         net = RecurrentNetwork()
         builder(net)
         
-        for _ in xrange(runs):
+        for i in xrange(runs):
             inpt = scipy.random.random(net.indim)
             pybrain_res = net.activate(inpt)
             arac_res = _net.activate(inpt)
@@ -230,6 +278,10 @@ class TestNetworkEquivalence(TestCase):
 
     def testLstmNetwork(self):
         self.equivalence_recurrent(self.lstm_network)
+
+    def testLstmCell(self):
+        self.equivalence_recurrent(self.lstm_cell)
+
 
 
 if __name__ == "__main__":

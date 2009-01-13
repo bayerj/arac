@@ -97,7 +97,7 @@ class PybrainAracMapper(object):
         try:
             proxy = self[layer]
         except KeyError:
-            proxy = self.classmapping[layer.__class__](layer.dim)
+            proxy = self.classmapping[layer.__class__](layer.outdim)
             self[layer] = proxy
         proxy.init_input(layer.inputbuffer)
         proxy.init_output(layer.outputbuffer)

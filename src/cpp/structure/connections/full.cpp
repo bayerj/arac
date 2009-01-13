@@ -68,13 +68,10 @@ FullConnection::~FullConnection()
 
 void FullConnection::_forward()
 {
-    assert(outgoing()->input().size() >= timestep());
-    
     if (timestep() - get_recurrent() < 0)
     {
         return;
     }
-    
 
     int indim = _incomingstop - _incomingstart;
     int outdim = _outgoingstop - _outgoingstart;

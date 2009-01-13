@@ -236,16 +236,27 @@ Network::sort()
     {
         if (count_iter->second != 0)
         {
-            assert(0);
             // FIXME: error handling, graph has cycle.
-            ;
+            assert(0);
         }
     }
 
     // Fill the list of sorted components correctly.
-    // TODO: connections should be ordered by recurrency in descending order and
-    // and then added in the front of the sorted components vector.
     _components_sorted.clear();
+    
+    // First fill in the recurrent connections.
+    // TODO: These should be sorted by recurrency.
+    for (con_iter = _connections.begin();
+         con_iter != _connections.end();
+         con_iter++)
+    {
+        if (((*con_iter)->get_recurrent()))
+        {
+            _components_sorted.push_back(*con_iter);
+        }
+    }
+    
+    // Then fill in the rest in topological order.
     for(mod_iter = sorted.begin(); mod_iter != sorted.end(); mod_iter++)
     {
         _components_sorted.push_back(*mod_iter);
@@ -253,10 +264,13 @@ Network::sort()
             con_iter != _outgoing_connections[*mod_iter].end();
             con_iter++)
         {
+            if (((*con_iter)->get_recurrent()))
+            {
+                continue;
+            }
             _components_sorted.push_back(*con_iter);
         }
     }
-    
     init_buffers();
     _dirty = false;
 }
