@@ -3,6 +3,7 @@
 
 
 #include <cassert>
+#include <cstring>
 
 #include "lstm.h"
 

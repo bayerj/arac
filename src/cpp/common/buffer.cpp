@@ -2,6 +2,7 @@
 // (c) 2008 by Justin S Bayer, <bayer.justin@googlemail.com>
 
 #include <iostream>
+#include <cstring>
 
 #include "buffer.h"
 

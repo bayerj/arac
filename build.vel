@@ -5,7 +5,7 @@ options (
 	author "Justin S Bayer, bayer.justin@googlemail.com"
 	version "pre0.3"
 
-	compiler "g++"
+	compiler "/sw/lib/gcc4.3/bin/g++"
 	flags "-g -I/usr/local/include -I/usr/include -I/sw/include" 
     lnflags "-L/usr/local/lib -L/usr/lib -lm -lblas"
     numy_swig_dir "/Users/bayerj/devel/thirdparty/numpy/doc/swig"
