@@ -17,6 +17,8 @@ counterparts.
 __author__ = 'Justin S Bayer, bayer.justin@googlemail.com'
 
 
+import copy
+
 import scipy
 
 from pybrain.structure import (
@@ -201,6 +203,14 @@ class _Network(Network):
         super(_Network, self).__init__(*args, **kwargs)
         # Mapping the components of the network to their proxies.
         self.proxies = PybrainAracMapper()
+        
+    def copy(self):
+        old_proxies = self.proxies
+        self.proxies = PybrainAracMapper()
+        result = copy.deepcopy(self)
+        self.proxies = old_proxies
+        result.sortModules()
+        return result
 
     def _growBuffers(self):
         super(_Network, self)._growBuffers()

@@ -7,7 +7,9 @@
 __author__ = 'Justin S Bayer, bayer.justin@googlemail.com'
 
 
+import copy
 import unittest
+
 import scipy
 
 import arac.pybrainbridge as pybrainbridge
@@ -316,7 +318,18 @@ class TestNetworkEquivalence(TestCase):
     def testWeirdNetwork(self):
         self.equivalence_feed_forward(self.weird_network)
         self.equivalence_recurrent(self.weird_network)
-
+        
+    def testCopyable(self):
+        net = pybrainbridge._RecurrentNetwork()
+        self.lstm_network(net)
+        success = False
+        e = ""
+        try:
+            copied = net.copy()
+            success = True
+        except TypeError, e:
+            success = False
+        self.assert_(success, e)
 
 
 if __name__ == "__main__":
