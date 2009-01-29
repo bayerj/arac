@@ -1,24 +1,20 @@
 options (
-	default "lib"
+	default "build"
 	
 	project "Arac - Neural Network Composition Library"
 	author "Justin S Bayer, bayer.justin@googlemail.com"
 	version "pre0.3"
 
-	compiler "/sw/lib/gcc4.3/bin/g++"
-	flags "-g -O3 -I/usr/local/include -I/usr/include -I/sw/include" 
-    lnflags "-L/usr/local/lib -L/usr/lib -lm -lblas"
-    numy_swig_dir "/Users/bayerj/devel/thirdparty/numpy/doc/swig"
+    numpy_swig_dir "/Users/bayerj/devel/thirdparty/numpy/doc/swig"
     swig_dir "src/swig"
     py_dir "src/python/arac"
 )
 
 
 depends (
-	lib ['basis']
-	test.c.build ['lib']
+	test.c.build ['build']
 	test.c.run ['test.c.build']
-	test.py ['swig' 'lib']
+	test.py ['lib']
 	test ['test.c.run' 'test.py.run']
 )
 
@@ -29,41 +25,17 @@ imports [
 
 targets (
 
-	basis [
-		$ %(compiler)s %(flags)s -c src/cpp/common/buffer.cpp -o src/cpp/common/buffer.o
-		$ %(compiler)s %(flags)s -c src/cpp/structure/modules/module.cpp -o src/cpp/structure/modules/module.o
-		$ %(compiler)s %(flags)s -c src/cpp/structure/modules/linear.cpp -o src/cpp/structure/modules/linear.o
-		$ %(compiler)s %(flags)s -c src/cpp/structure/modules/gate.cpp -o src/cpp/structure/modules/gate.o
-		$ %(compiler)s %(flags)s -c src/cpp/structure/modules/mdlstm.cpp -o src/cpp/structure/modules/mdlstm.o
-		$ %(compiler)s %(flags)s -c src/cpp/structure/modules/bias.cpp -o src/cpp/structure/modules/bias.o
-		$ %(compiler)s %(flags)s -c src/cpp/structure/modules/lstm.cpp -o src/cpp/structure/modules/lstm.o
-		$ %(compiler)s %(flags)s -c src/cpp/structure/modules/partialsoftmax.cpp -o src/cpp/structure/modules/partialsoftmax.o
-		$ %(compiler)s %(flags)s -c src/cpp/structure/modules/softmax.cpp -o src/cpp/structure/modules/softmax.o
-		$ %(compiler)s %(flags)s -c src/cpp/structure/modules/sigmoid.cpp -o src/cpp/structure/modules/sigmoid.o
-		$ %(compiler)s %(flags)s -c src/cpp/structure/modules/tanh.cpp -o src/cpp/structure/modules/tanh.o
-		$ %(compiler)s %(flags)s -c src/cpp/structure/modules/modules.cpp -o src/cpp/structure/modules/modules.o
-		$ %(compiler)s %(flags)s -c src/cpp/structure/connections/connection.cpp -o src/cpp/structure/connections/connection.o
-		$ %(compiler)s %(flags)s -c src/cpp/structure/connections/full.cpp -o src/cpp/structure/connections/full.o
-		$ %(compiler)s %(flags)s -c src/cpp/structure/connections/linear.cpp -o src/cpp/structure/connections/linear.o
-		$ %(compiler)s %(flags)s -c src/cpp/structure/connections/identity.cpp -o src/cpp/structure/connections/identity.o
-		$ %(compiler)s %(flags)s -c src/cpp/structure/connections/connections.cpp -o src/cpp/structure/connections/connections.o
-		$ %(compiler)s %(flags)s -c src/cpp/structure/networks/basenetwork.cpp -o src/cpp/structure/networks/basenetwork.o
-		$ %(compiler)s %(flags)s -c src/cpp/structure/networks/network.cpp -o src/cpp/structure/networks/network.o
-		$ %(compiler)s %(flags)s -c src/cpp/structure/networks/networks.cpp -o src/cpp/structure/networks/networks.o
-		$ %(compiler)s %(flags)s -c src/cpp/structure/networks/mdrnns/basemdrnn.cpp -o src/cpp/structure/networks/mdrnns/basemdrnn.o
-		$ %(compiler)s %(flags)s -c src/cpp/structure/networks/mdrnns/mdrnn.cpp -o src/cpp/structure/networks/mdrnns/mdrnn.o
-		$ %(compiler)s %(flags)s -c src/cpp/structure/component.cpp -o src/cpp/structure/component.o
-		$ %(compiler)s %(flags)s -c src/cpp/structure/parametrized.cpp -o src/cpp/structure/parametrized.o
-		$ %(compiler)s %(flags)s -c src/cpp/structure/structure.cpp -o src/cpp/structure/structure.o
-		$ %(compiler)s %(flags)s -c src/cpp/arac.cpp -o src/cpp/arac.o
-	]
-
-	lib [
-		$ %(compiler)s %(flags)s %(lnflags)s -dynamiclib -shared -o libarac.so src/cpp/common/buffer.o src/cpp/structure/modules/module.o src/cpp/structure/modules/gate.o src/cpp/structure/modules/linear.o src/cpp/structure/modules/bias.o src/cpp/structure/modules/mdlstm.o src/cpp/structure/modules/lstm.o src/cpp/structure/modules/partialsoftmax.o src/cpp/structure/modules/softmax.o src/cpp/structure/modules/sigmoid.o src/cpp/structure/modules/tanh.o src/cpp/structure/modules/modules.o src/cpp/structure/connections/connection.o src/cpp/structure/connections/identity.o src/cpp/structure/connections/linear.o src/cpp/structure/connections/full.o src/cpp/structure/connections/connections.o src/cpp/structure/networks/basenetwork.o src/cpp/structure/networks/network.o src/cpp/structure/networks/networks.o src/cpp/structure/networks/mdrnns/basemdrnn.o src/cpp/structure/networks/mdrnns/mdrnn.o src/cpp/structure/component.o src/cpp/structure/parametrized.o src/cpp/structure/structure.o src/cpp/arac.o
+	build [
+	    py [
+	        |import os, sys
+	        |sys.path.append(os.getcwd())
+	        |import build
+	        |build.compile_arac()
+	    ]
 	]
 	
 	test.c.build [
-		$ %(compiler)s %(flags)s -c -o src/cpp/tests/test_structure.o src/cpp/tests/test_structure.cpp
+      $ %(compiler)s %(flags)s -c -o src/cpp/tests/test_structure.o src/cpp/tests/test_structure.cpp
       $ %(compiler)s -L. -lgtest -larac -o test-arac src/cpp/tests/test_structure.o
 	]
 	
@@ -78,7 +50,7 @@ targets (
 	test []
 	
 	swig [
-	   $ swig -Wall -python -c++ -outdir %(swig_dir)s -I%(numy_swig_dir)s -o %(swig_dir)s/cppbridge_wrap.cpp %(swig_dir)s/cppbridge.i
+	   $ swig -Wall -python -c++ -outdir %(swig_dir)s -I%(numpy_swig_dir)s -o %(swig_dir)s/cppbridge_wrap.cpp %(swig_dir)s/cppbridge.i
 	   $ gcc -larac -L. -c -Wno-long-double %(swig_dir)s/cppbridge_wrap.cpp -Isrc/cpp/ -I/usr/local/include/python2.6 -I/usr/local/lib/python2.6/config -I/usr/local//lib/python2.6/site-packages/numpy/core/include -o %(swig_dir)s/cppbridge_wrap.o
        $ gcc -larac -L. -Wno-long-double -bundle -undefined suppress -flat_namespace %(swig_dir)s/cppbridge_wrap.o -o %(swig_dir)s/_cppbridge.so
        $ cp %(swig_dir)s/cppbridge.py %(py_dir)s/
