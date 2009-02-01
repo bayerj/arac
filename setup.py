@@ -101,3 +101,17 @@ def compile_test():    # Now compile test.
     compiler.add_library('gtest')
     compiler.add_library('arac')
     compiler.link_executable(objects, 'test-arac')
+    
+    
+setup(
+    name="Arac",
+    version="0.1post",
+    description="Arac is a C++ library for modular neural networking.",
+    license="BSD",
+    keywords="Neural Networks Machine Learning",
+    packages=find_packages('./src/python'),
+    include_package_data=True,
+    package_dir={'arac': './src/python/arac'},
+    data_files=[('arac', ('libarac.dylib',))],
+    test_suite='arac.tests.runtests.make_test_suite',
+)
