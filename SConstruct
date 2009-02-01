@@ -16,14 +16,15 @@ libenv = Environment(LIBS=['m', 'blas'], CPPPATH=CPPPATH, LIBPATH=LIBPATH,
                      SHLIBPREFIX="")
 library_globs = ['src/cpp/*.cpp', 
                  'src/cpp/common/*.cpp', 
+                 'src/cpp/datasets/*.cpp', 
                  'src/cpp/structure/*.cpp',  
                  'src/cpp/structure/connections/*.cpp',  
                  'src/cpp/structure/modules/*.cpp',  
                  'src/cpp/structure/networks/*.cpp',
                  'src/cpp/structure/networks/mdrnns/*.cpp']
 lib = libenv.SharedLibrary('libarac.dylib', sum([Glob(i) for i in library_globs], []))
-libenv.Install('/usr/local/lib/', lib)
-libenv.Alias('install', '/usr/local/lib/')
+libenv.Install('/usr/local/lib', lib)
+libenv.Alias('install', '/usr/local/lib')
 
 # Then compile the tests.
 testenv = Environment(LIBS=['arac', 'gtest'], CPPPATH=CPPPATH, LIBPATH=LIBPATH)
