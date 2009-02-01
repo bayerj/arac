@@ -104,7 +104,7 @@ def compile_test():    # Now compile test.
     
     
 setup(
-    name="Arac",
+    name="arac",
     version="0.1post",
     description="Arac is a C++ library for modular neural networking.",
     license="BSD",
