@@ -8,11 +8,14 @@ options (
     numpy_swig_dir "/Users/bayerj/devel/thirdparty/numpy/doc/swig"
     swig_dir "src/swig"
     py_dir "src/python/arac"
+
+    compiler "/sw/lib/gcc4.3/bin/g++"    
+    flags "-g -O3 -I/usr/local/include -I/usr/include -I/sw/include" 
+    lnflags "-L/usr/local/lib -L/usr/lib -lm -lblas"
 )
 
 
 depends (
-	test.c.build ['build']
 	test.c.run ['test.c.build']
 	test.py ['lib']
 	test ['test.c.run' 'test.py.run']
@@ -29,14 +32,18 @@ targets (
 	    py [
 	        |import os, sys
 	        |sys.path.append(os.getcwd())
-	        |import build
-	        |build.compile_arac()
+	        |import setup
+	        |setup.compile_arac()
 	    ]
 	]
 	
 	test.c.build [
-      $ %(compiler)s %(flags)s -c -o src/cpp/tests/test_structure.o src/cpp/tests/test_structure.cpp
-      $ %(compiler)s -L. -lgtest -larac -o test-arac src/cpp/tests/test_structure.o
+	    py [
+	        |import os, sys
+	        |sys.path.append(os.getcwd())
+	        |import setup
+	        |setup.compile_test()
+	    ]
 	]
 	
 	test.c.run [
@@ -50,11 +57,13 @@ targets (
 	test []
 	
 	swig [
-	   $ swig -Wall -python -c++ -outdir %(swig_dir)s -I%(numpy_swig_dir)s -o %(swig_dir)s/cppbridge_wrap.cpp %(swig_dir)s/cppbridge.i
-	   $ gcc -larac -L. -c -Wno-long-double %(swig_dir)s/cppbridge_wrap.cpp -Isrc/cpp/ -I/usr/local/include/python2.6 -I/usr/local/lib/python2.6/config -I/usr/local//lib/python2.6/site-packages/numpy/core/include -o %(swig_dir)s/cppbridge_wrap.o
-       $ gcc -larac -L. -Wno-long-double -bundle -undefined suppress -flat_namespace %(swig_dir)s/cppbridge_wrap.o -o %(swig_dir)s/_cppbridge.so
-       $ cp %(swig_dir)s/cppbridge.py %(py_dir)s/
-       $ cp %(swig_dir)s/_cppbridge.so %(py_dir)s/
+        $ swig -Wall -python -c++ -outdir %(swig_dir)s -I%(numpy_swig_dir)s -o %(swig_dir)s/cppbridge_wrap.cpp %(swig_dir)s/cppbridge.i
+        py [
+	        |import os, sys
+	        |sys.path.append(os.getcwd())
+	        |import setup
+	        |setup.compile_swig()
+	    ]
    ]
 	
 	clean [
@@ -62,9 +71,9 @@ targets (
 		$ rm -rf src/cpp/structure/connections/*.o
 		$ rm -rf src/cpp/structure/modules/*.o
 		$ rm -rf src/cpp/structure/networks/*.o
+		$ rm -rf src/cpp/structure/networks/mdrnns/*.o
 		$ rm libarac.so
 		$ rm test-arac
-		$ rm src/swig/*.so
 		$ rm src/swig/*.cpp
 		$ rm src/swig/*.o
 		$ rm src/swig/*.py
