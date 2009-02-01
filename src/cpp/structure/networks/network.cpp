@@ -52,6 +52,7 @@ Network::add_module(Module* module_p, Network::ModuleType type)
     {
         _outmodules.push_back(module_p);
     }
+    add_component(module_p);
 }
 
 
@@ -61,6 +62,7 @@ Network::add_connection(Connection* con_p)
     _dirty = true;
     _connections.push_back(con_p);
     _outgoing_connections[con_p->incoming()].push_back(con_p);
+    add_component(con_p);
 }
 
 
@@ -156,6 +158,16 @@ Network::_backward()
         double* source_p = module_p->inerror()[mod_timestep];
         memcpy((void*) inerror_p, (void*) source_p, size * sizeof(double));
         inerror_p += size;
+    }
+}
+
+
+void
+Network::add_component(Component* comp_p)
+{
+    if (Parametrized* parametrized_p = dynamic_cast<Parametrized*>(comp_p))
+    {
+        _parametrizeds.push_back(parametrized_p);
     }
 }
 

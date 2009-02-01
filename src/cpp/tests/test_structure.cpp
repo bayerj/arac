@@ -1245,6 +1245,21 @@ TEST(TestNetwork, TestCopyResult) {
 }
 
 
+TEST(TestNetwork, TestAddParametrized) {
+    Network* net_p = new Network();
+    
+    LinearLayer* inlayer_p = new LinearLayer(2);
+    LinearLayer* outlayer_p = new LinearLayer(2);
+    FullConnection* con_p = new FullConnection(inlayer_p, outlayer_p);
+
+    net_p->add_module(inlayer_p, Network::InputModule);
+    net_p->add_module(outlayer_p, Network::OutputModule);
+    net_p->add_connection(con_p);
+
+    ASSERT_EQ(con_p, net_p->parametrizeds()[0]);
+}
+
+
 TEST(TestNetwork, TestTwoLayerNetwork) {
     Network* net_p = new Network();
     
