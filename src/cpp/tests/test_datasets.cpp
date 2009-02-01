@@ -63,7 +63,6 @@ TEST(TestDataset, TestConstruction)
         << "Wrong item in dataset.";
     EXPECT_EQ(0, ds[3][2])
         << "Wrong item in dataset.";
-    
 }
 
         
