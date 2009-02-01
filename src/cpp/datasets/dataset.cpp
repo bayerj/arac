@@ -16,9 +16,18 @@ Dataset::Dataset() :
 }
 
 
+Dataset::~Dataset()
+{
+    
+}
+
+
 Dataset::Dataset(int inputsize, int targetsize) :
     _inputsize(inputsize),
     _targetsize(targetsize)
 {
     
 }
+
+
+
