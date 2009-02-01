@@ -54,8 +54,10 @@ def compile_arac():
         raise AracCompileError('No support for arac on platform %s yet.' 
                                % sys.platform)
     
-    globs = ('src/cpp/*.cpp', 
+    globs = (
+             'src/cpp/*.cpp', 
              'src/cpp/common/*.cpp', 
+             'src/cpp/datasets/*.cpp',  
              'src/cpp/structure/*.cpp',  
              'src/cpp/structure/connections/*.cpp',  
              'src/cpp/structure/modules/*.cpp',  

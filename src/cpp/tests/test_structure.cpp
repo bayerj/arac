@@ -1601,5 +1601,3 @@ TEST(TestNetwork, NetworkClearConnection)
 
         
 }  // namespace
-
-

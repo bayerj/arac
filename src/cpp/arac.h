@@ -9,6 +9,7 @@
 #define Arac_INCLUDED
 
 #include "structure/structure.h"
+#include "datasets/datasets.h"
 
 #endif
 

@@ -68,6 +68,7 @@ targets (
 	
 	clean [
 		$ rm -rf src/cpp/structure/*.o
+		$ rm -rf src/cpp/datasets/*.o
 		$ rm -rf src/cpp/structure/connections/*.o
 		$ rm -rf src/cpp/structure/modules/*.o
 		$ rm -rf src/cpp/structure/networks/*.o
