@@ -7,6 +7,8 @@
 
 
 #include "dataset.h"
+#include "sequence.h"
+#include "semisequence.h"
 
 
 #endif
