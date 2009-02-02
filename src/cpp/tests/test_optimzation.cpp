@@ -34,13 +34,19 @@ TEST(TestBackprop, TestStochasticStep)
     ds.append(row_p);
     
     Backprop trainer(*net_p, ds);
-    trainer.set_learningrate(1);
+    trainer.set_learningrate(1.);
     trainer.train_stochastic();
+
+    EXPECT_DOUBLE_EQ(1, con_p->get_derivatives()[0])
+        << "Derivatives not correct.";
+
+    EXPECT_DOUBLE_EQ(0.5, con_p->get_derivatives()[1])
+        << "Derivatives not correct.";
     
-    EXPECT_DOUBLE_EQ(3, con_p->get_parameters()[0])
+    EXPECT_DOUBLE_EQ(2, con_p->get_parameters()[0])
         << "Parameters not learned correctly.";
 
-    EXPECT_DOUBLE_EQ(5.5, con_p->get_parameters()[1])
+    EXPECT_DOUBLE_EQ(3, con_p->get_parameters()[1])
         << "Parameters not learned correctly.";
 }
         
