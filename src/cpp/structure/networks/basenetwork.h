@@ -53,16 +53,17 @@ class BaseNetwork : public arac::structure::modules::Module
         virtual void back_activate(const double* outerror_p, double* inerror_p);
         
         virtual void forward();
-        
-    protected:
-        
-        bool _dirty;
-        
+
         ///
         /// Initialize the network for processing. This method has to be 
         /// overwritten by subclasses.
         ///
         virtual void sort() = 0;
+        
+    protected:
+        
+        bool _dirty;
+        
 };
 
 

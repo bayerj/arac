@@ -90,6 +90,7 @@ class Network : public BaseNetwork
         ///
         // TODO: allow specification of intervals.
         void randomize();
+        virtual void sort();
         
     protected:
         
@@ -102,8 +103,6 @@ class Network : public BaseNetwork
         /// Fill count with the amount of incoming edges for every module.
         ///
         void incoming_count(std::map<Module*, int>& count);
-        
-        virtual void sort();
         
         void init_buffers();
 
