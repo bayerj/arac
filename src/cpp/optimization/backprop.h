@@ -45,6 +45,7 @@ class Backprop
         Network& _network;
         Dataset& _dataset;
         double _learningrate;
+        double* _error_p;
 };
 
 

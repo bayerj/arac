@@ -2,6 +2,9 @@
 // (c) 2008 by Justin S Bayer, <bayer.justin@googlemail.com>
 
 
+#include <iostream>
+#include <typeinfo>
+
 #include "backprop.h"
 #include "../structure/parametrized.h"
 
@@ -15,13 +18,16 @@ Backprop::Backprop(Network& network, Dataset& dataset) :
     _dataset(dataset),
     _learningrate(0.001)
 {
-    // TODO: assert that dimensions are correct.
+    _network.sort();
+    assert(_network.insize() == _dataset.inputsize());
+    assert(_network.outsize() == _dataset.targetsize());
+    _error_p = new double[_network.outsize()];
 }
 
 
 Backprop::~Backprop()
 {
-    
+    delete[] _error_p;
 }
 
 
@@ -29,12 +35,11 @@ void
 Backprop::process_sample(const double* input_p, const double* target_p)
 {
     const double* output_p = network().activate(input_p);
-    double* error_p = new double[network().outsize()];
     for (int i = 0; i < network().outsize(); i++)
     {
-        error_p[i] = input_p[i] - target_p[i];
+        _error_p[i] = target_p[i] - output_p[i];
     }
-    network().back_activate(error_p);
+    network().back_activate(_error_p);
 }
         
 
@@ -49,6 +54,7 @@ Backprop::train_stochastic()
     process_sample(input_p, target_p);
     learn();
 }
+
 
 void 
 Backprop::learn()
