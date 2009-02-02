@@ -11,6 +11,7 @@
 #include "structure/structure.h"
 #include "datasets/datasets.h"
 #include "utilities/utilities.h"
+#include "optimization/optimization.h"
 
 #endif
 
