@@ -34,7 +34,7 @@ test = testenv.Program('test-arac', Glob('src/cpp/tests/*.cpp'))
 swigenv = Environment(SWIGFLAGS=['-python', '-c++'],
                       CPPPATH=CPPPATH + NUMPYPATH + PYTHONPATH,
                       LIBS=['arac'],
-                      CCFLAGS='-Wno-long-double -bundle -undefined suppress -flat_namespace',
+                      CCFLAGS='-bundle -undefined suppress -flat_namespace',
                       LINKFLAGS='-Wno-long-double -undefined suppress -flat_namespace',
                       LIBPATH=LIBPATH,
                       SHLIBPREFIX="")
