@@ -99,7 +99,7 @@ TEST(TestDataset_sequence_array, TestConstruction)
 }
 
 
-TEST(TestDataset_array_array, TestConstruction)
+TEST(TestDataset, TestConstruction)
 {
     double* data_p = new double[12];
     data_p[0] = 0;
@@ -118,7 +118,7 @@ TEST(TestDataset_array_array, TestConstruction)
     data_p[10] = 1;
     data_p[11] = 0;
     
-    SupervisedSimpleDataset ds(2, 1);
+    SupervisedDataset<double*, double*> ds(2, 1);
     ds.append(data_p, data_p + 2);
     ds.append(data_p + 3, data_p + 5);
     ds.append(data_p + 6, data_p + 8);
@@ -157,17 +157,4 @@ TEST(TestDataset_array_array, TestConstruction)
 }
 
 
-TEST(TestDataSet_sequential_array, TestConstruction)
-{
-    
-    
-}
-
-
-TEST(TestSemiSequentialDataset, TestConstruction)
-{
-    
-}
-
-        
 }  // namespace
