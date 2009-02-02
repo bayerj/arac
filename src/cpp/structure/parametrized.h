@@ -32,6 +32,8 @@ class Parametrized
         bool parameters_owner();
         bool derivatives_owner();
         
+        int size();
+        
     protected:
         
         double* _parameters_p;
@@ -40,6 +42,14 @@ class Parametrized
         bool _parameters_owner;
         bool _derivatives_owner;
 };
+
+
+inline
+int
+Parametrized::size()
+{
+    return _size;
+}
  
  
 }

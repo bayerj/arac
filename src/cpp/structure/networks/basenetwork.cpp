@@ -40,7 +40,7 @@ BaseNetwork::forward()
 
 
 const double*
-BaseNetwork::activate(double* input_p)
+BaseNetwork::activate(const double* input_p)
 {
     if (_dirty)
     {
@@ -61,7 +61,7 @@ BaseNetwork::activate(double* input_p)
 
 
 void
-BaseNetwork::activate(double* input_p, double* output_p)
+BaseNetwork::activate(const double* input_p, double* output_p)
 {
     const double* result_p = activate(input_p);
     memcpy(output_p, result_p, sizeof(double) * outsize());
@@ -69,7 +69,7 @@ BaseNetwork::activate(double* input_p, double* output_p)
 
 
 const double*
-BaseNetwork::back_activate(double* error_p)
+BaseNetwork::back_activate(const double* error_p)
 {
     memcpy((void*) outerror()[timestep() - 1], 
            (void*) error_p, 
@@ -81,7 +81,7 @@ BaseNetwork::back_activate(double* error_p)
 
 
 void
-BaseNetwork::back_activate(double* outerror_p, double* inerror_p)
+BaseNetwork::back_activate(const double* outerror_p, double* inerror_p)
 {
     const double* result_p = back_activate(outerror_p);
     memcpy(inerror_p, result_p, sizeof(double) * insize());

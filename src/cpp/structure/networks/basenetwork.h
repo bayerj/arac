@@ -24,11 +24,11 @@ class BaseNetwork : public arac::structure::modules::Module
         BaseNetwork();
         virtual ~BaseNetwork();
     
-        virtual const double* activate(double* input_p);
-        virtual const double* back_activate(double* error_p);
+        virtual const double* activate(const double* input_p);
+        virtual const double* back_activate(const double* error_p);
 
-        virtual void activate(double* input_p, double* output_p);
-        virtual void back_activate(double* outerror_p, double* inerror_p);
+        virtual void activate(const double* input_p, double* output_p);
+        virtual void back_activate(const double* outerror_p, double* inerror_p);
         
         virtual void forward();
         
