@@ -13,13 +13,14 @@ PYTHONPATH = [distutils.sysconfig.get_python_inc()]
 NUMPYPATH = numpy.distutils.misc_util.get_numpy_include_dirs()
 
 
-
 # First compile and link the library.
 libenv = Environment(LIBS=['m', 'blas'], CPPPATH=CPPPATH, LIBPATH=LIBPATH,
                      SHLIBPREFIX="")
 library_globs = ['src/cpp/*.cpp', 
                  'src/cpp/common/*.cpp', 
                  'src/cpp/utilities/*.cpp', 
+                 'src/cpp/datasets/*.cpp', 
+                 'src/cpp/optimization/*.cpp', 
                  'src/cpp/structure/*.cpp',  
                  'src/cpp/structure/connections/*.cpp',  
                  'src/cpp/structure/modules/*.cpp',  
