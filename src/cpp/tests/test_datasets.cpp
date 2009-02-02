@@ -157,4 +157,16 @@ TEST(TestDataset, TestConstruction)
 }
 
 
+TEST(TestSequentialDataset, TestConstruction)
+{
+    
+}
+
+
+TEST(TestSemiSequentialDataset, TestConstruction)
+{
+    
+}
+
+        
 }  // namespace
