@@ -160,7 +160,7 @@ TEST(TestDataset, TestConstruction)
 }
 
 
-TEST(TestSemiSequentialDataset, TestConstruction)
+TEST(TestSequentialDataset, TestConstruction)
 {
     
 }
