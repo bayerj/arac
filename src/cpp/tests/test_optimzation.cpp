@@ -35,7 +35,6 @@ TEST(TestBackprop, TestStochasticStep)
     ds.append(row_p, row_p + 1);
     
     SimpleBackprop trainer(*net_p, ds);
-
     trainer.set_learningrate(1.);
     trainer.train_stochastic();
 
