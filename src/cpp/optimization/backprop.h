@@ -7,78 +7,187 @@
 
 
 #include "../structure/networks/network.h"
-#include "../datasets/dataset.h"
+#include "../datasets/datasets.h"
 
 
 using arac::structure::networks::Network;
-using arac::datasets::Dataset;
+using arac::structure::Parametrized;
+using arac::datasets::SupervisedDataset;
+using arac::datasets::Sequence;
 
 
 namespace arac {
 namespace optimization {
     
-
+    
 // TODO: document.
-
-class Backprop 
+template<typename SampleType, typename TargetType>
+class Backprop
 {
     public: 
     
-        Backprop(Network& network, Dataset& dataset);
+        typedef SupervisedDataset<SampleType, TargetType> DatasetType;
+    
+        Backprop(Network& network, DatasetType& dataset);
         virtual ~Backprop();
-        
-        void train_stochastic();
         
         Network& network();
         
-        Dataset& dataset();
+        DatasetType& dataset();
         
         const double& learningrate();
         
         void set_learningrate(const double value);
+
+        void train_stochastic();
         
     protected:
         
-        void process_sample(const double* input_p, const double* target_p);
+        // FIXME: this function should be abstract instead. But in that case,
+        // classes inheriting from this class which give a definition for the
+        // concrete class are still abstract somehow. wtf...?
+        virtual void process_sample(const SampleType inpt, 
+                                    const TargetType target) {};
         void learn();
         
         Network& _network;
-        Dataset& _dataset;
+        DatasetType& _dataset;
         double _learningrate;
         double* _error_p;
 };
 
 
-inline
+template<typename SampleType, typename TargetType>
+Backprop<SampleType, TargetType>::Backprop(Network& network, 
+                                            DatasetType& dataset) :
+    _network(network),
+    _dataset(dataset),
+    _learningrate(0.001)
+{
+    _network.sort();
+    assert(_network.insize() == _dataset.samplesize());
+    assert(_network.outsize() == _dataset.targetsize());
+    _error_p = new double[_network.outsize()];
+}
+
+
+template<typename SampleType, typename TargetType>
+Backprop<SampleType, TargetType>::~Backprop()
+{
+    delete[] _error_p;
+}
+
+
+template<typename SampleType, typename TargetType>
 Network&
-Backprop::network()
+Backprop<SampleType, TargetType>::network()
 {
     return _network;
 }
 
 
-inline
-Dataset&
-Backprop::dataset()
+template<typename SampleType, typename TargetType>
+SupervisedDataset<SampleType, TargetType>&
+Backprop<SampleType, TargetType>::dataset()
 {
     return _dataset;
 }
  
  
-inline
+template<typename SampleType, typename TargetType>
 const double&
-Backprop::learningrate()
+Backprop<SampleType, TargetType>::learningrate()
 {
     return _learningrate;
 }
  
  
-inline
+template<typename SampleType, typename TargetType>
 void
-Backprop::set_learningrate(const double value)
+Backprop<SampleType, TargetType>::set_learningrate(const double value)
 {
     _learningrate = value;
 }
+
+
+template<typename SampleType, typename TargetType>
+void
+Backprop<SampleType, TargetType>::train_stochastic()
+{
+    int index = rand() % dataset().size();
+    
+    SampleType sample = dataset()[index].first;
+    TargetType target = dataset()[index].second;
+    _network.clear();
+    process_sample(sample, target);
+    learn();
+}
+
+
+template<typename SampleType, typename TargetType>
+void 
+Backprop<SampleType, TargetType>::learn()
+{
+    std::vector<Parametrized*>::const_iterator param_iter;
+    for (param_iter = network().parametrizeds().begin();
+         param_iter != network().parametrizeds().end();
+         param_iter++)
+    {
+        double* params_p = (*param_iter)->get_parameters();
+        double* derivs_p = (*param_iter)->get_derivatives();
+        for (int i = 0; i < (*param_iter)->size(); i++)
+        {
+            params_p[i] += _learningrate * derivs_p[i];
+        }
+    }
+}
+
+
+//
+// Spezializations.
+//
+ 
+class SimpleBackprop : public Backprop<double*, double*> 
+{
+    public:
+        SimpleBackprop(Network& network, 
+                       SupervisedDataset<double*, double*>& dataset);
+        ~SimpleBackprop();
+    
+    protected:
+        virtual void process_sample(const double* input_p, 
+                                    const double* target_p);
+    
+};
+
+
+class SemiSequentialBackprop : public Backprop<Sequence, double*>
+{
+    
+    public:
+        SemiSequentialBackprop(Network& network,
+                               SupervisedDataset<Sequence, double*>& dataset);
+        ~SemiSequentialBackprop();
+
+    protected:
+        virtual void process_sample(const Sequence input_p, 
+                                    const double* target_p);
+    
+};
+
+
+class SequentialBackprop : public Backprop<Sequence, Sequence>
+{
+    public:
+        SequentialBackprop(Network& network, 
+                           SupervisedDataset<double*, double*>& dataset);
+        ~SequentialBackprop();
+
+    protected:
+        virtual void process_sample(const Sequence input, 
+                                    const Sequence target);
+    
+};
 
  
 }

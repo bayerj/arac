@@ -9,30 +9,26 @@
 #include "../structure/parametrized.h"
 
 
-using arac::optimization::Backprop;
+using arac::optimization::SimpleBackprop;
 using arac::structure::Parametrized;
 
+
+SimpleBackprop::SimpleBackprop(Network& network, 
+               SupervisedDataset<double*, double*>& dataset) :
+               Backprop<double*, double*>(network, dataset)
+{
     
-Backprop::Backprop(Network& network, Dataset& dataset) :
-    _network(network),
-    _dataset(dataset),
-    _learningrate(0.001)
+}   
+           
+SimpleBackprop::~SimpleBackprop()
 {
-    _network.sort();
-    assert(_network.insize() == _dataset.inputsize());
-    assert(_network.outsize() == _dataset.targetsize());
-    _error_p = new double[_network.outsize()];
+    
 }
 
 
-Backprop::~Backprop()
-{
-    delete[] _error_p;
-}
-
-
-void 
-Backprop::process_sample(const double* input_p, const double* target_p)
+void
+SimpleBackprop::process_sample(const double* input_p, 
+                               const double* target_p)
 {
     const double* output_p = network().activate(input_p);
     for (int i = 0; i < network().outsize(); i++)
@@ -41,37 +37,3 @@ Backprop::process_sample(const double* input_p, const double* target_p)
     }
     network().back_activate(_error_p);
 }
-        
-
-void
-Backprop::train_stochastic()
-{
-    int index = rand() % dataset().size();
-    
-    double* input_p = dataset()[index];
-    double* target_p = input_p + dataset().inputsize();
-    network().clear();
-    process_sample(input_p, target_p);
-    learn();
-}
-
-
-void 
-Backprop::learn()
-{
-    std::vector<Parametrized*>::const_iterator param_iter;
-    for (param_iter = network().parametrizeds().begin();
-         param_iter != network().parametrizeds().end();
-         param_iter++)
-    {
-        double* params_p = (*param_iter)->get_parameters();
-        double* derivs_p = (*param_iter)->get_derivatives();
-        for (int i = 0; i < (*param_iter)->size(); i++)
-        {
-            params_p[i] += _learningrate * derivs_p[i];
-        }
-    }
-}
-
-
-
