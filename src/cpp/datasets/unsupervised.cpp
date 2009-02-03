@@ -3,24 +3,3 @@
 
 
 #include "unsupervised.h"
-
-
-using arac::datasets::UnsupervisedDataset;
-
-
-UnsupervisedDataset::UnsupervisedDataset(int samplesize) :
-    _samplesize(samplesize)
-{
-    
-}
-
-
-UnsupervisedDataset::~UnsupervisedDataset()
-{
-    
-}
-
-
-
-
-

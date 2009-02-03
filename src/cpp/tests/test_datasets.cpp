@@ -70,7 +70,7 @@ TEST(TestDataset_sequence_array, TestConstruction)
     double* second_target = new double[1];
     second_target[0] = -1;
     
-    Dataset_sequence_array ds(2, 1);
+    SupervisedSemiSequentialDataset ds(2, 1);
     ds.append(first, first_target);
     ds.append(second, second_target);
     
@@ -118,7 +118,7 @@ TEST(TestDataset_array_array, TestConstruction)
     data_p[10] = 1;
     data_p[11] = 0;
     
-    Dataset_array_array ds(2, 1);
+    SupervisedSimpleDataset ds(2, 1);
     ds.append(data_p, data_p + 2);
     ds.append(data_p + 3, data_p + 5);
     ds.append(data_p + 6, data_p + 8);

@@ -6,9 +6,16 @@
 #define Arac_DATASETS_DATASETS_INCLUDED
 
 
-#include "dataset_array_array.h"
-#include "dataset_sequence_array.h"
 #include "sequence.h"
+#include "supervised.h"
+#include "unsupervised.h"
+
+
+typedef arac::datasets::SupervisedDataset<arac::datasets::Sequence, arac::datasets::Sequence> SupervisedSequentialDataset;
+typedef arac::datasets::SupervisedDataset<arac::datasets::Sequence, double*> SupervisedSemiSequentialDataset;
+typedef arac::datasets::SupervisedDataset<double*, double*> SupervisedSimpleDataset;
+typedef arac::datasets::UnsupervisedDataset<double*> UnsupervisedSimpleDataset;
+typedef arac::datasets::UnsupervisedDataset<arac::datasets::Sequence> UnsupervisedSequenceDataset;
 
 
 #endif

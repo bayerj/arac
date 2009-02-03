@@ -15,6 +15,7 @@ namespace datasets {
 
 // TODO: document.
 
+template<typename SampleType>
 class UnsupervisedDataset 
 {
     public: 
@@ -26,20 +27,56 @@ class UnsupervisedDataset
         int samplesize();
 
         // Return the number of rows currently in the dataset.
-        virtual int size() = 0;
+        virtual int size();
+        
+        const SampleType& operator[](int index);
         
     private:
         
         int _samplesize;
+        std::vector<SampleType> _rows;
         
 };
 
 
+template <typename SampleType>
+UnsupervisedDataset<SampleType>::UnsupervisedDataset(int samplesize) :
+    _samplesize(samplesize)
+{
+    
+}
+
+template <typename SampleType>
+UnsupervisedDataset<SampleType>::~UnsupervisedDataset()
+{
+    
+}
+
+
+template<typename SampleType>
 inline
 int 
-UnsupervisedDataset::samplesize()
+UnsupervisedDataset<SampleType>::samplesize()
 {
     return _samplesize;
+}
+
+
+template<typename SampleType>
+inline
+int 
+UnsupervisedDataset<SampleType>::size()
+{
+    return _rows.size();
+}
+
+
+template<typename SampleType>
+inline
+const SampleType& 
+UnsupervisedDataset<SampleType>::operator[](int index)
+{
+    return _rows[index];
 }
 
 
