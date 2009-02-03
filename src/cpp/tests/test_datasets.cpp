@@ -99,7 +99,7 @@ TEST(TestDataset_sequence_array, TestConstruction)
 }
 
 
-TEST(TestDataset, TestConstruction)
+TEST(TestDataset_array_array, TestConstruction)
 {
     double* data_p = new double[12];
     data_p[0] = 0;
@@ -157,8 +157,9 @@ TEST(TestDataset, TestConstruction)
 }
 
 
-TEST(TestSequentialDataset, TestConstruction)
+TEST(TestDataSet_sequential_array, TestConstruction)
 {
+    
     
 }
 
