@@ -6,6 +6,8 @@
 #define Arac_OPTIMIZER_BACKPROP_INCLUDED
 
 
+#include <iostream>
+
 #include "../structure/networks/network.h"
 #include "../datasets/datasets.h"
 
@@ -43,17 +45,21 @@ class Backprop
         
     protected:
         
-        // FIXME: this function should be abstract instead. But in that case,
-        // classes inheriting from this class which give a definition for the
-        // concrete class are still abstract somehow. wtf...?
-        virtual void process_sample(const SampleType inpt, 
-                                    const TargetType target) {};
         void learn();
         
         Network& _network;
         DatasetType& _dataset;
         double _learningrate;
         double* _error_p;
+
+        // FIXME: this function should be abstract instead. But in that case,
+        // classes inheriting from this class which give a definition for the
+        // concrete class are still abstract somehow. wtf...?
+        virtual void process_sample(const SampleType inpt, 
+                                    const TargetType target) {
+                                        std::cout << "Don't use!" << std::endl;
+                                    };
+
 };
 
 
@@ -118,8 +124,8 @@ Backprop<SampleType, TargetType>::train_stochastic()
     
     SampleType sample = dataset()[index].first;
     TargetType target = dataset()[index].second;
-    _network.clear();
-    process_sample(sample, target);
+    network().clear();
+    this->process_sample(sample, target);
     learn();
 }
 
@@ -155,8 +161,17 @@ class SimpleBackprop : public Backprop<double*, double*>
         ~SimpleBackprop();
     
     protected:
-        virtual void process_sample(const double* input_p, 
-                                    const double* target_p);
+        virtual void process_sample(const double* input, 
+                                    const double* target)
+        {
+            std::cout << "processing for double* double*" << std::endl;
+            const double* output_p = network().activate(input_p);
+            for (int i = 0; i < network().outsize(); i++)
+            {
+                _error_p[i] = target_p[i] - output_p[i];
+            }
+            network().back_activate(_error_p);
+        }
     
 };
 
@@ -171,8 +186,10 @@ class SemiSequentialBackprop : public Backprop<Sequence, double*>
 
     protected:
         virtual void process_sample(const Sequence input_p, 
-                                    const double* target_p);
-    
+                                    const double* target_p)
+        {
+            // FIXME: implement
+        }
 };
 
 
@@ -185,8 +202,10 @@ class SequentialBackprop : public Backprop<Sequence, Sequence>
 
     protected:
         virtual void process_sample(const Sequence input, 
-                                    const Sequence target);
-    
+                                    const Sequence target)
+        {
+            // FIXME: implement
+        }
 };
 
  

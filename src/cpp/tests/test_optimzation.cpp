@@ -9,7 +9,8 @@ namespace AracTesting {
 using namespace arac::structure::modules;
 using namespace arac::structure::connections;
 using namespace arac::structure::networks;
-using arac::optimization::Backprop;
+using namespace arac::datasets;
+using namespace arac::optimization;
 
 
 TEST(TestBackprop, TestStochasticStep)
@@ -26,14 +27,14 @@ TEST(TestBackprop, TestStochasticStep)
     net_p->add_module(outlayer_p, Network::OutputModule);
     net_p->add_connection(con_p);
     
-    Dataset ds(1, 2);
+    SupervisedDataset<double*, double*> ds(1, 2);
     double* row_p = new double[3];
     row_p[0] = 1;
     row_p[1] = 2;
     row_p[2] = 3;
-    ds.append(row_p);
+    ds.append(row_p, row_p + 1);
     
-    Backprop trainer(*net_p, ds);
+    SimpleBackprop trainer(*net_p, ds);
     trainer.set_learningrate(1.);
     trainer.train_stochastic();
 

@@ -24,16 +24,3 @@ SimpleBackprop::~SimpleBackprop()
 {
     
 }
-
-
-void
-SimpleBackprop::process_sample(const double* input_p, 
-                               const double* target_p)
-{
-    const double* output_p = network().activate(input_p);
-    for (int i = 0; i < network().outsize(); i++)
-    {
-        _error_p[i] = target_p[i] - output_p[i];
-    }
-    network().back_activate(_error_p);
-}
