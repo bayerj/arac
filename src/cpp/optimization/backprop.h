@@ -41,12 +41,23 @@ class Backprop
         
         void set_learningrate(const double value);
 
+<<<<<<< HEAD:src/cpp/optimization/backprop.h
         const double* error();
         
+=======
+>>>>>>> Very nasty templateing: Backprop trainers are now somehow partially done. ;):src/cpp/optimization/backprop.h
         void train_stochastic();
         
     protected:
         
+<<<<<<< HEAD:src/cpp/optimization/backprop.h
+=======
+        // FIXME: this function should be abstract instead. But in that case,
+        // classes inheriting from this class which give a definition for the
+        // concrete class are still abstract somehow. wtf...?
+        virtual void process_sample(const SampleType inpt, 
+                                    const TargetType target) {};
+>>>>>>> Very nasty templateing: Backprop trainers are now somehow partially done. ;):src/cpp/optimization/backprop.h
         void learn();
         
         Network& _network;

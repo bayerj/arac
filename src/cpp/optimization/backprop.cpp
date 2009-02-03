@@ -36,4 +36,3 @@ SimpleBackprop::process_sample(double* sample_p, double* target_p)
     }
     network().back_activate(_error_p);
 }
-    
