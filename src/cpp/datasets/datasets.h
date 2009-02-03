@@ -6,9 +6,7 @@
 #define Arac_DATASETS_DATASETS_INCLUDED
 
 
-#include "dataset.h"
-#include "sequence.h"
-#include "semisequence.h"
+#include "dataset_array_array.h"
 
 
 #endif
