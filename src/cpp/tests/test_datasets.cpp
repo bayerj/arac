@@ -118,7 +118,7 @@ TEST(TestDataset_array_array, TestConstruction)
     data_p[10] = 1;
     data_p[11] = 0;
     
-    SupervisedDataset<double*, double*> ds(2, 1);
+    SupervisedSimpleDataset ds(2, 1);
     ds.append(data_p, data_p + 2);
     ds.append(data_p + 3, data_p + 5);
     ds.append(data_p + 6, data_p + 8);
