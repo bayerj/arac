@@ -8,101 +8,98 @@ namespace AracTesting {
 using namespace arac::datasets;
 
 
-TEST(TestSequence, TestConstruction) {
-    double* contents_p = new double[8];
-    double* targets_p = new double[4];
+TEST(TestSequence, TestConstruction)
+{
+    double* data_p = new double[10];
+    data_p[0] = 1;
+    data_p[1] = 2;
+    data_p[2] = 4;
+    data_p[3] = 8;
+    data_p[4] = 16;
+    data_p[5] = 32;
+    data_p[6] = 64;
+    data_p[7] = 128;
+    data_p[8] = 256;
+    data_p[9] = 512;
     
-    contents_p[0] = 1;
-    contents_p[1] = 5;
-    contents_p[2] = 10;
-    contents_p[3] = 14;
-    contents_p[4] = 5;
-    contents_p[5] = 26;
-    contents_p[6] = 7;
-    contents_p[7] = 98;
-
-    targets_p[0] = 0;
-    targets_p[1] = 1;
-    targets_p[2] = 0;
-    targets_p[3] = 1;
+    Sequence seq(5, 2, data_p);
     
-    Sequence seq(4, 2, 1, contents_p, targets_p);
-
-    EXPECT_DOUBLE_EQ(1, seq.contents(0)[0])
-        << "Wrong sequence entry.";
-    EXPECT_DOUBLE_EQ(5, seq.contents(0)[1])
-        << "Wrong sequence entry.";
-    EXPECT_DOUBLE_EQ(10, seq.contents(1)[0])
-        << "Wrong sequence entry.";
-    EXPECT_DOUBLE_EQ(14, seq.contents(1)[1])
-        << "Wrong sequence entry.";
-    EXPECT_DOUBLE_EQ(5, seq.contents(2)[0])
-        << "Wrong sequence entry.";
-    EXPECT_DOUBLE_EQ(26, seq.contents(2)[1])
-        << "Wrong sequence entry.";
-    EXPECT_DOUBLE_EQ(7, seq.contents(3)[0])
-        << "Wrong sequence entry.";
-    EXPECT_DOUBLE_EQ(98, seq.contents(3)[1])
-        << "Wrong sequence entry.";
-
-    EXPECT_DOUBLE_EQ(0, seq.targets(0)[0])
-        << "Wrong sequence entry.";
-    EXPECT_DOUBLE_EQ(1, seq.targets(1)[0])
-        << "Wrong sequence entry.";
-    EXPECT_DOUBLE_EQ(0, seq.targets(2)[0])
-        << "Wrong sequence entry.";
-    EXPECT_DOUBLE_EQ(1, seq.targets(3)[0])
-        << "Wrong sequence entry.";
+    EXPECT_DOUBLE_EQ(1, seq[0][0]) << "Sequence data not correct.";
+    EXPECT_DOUBLE_EQ(2, seq[0][1]) << "Sequence data not correct.";
+    EXPECT_DOUBLE_EQ(4, seq[1][0]) << "Sequence data not correct.";
+    EXPECT_DOUBLE_EQ(8, seq[1][1]) << "Sequence data not correct.";
+    EXPECT_DOUBLE_EQ(16, seq[2][0]) << "Sequence data not correct.";
+    EXPECT_DOUBLE_EQ(32, seq[2][1]) << "Sequence data not correct.";
+    EXPECT_DOUBLE_EQ(64, seq[3][0]) << "Sequence data not correct.";
+    EXPECT_DOUBLE_EQ(128, seq[3][1]) << "Sequence data not correct.";
+    EXPECT_DOUBLE_EQ(256, seq[4][0]) << "Sequence data not correct.";
+    EXPECT_DOUBLE_EQ(512, seq[4][1]) << "Sequence data not correct.";
 }
 
 
-TEST(TestSemiSequence, TestConstruction) {
-    double* contents_p = new double[8];
-    double* targets_p = new double[2];
+TEST(TestDataset_sequence_array, TestConstruction)
+{
+    double* first_data_p = new double[10];
+    first_data_p[0] = 1;
+    first_data_p[1] = 2;
+    first_data_p[2] = 4;
+    first_data_p[3] = 8;
+    first_data_p[4] = 16;
+    first_data_p[5] = 32;
+    first_data_p[6] = 64;
+    first_data_p[7] = 128;
+    first_data_p[8] = 256;
+    first_data_p[9] = 512;
     
-    contents_p[0] = 1;
-    contents_p[1] = 5;
-    contents_p[2] = 10;
-    contents_p[3] = 14;
-    contents_p[4] = 5;
-    contents_p[5] = 26;
-    contents_p[6] = 7;
-    contents_p[7] = 98;
-
-    targets_p[0] = 1.3;
-    targets_p[1] = 2.5;
+    Sequence first(5, 2, first_data_p);
     
-    SemiSequence seq(4, 2, 2, contents_p, targets_p);
+    double* second_data_p = new double[8];
+    second_data_p[0] = -1;
+    second_data_p[1] = -2;
+    second_data_p[2] = -4;
+    second_data_p[3] = -8;
+    second_data_p[4] = -16;
+    second_data_p[5] = -32;
+    second_data_p[6] = -64;
+    second_data_p[7] = -128;
+    
+    Sequence second(4, 2, second_data_p);
+    
+    double* first_target = new double[1];
+    first_target[0] = 1;
+    double* second_target = new double[1];
+    second_target[0] = -1;
+    
+    Dataset_sequence_array ds(2, 1);
+    ds.append(first, first_target);
+    ds.append(second, second_target);
+    
+    EXPECT_EQ(1, ds[0].first[0][0]);
+    EXPECT_EQ(2, ds[0].first[0][1]);
+    EXPECT_EQ(4, ds[0].first[1][0]);
+    EXPECT_EQ(8, ds[0].first[1][1]);
+    EXPECT_EQ(16, ds[0].first[2][0]);
+    EXPECT_EQ(32, ds[0].first[2][1]);
+    EXPECT_EQ(64, ds[0].first[3][0]);
+    EXPECT_EQ(128, ds[0].first[3][1]);
+    EXPECT_EQ(256, ds[0].first[4][0]);
+    EXPECT_EQ(512, ds[0].first[4][1]);
+    
+    EXPECT_EQ(-1, ds[1].first[0][0]);
+    EXPECT_EQ(-2, ds[1].first[0][1]);
+    EXPECT_EQ(-4, ds[1].first[1][0]);
+    EXPECT_EQ(-8, ds[1].first[1][1]);
+    EXPECT_EQ(-16, ds[1].first[2][0]);
+    EXPECT_EQ(-32, ds[1].first[2][1]);
+    EXPECT_EQ(-64, ds[1].first[3][0]);
+    EXPECT_EQ(-128, ds[1].first[3][1]);
 
-    EXPECT_DOUBLE_EQ(1, seq.contents(0)[0])
-        << "Wrong sequence entry.";
-    EXPECT_DOUBLE_EQ(5, seq.contents(0)[1])
-        << "Wrong sequence entry.";
-    EXPECT_DOUBLE_EQ(10, seq.contents(1)[0])
-        << "Wrong sequence entry.";
-    EXPECT_DOUBLE_EQ(14, seq.contents(1)[1])
-        << "Wrong sequence entry.";
-    EXPECT_DOUBLE_EQ(5, seq.contents(2)[0])
-        << "Wrong sequence entry.";
-    EXPECT_DOUBLE_EQ(26, seq.contents(2)[1])
-        << "Wrong sequence entry.";
-    EXPECT_DOUBLE_EQ(7, seq.contents(3)[0])
-        << "Wrong sequence entry.";
-    EXPECT_DOUBLE_EQ(98, seq.contents(3)[1])
-        << "Wrong sequence entry.";
-
-    EXPECT_DOUBLE_EQ(1.3, seq.targets(0)[0])
-        << "Wrong sequence entry.";
-    EXPECT_DOUBLE_EQ(2.5, seq.targets(0)[1])
-        << "Wrong sequence entry.";
-    EXPECT_DOUBLE_EQ(1.3, seq.targets(1)[0])
-        << "Wrong sequence entry.";
-    EXPECT_DOUBLE_EQ(2.5, seq.targets(1)[1])
-        << "Wrong sequence entry.";
+    EXPECT_EQ(1, ds[0].second[0]);
+    EXPECT_EQ(-1, ds[1].second[0]);
 }
 
 
-TEST(TestDataset, TestConstruction)
+TEST(TestDataset_array_array, TestConstruction)
 {
     double* data_p = new double[12];
     data_p[0] = 0;
@@ -121,47 +118,48 @@ TEST(TestDataset, TestConstruction)
     data_p[10] = 1;
     data_p[11] = 0;
     
-    Dataset ds(2, 1);
-    ds.append(data_p);
-    ds.append(data_p + 3);
-    ds.append(data_p + 6);
-    ds.append(data_p + 9);
+    Dataset_array_array ds(2, 1);
+    ds.append(data_p, data_p + 2);
+    ds.append(data_p + 3, data_p + 5);
+    ds.append(data_p + 6, data_p + 8);
+    ds.append(data_p + 9, data_p + 11);
     
     EXPECT_EQ(4, ds.size())
         << "Wrong size of dataset.";
     
-    EXPECT_EQ(0, ds[0][0])
+    EXPECT_EQ(0, ds[0].first[0])
         << "Wrong size of dataset.";
-    EXPECT_EQ(0, ds[0][1])
+    EXPECT_EQ(0, ds[0].first[1])
         << "Wrong item in dataset.";
-    EXPECT_EQ(0, ds[0][2])
+    EXPECT_EQ(0, ds[0].second[0])
         << "Wrong size of dataset.";
 
-    EXPECT_EQ(0, ds[1][0])
+    EXPECT_EQ(0, ds[1].first[0])
         << "Wrong item in dataset.";
-    EXPECT_EQ(1, ds[1][1])
+    EXPECT_EQ(1, ds[1].first[1])
         << "Wrong item in dataset.";
-    EXPECT_EQ(1, ds[1][2])
-        << "Wrong item in dataset.";
-
-    EXPECT_EQ(1, ds[2][0])
-        << "Wrong item in dataset.";
-    EXPECT_EQ(0, ds[2][1])
-        << "Wrong item in dataset.";
-    EXPECT_EQ(1, ds[2][2])
+    EXPECT_EQ(1, ds[1].second[0])
         << "Wrong item in dataset.";
 
-    EXPECT_EQ(1, ds[3][0])
+    EXPECT_EQ(1, ds[2].first[0])
         << "Wrong item in dataset.";
-    EXPECT_EQ(1, ds[3][1])
+    EXPECT_EQ(0, ds[2].first[1])
         << "Wrong item in dataset.";
-    EXPECT_EQ(0, ds[3][2])
+    EXPECT_EQ(1, ds[2].second[0])
+        << "Wrong item in dataset.";
+
+    EXPECT_EQ(1, ds[3].first[0])
+        << "Wrong item in dataset.";
+    EXPECT_EQ(1, ds[3].first[1])
+        << "Wrong item in dataset.";
+    EXPECT_EQ(0, ds[3].second[0])
         << "Wrong item in dataset.";
 }
 
 
-TEST(TestSequentialDataset, TestConstruction)
+TEST(TestDataSet_sequential_array, TestConstruction)
 {
+    
     
 }
 

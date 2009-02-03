@@ -18,48 +18,44 @@ class Sequence
 {
     public:
         
-        Sequence();
-        Sequence(int length, int contentsize, int targetsize,
-                 const double* contents_p, const double* targets_p);
+        Sequence(int length, int itemsize, const double* data_p);
         virtual ~Sequence();
         
-        int length();
-        const double* contents(int index);
-        virtual const double* targets(int index);
+        int length() const;
+        int itemsize() const;
+        const double* operator[](int index) const;
         
     private:
         int _length;
-        const double* _contents_p;
-        const double* _targets_p;
-        int _contentsize;
-        int _targetsize;
+        const double* _data_p;
+        int _itemsize;
 };
 
 
 inline 
 int
-Sequence::length()
+Sequence::length() const
 {
     return _length;
 }
 
 
 inline
-const double*
-Sequence::contents(int index)
+int
+Sequence::itemsize() const
 {
-    assert(index < length());
-    return _contents_p + _contentsize * index;
+    return _itemsize;
 }
 
 
 inline
 const double*
-Sequence::targets(int index)
+Sequence::operator[](int index) const
 {
     assert(index < length());
-    return _targets_p + _targetsize * index;
+    return _data_p + _itemsize * index;
 }
+
 
 } } // Namespace.
 

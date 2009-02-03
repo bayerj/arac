@@ -7,6 +7,8 @@
 
 
 #include "dataset_array_array.h"
+#include "dataset_sequence_array.h"
+#include "sequence.h"
 
 
 #endif
