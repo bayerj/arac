@@ -96,7 +96,6 @@ SupervisedDataset<SampleType, TargetType>::size()
 }
 
 
-
 }
 }
 
