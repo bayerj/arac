@@ -8,6 +8,19 @@
 using arac::datasets::Dataset_array_array;
 
 
+Dataset_array_array::Dataset_array_array(int samplesize, int targetsize) :
+    SupervisedDataset(samplesize, targetsize)
+{
+    
+}
+
+
+Dataset_array_array::~Dataset_array_array()
+{
+    
+}
+
+
 void
 Dataset_array_array::append(const double* sample_p, const double* target_p)
 {

@@ -19,12 +19,18 @@ namespace datasets {
 class Dataset_array_array : public SupervisedDataset
 {
     public: 
+        
+        Dataset_array_array(int samplesize, int targetsize);
+        virtual ~Dataset_array_array();
+        
 
         // Return the number of rows currently in the dataset.
         virtual int size();
         
         // Add another row to the dataset.
         void append(const double* sample_p, const double* target_p);
+        
+        const std::pair<const double*, const double*>& operator[](int index);
         
     private:
         
@@ -38,6 +44,16 @@ Dataset_array_array::size()
 {
     return _rows.size();
 }
+
+
+inline
+const std::pair<const double*, const double*>&
+Dataset_array_array::operator[](int index)
+{
+    return _rows[index];
+}
+
+
 
 }
 }
