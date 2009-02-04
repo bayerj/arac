@@ -41,6 +41,8 @@ class Backprop
         
         void set_learningrate(const double value);
 
+        const double* error();
+        
         void train_stochastic();
         
     protected:
@@ -114,6 +116,14 @@ Backprop<SampleType, TargetType>::set_learningrate(const double value)
 
 
 template<typename SampleType, typename TargetType>
+const double*
+Backprop<SampleType, TargetType>::error()
+{
+    return _error_p;
+}
+
+
+template<typename SampleType, typename TargetType>
 void
 Backprop<SampleType, TargetType>::train_stochastic()
 {
@@ -122,6 +132,7 @@ Backprop<SampleType, TargetType>::train_stochastic()
     SampleType sample = dataset()[index].first;
     TargetType target = dataset()[index].second;
     network().clear();
+    network().clear_derivatives();
     this->process_sample(sample, target);
     learn();
 }
@@ -175,6 +186,7 @@ class SemiSequentialBackprop : public Backprop<Sequence, double*>
                                     double* target_p)
         {
             // FIXME: implement
+            assert(0);
         }
 };
 
@@ -191,6 +203,7 @@ class SequentialBackprop : public Backprop<Sequence, Sequence>
                                     Sequence target)
         {
             // FIXME: implement
+            assert(0);
         }
 };
 
