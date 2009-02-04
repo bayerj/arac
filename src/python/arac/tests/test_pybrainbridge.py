@@ -161,6 +161,18 @@ class TestNetworkEquivalence(TestCase):
         net.sortModules()
         net.params[:] = 1, 2, 3, 4, 5
         
+    def xor_network(self, net):
+        net.addInputModule(LinearLayer(2, name='in'))
+        net.addModule(BiasUnit(name='bias'))
+        net.addModule(LinearLayer(3, name='hidden'))
+        net.addOutputModule(LinearLayer(1, name='out'))
+        net.addConnection(FullConnection(net['in'], net['hidden']))
+        net.addConnection(FullConnection(net['bias'], net['hidden']))
+        net.addConnection(FullConnection(net['hidden'], net['out']))
+        net.sortModules()
+        scipy.random.seed(1)
+        net.params[:] = scipy.random.random((12,))
+        
     def rec_three_layer_network(self, net):
         inlayer = TanhLayer(2, 'in')
         hiddenlayer = TanhLayer(hiddensize, 'hidden')
@@ -317,6 +329,10 @@ class TestNetworkEquivalence(TestCase):
 
     def testWeirdNetwork(self):
         self.equivalence_feed_forward(self.weird_network)
+        self.equivalence_recurrent(self.weird_network)
+
+    def testXorNetwork(self):
+        self.equivalence_feed_forward(self.xor_network)
         self.equivalence_recurrent(self.weird_network)
         
     def testCopyable(self):
