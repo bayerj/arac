@@ -47,11 +47,6 @@ class Backprop
         
     protected:
         
-        // FIXME: this function should be abstract instead. But in that case,
-        // classes inheriting from this class which give a definition for the
-        // concrete class are still abstract somehow. wtf...?
-        virtual void process_sample(const SampleType inpt, 
-                                    const TargetType target) {};
         void learn();
         
         Network& _network;
