@@ -55,10 +55,7 @@ class Backprop
         // FIXME: this function should be abstract instead. But in that case,
         // classes inheriting from this class which give a definition for the
         // concrete class are still abstract somehow. wtf...?
-        virtual void process_sample(const SampleType inpt, 
-                                    const TargetType target) {
-                                        std::cout << "Don't use!" << std::endl;
-                                    };
+        virtual void process_sample(SampleType inpt, TargetType target)  = 0;
 
 };
 
@@ -161,10 +158,9 @@ class SimpleBackprop : public Backprop<double*, double*>
         ~SimpleBackprop();
     
     protected:
-        virtual void process_sample(const double* input, 
-                                    const double* target)
+        virtual void process_sample(double* input_p, 
+                                    double* target_p)
         {
-            std::cout << "processing for double* double*" << std::endl;
             const double* output_p = network().activate(input_p);
             for (int i = 0; i < network().outsize(); i++)
             {
@@ -185,8 +181,8 @@ class SemiSequentialBackprop : public Backprop<Sequence, double*>
         ~SemiSequentialBackprop();
 
     protected:
-        virtual void process_sample(const Sequence input_p, 
-                                    const double* target_p)
+        virtual void process_sample(Sequence input_p, 
+                                    double* target_p)
         {
             // FIXME: implement
         }
@@ -201,8 +197,8 @@ class SequentialBackprop : public Backprop<Sequence, Sequence>
         ~SequentialBackprop();
 
     protected:
-        virtual void process_sample(const Sequence input, 
-                                    const Sequence target)
+        virtual void process_sample(Sequence input, 
+                                    Sequence target)
         {
             // FIXME: implement
         }
