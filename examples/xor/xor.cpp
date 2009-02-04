@@ -1,11 +1,15 @@
 #include "arac.h"
 #include <iostream>
+#include <stdlib.h>
+#include <time.h>
+
 
 using namespace arac::structure::networks;
 using namespace arac::structure::connections;
 using namespace arac::structure::modules;
 using namespace arac::optimization;
 using namespace arac::datasets;
+using namespace arac::utilities;
 
 
 SupervisedDataset<double*, double*> make_dataset()
@@ -43,7 +47,7 @@ Network make_network()
     LinearLayer* inlayer_p = new LinearLayer(2);
     Bias* bias_p = new Bias();
     TanhLayer* hidden_p = new TanhLayer(3);
-    SigmoidLayer* outlayer_p = new SigmoidLayer(1);
+    LinearLayer* outlayer_p = new LinearLayer(1);
     FullConnection* con1_p = new FullConnection(inlayer_p, hidden_p);
     FullConnection* con2_p = new FullConnection(hidden_p, outlayer_p);
     FullConnection* con3_p = new FullConnection(bias_p, hidden_p);
@@ -56,20 +60,31 @@ Network make_network()
     net.add_connection(con2_p);
     net.add_connection(con3_p);
     
+    net.randomize();
+    
     return net;
 }
 
 
 int main (int argc, char const *argv[])
 {
+    srand(0);
     SupervisedDataset<double*, double*> ds = make_dataset();
     Network net = make_network();
+    srand(0);
     SimpleBackprop optimizer = SimpleBackprop(net, ds);
     optimizer.set_learningrate(0.05);
-    
+    // print_parameters(net);
+    std::cout << std::endl;
     for(int i = 0; i < 10000; i++)
     {
         optimizer.train_stochastic();
+        // print_derivatives(net);
+        std::cout << std::endl;
         std::cout << *optimizer.error() << std::endl;
     }
+    std::cout << "Parameter: ";
+    print_parameters(net);
+    std::cout << std::endl;
+    print_activations(net, ds);
 }
