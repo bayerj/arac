@@ -53,6 +53,8 @@ class Network : public BaseNetwork
 
         const std::vector<Parametrized*>& parametrizeds() const;
         
+        void randomize();
+        
     protected:
         
         virtual void _forward();

@@ -80,6 +80,20 @@ Network::clear_derivatives()
 
 
 void
+Network::randomize()
+{
+    std::vector<Parametrized*>::iterator param_iter;
+    for (param_iter = _parametrizeds.begin();
+         param_iter != _parametrizeds.end();
+         param_iter++)
+    {
+        (*param_iter)->randomize();
+    }
+}
+
+
+
+void
 Network::_forward()
 {
     // Make sure that all the modules are in the right order.
