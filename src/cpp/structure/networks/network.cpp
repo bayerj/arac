@@ -67,6 +67,19 @@ Network::add_connection(Connection* con_p)
 
 
 void
+Network::clear_derivatives()
+{
+    std::vector<Parametrized*>::iterator param_iter;
+    for (param_iter = _parametrizeds.begin();
+         param_iter != _parametrizeds.end();
+         param_iter++)
+    {
+        (*param_iter)->clear_derivatives();
+    }
+}
+
+
+void
 Network::_forward()
 {
     // Make sure that all the modules are in the right order.

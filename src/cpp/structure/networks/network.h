@@ -49,6 +49,8 @@ class Network : public BaseNetwork
         
         void add_connection(Connection* con_p);
 
+        virtual void clear_derivatives();
+
         const std::vector<Parametrized*>& parametrizeds() const;
         
     protected:
