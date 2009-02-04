@@ -10,6 +10,7 @@
 
 #include "structure/structure.h"
 #include "datasets/datasets.h"
+#include "utilities/utilities.h"
 
 #endif
 
