@@ -3,6 +3,8 @@
 
 
 #include <cstring>
+#include <stdlib.h>
+
 
 #include "parametrized.h"
 
@@ -108,8 +110,17 @@ Parametrized::set_derivatives(double* derivatives_p)
 void
 Parametrized::clear_derivatives()
 {
-    // TODO: test this
     memset(_derivatives_p, 0, _size * sizeof(double));
 }
 
 
+void
+Parametrized::randomize(double interval)
+{
+    for(int i = 0; i < size(); i++)
+    {
+        double param = RAND_MAX - RAND_MAX / 2;
+        param /= rand();
+        get_parameters()[i] = param;
+    }
+}

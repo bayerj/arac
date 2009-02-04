@@ -34,6 +34,8 @@ class Parametrized
         
         int size();
         
+        void randomize(double interval=0.1);
+        
     protected:
         
         double* _parameters_p;
