@@ -20,6 +20,11 @@ void
 print_derivatives(arac::structure::networks::Network& net);
 
 
+void
+print_activations(arac::structure::networks::Network& net, 
+                  arac::datasets::SupervisedDataset<double*, double*>& ds);
+
+
 } } // Namespace
 
 

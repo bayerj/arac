@@ -10,12 +10,16 @@
 #include "supervised.h"
 #include "unsupervised.h"
 
-
-typedef arac::datasets::SupervisedDataset<arac::datasets::Sequence, arac::datasets::Sequence> SupervisedSequentialDataset;
-typedef arac::datasets::SupervisedDataset<arac::datasets::Sequence, double*> SupervisedSemiSequentialDataset;
-typedef arac::datasets::SupervisedDataset<double*, double*> SupervisedSimpleDataset;
-typedef arac::datasets::UnsupervisedDataset<double*> UnsupervisedSimpleDataset;
-typedef arac::datasets::UnsupervisedDataset<arac::datasets::Sequence> UnsupervisedSequenceDataset;
+namespace arac {
+namespace datasets {
+    
+typedef SupervisedDataset<arac::datasets::Sequence, arac::datasets::Sequence> SupervisedSequentialDataset;
+typedef SupervisedDataset<arac::datasets::Sequence, double*> SupervisedSemiSequentialDataset;
+typedef SupervisedDataset<double*, double*> SupervisedSimpleDataset;
+typedef UnsupervisedDataset<double*> UnsupervisedSimpleDataset;
+typedef UnsupervisedDataset<arac::datasets::Sequence> UnsupervisedSequenceDataset;
+    
+} } // Namespace
 
 
 #endif
