@@ -131,7 +131,6 @@ Backprop<SampleType, TargetType>::train_stochastic()
     
     SampleType sample = dataset()[index].first;
     TargetType target = dataset()[index].second;
-    network().clear();
     network().clear_derivatives();
     this->process_sample(sample, target);
     learn();
@@ -182,12 +181,10 @@ class SemiSequentialBackprop : public Backprop<Sequence, double*>
         ~SemiSequentialBackprop();
 
     protected:
-        virtual void process_sample(Sequence input_p, 
-                                    double* target_p)
-        {
-            // FIXME: implement
-            assert(0);
-        }
+        virtual void process_sample(Sequence input_p, double* target_p);
+
+    private:
+        double* _output_p;
 };
 
 
@@ -195,16 +192,14 @@ class SequentialBackprop : public Backprop<Sequence, Sequence>
 {
     public:
         SequentialBackprop(Network& network, 
-                           SupervisedDataset<double*, double*>& dataset);
+                           SupervisedDataset<Sequence, Sequence>& dataset);
         ~SequentialBackprop();
 
     protected:
-        virtual void process_sample(Sequence input, 
-                                    Sequence target)
-        {
-            // FIXME: implement
-            assert(0);
-        }
+        virtual void process_sample(Sequence input, Sequence target);
+    private:
+        std::vector<const double*> _outputs;
+
 };
 
  
