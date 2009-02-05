@@ -25,6 +25,10 @@ class MdlstmLayer : public arac::structure::modules::Module
 
     protected:
         
+        // Set the intermediate buffers to zero.
+        // TODO: find better name.
+        void clear_intermediates();
+        
         virtual void _forward();
         virtual void _backward();
         
@@ -39,6 +43,19 @@ class MdlstmLayer : public arac::structure::modules::Module
         arac::common::Buffer _output_gate_unsquashed;
         arac::common::Buffer _forget_gate_unsquashed;
         arac::common::Buffer _forget_gate_squashed;
+        
+        
+        // Intermediate buffers.
+        double* _input_p;
+        double* _input_state_p;
+        double* _output_error_p;
+        double* _output_state_error_p;
+        double* _output_gate_error_p;
+        double* _forget_gate_error_p;
+        double* _input_gate_error_p;
+        double* _input_error_p;
+        double* _input_state_error_p;
+        double* _state_error_p;
 };
 
 
