@@ -18,8 +18,6 @@ libenv = Environment(LIBS=['m', 'blas'], CPPPATH=CPPPATH, LIBPATH=LIBPATH,
 library_globs = ['src/cpp/*.cpp', 
                  'src/cpp/common/*.cpp', 
                  'src/cpp/utilities/*.cpp', 
-                 'src/cpp/utilities/*.cpp', 
-                 'src/cpp/optimization/*.cpp', 
                  'src/cpp/structure/*.cpp',  
                  'src/cpp/structure/connections/*.cpp',  
                  'src/cpp/structure/modules/*.cpp',  
@@ -40,8 +38,8 @@ swigenv = Environment(SWIGFLAGS=['-python', '-c++'],
                       CCFLAGS='-bundle -undefined suppress -flat_namespace',
                       LINKFLAGS='-Wno-long-double -undefined suppress -flat_namespace',
                       LIBPATH=LIBPATH,
-                      SHLIBPREFIX="")
-swig = swigenv.SharedLibrary('src/python/arac/_cppbridge.so', 
+                      LDMODULEPREFIX='src/python/arac/_', LDMODULESUFFIX = '.so',)
+swig = swigenv.LoadableModule('cppbridge', 
                              ['src/swig/cppbridge.i'])
 
 # Declare some dependencies.
