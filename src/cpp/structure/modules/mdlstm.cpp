@@ -72,6 +72,23 @@ MdlstmLayer::clear_intermediates()
 
 
 void
+MdlstmLayer::clear_intermediates()
+{
+    int size = _outsize / 2;
+    memset(_input_p, 0, sizeof(double) * size);
+    memset(_input_state_p, 0, sizeof(double) * size);
+    memset(_output_error_p, 0, sizeof(double) * size);
+    memset(_output_state_error_p, 0, sizeof(double) * size);
+    memset(_output_gate_error_p, 0, sizeof(double) * size);
+    memset(_forget_gate_error_p, 0, sizeof(double) * size * _timedim);
+    memset(_input_gate_error_p, 0, sizeof(double) * size);
+    memset(_input_error_p, 0, sizeof(double) * size);
+    memset(_input_state_error_p, 0, sizeof(double) * size * _timedim);
+    memset(_state_error_p, 0, sizeof(double) * size);
+}
+
+
+void
 MdlstmLayer::expand()
 {
     _input_squashed.expand();
