@@ -44,7 +44,6 @@ class Mdrnn : public BaseMdrnn, public arac::structure::Parametrized
         
         virtual void _backward();
         
-        
     protected:
         
         void init_multiplied_sizes();
