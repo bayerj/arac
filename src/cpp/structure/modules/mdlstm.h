@@ -36,6 +36,10 @@ class MdlstmLayer : public arac::structure::modules::Module
 
     protected:
         
+        // Set the intermediate buffers to zero.
+        // TODO: find better name.
+        void clear_intermediates();
+        
         virtual void _forward();
         virtual void _backward();
         
