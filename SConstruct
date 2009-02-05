@@ -38,8 +38,7 @@ test = testenv.Program('test-arac', Glob('src/cpp/tests/*.cpp'))
 swigenv = Environment(SWIGFLAGS=['-python', '-c++', '-outdir', 'src/python/arac'],
                       CPPPATH=CPPPATH + NUMPYPATH + PYTHONPATH,
                       LIBS=['arac'],
-                      CCFLAGS='-bundle -undefined suppress -flat_namespace',
-                      LINKFLAGS='-Wno-long-double -undefined suppress -flat_namespace',
+                      FRAMEWORKSFLAGS = '-flat_namespace -undefined suppress',                      LINKFLAGS='-Wno-long-double -undefined suppress -flat_namespace',
                       LIBPATH=LIBPATH,
                       LDMODULEPREFIX='src/python/arac/_', LDMODULESUFFIX = '.so',
                       )

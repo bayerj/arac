@@ -10,10 +10,12 @@
 
 
 using namespace arac::common;
-using namespace arac::structure;
+using namespace arac::datasets;
+using namespace arac::optimization;
 using namespace arac::structure::connections;
 using namespace arac::structure::modules;
 using namespace arac::structure::networks;
+using namespace arac::structure;
 
 
 void init_buffer(Buffer& buffer, double* content_p, int length, int rowsize)
@@ -44,9 +46,6 @@ void init_buffer(Buffer& buffer, double* content_p, int length, int rowsize)
                                            (double* inerror_p, int inlength)};
 %apply (double* INPLACE_ARRAY2, int DIM1, int DIM2) {
     (double* content_p, int length, int rowsize)};
-
-
-
 
 
 %nodefaultctor Buffer;
@@ -512,3 +511,42 @@ class Network : public BaseNetwork
         $self->back_activate(outerror_p, inerror_p);
     }
 };
+
+
+%apply (double* INPLACE_ARRAY1, int DIM1) {(double* sample_p, int samplelength), 
+                                           (double* target_p, int targetlength)};
+
+
+class SupervisedSimpleDataset
+{
+   public:
+       SupervisedSimpleDataset(int samplesize, int targetsize);
+       ~SupervisedSimpleDataset();
+       
+       virtual int size();
+       int samplesize();
+       int targetsize();
+       
+};
+
+
+%extend SupervisedSimpleDataset
+{
+    void append(double* sample_p, int samplelength, 
+                double* target_p, int targetlength)
+    {
+        if (samplelength != $self->samplesize() or targetlength != $self->targetsize()) {
+            PyErr_Format(PyExc_ValueError, "Arrays of lengths (%d,%d) given",
+                         samplelength, targetlength);
+            return;
+        }
+        $self->append(sample_p, target_p);
+    }
+};
+
+
+// SupervisedSequentialDataset
+// SupervisedSimpleDataset;
+// UnsupervisedSimpleDataset;
+// UnsupervisedSequenceDataset;
+
