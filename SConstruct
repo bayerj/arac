@@ -1,9 +1,11 @@
 import distutils.sysconfig
 import numpy.distutils.misc_util
 
+SetOption('num_jobs', 4)
+
 TARGET = '/usr/local'
 
-LIBPATH = ['/usr/lib', '/usr/local/lib', '/sw/lib', '.']
+LIBPATH = ['/usr/lib', '.', '/usr/local/lib', '/sw/lib']
 CPPPATH = ['/usr/local/include', '/sw/include', '/usr/include']
 CCFLAGS = ['-g', '-O3']
 
@@ -32,13 +34,14 @@ testenv = Environment(LIBS=['arac', 'gtest'], CPPPATH=CPPPATH, LIBPATH=LIBPATH)
 test = testenv.Program('test-arac', Glob('src/cpp/tests/*.cpp'))
 
 
-swigenv = Environment(SWIGFLAGS=['-python', '-c++'],
+swigenv = Environment(SWIGFLAGS=['-python', '-c++', '-outdir', 'src/python/arac'],
                       CPPPATH=CPPPATH + NUMPYPATH + PYTHONPATH,
                       LIBS=['arac'],
                       CCFLAGS='-bundle -undefined suppress -flat_namespace',
                       LINKFLAGS='-Wno-long-double -undefined suppress -flat_namespace',
                       LIBPATH=LIBPATH,
-                      LDMODULEPREFIX='src/python/arac/_', LDMODULESUFFIX = '.so',)
+                      LDMODULEPREFIX='src/python/arac/_', LDMODULESUFFIX = '.so',
+                      )
 swig = swigenv.LoadableModule('cppbridge', 
                              ['src/swig/cppbridge.i'])
 
