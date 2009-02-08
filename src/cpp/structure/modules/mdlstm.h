@@ -22,6 +22,17 @@ class MdlstmLayer : public arac::structure::modules::Module
 
         MdlstmLayer(int timedim, int size);
         virtual ~MdlstmLayer();
+        
+        arac::common::Buffer& input_squashed();
+        
+        arac::common::Buffer& output_gate_squashed();
+        arac::common::Buffer& output_gate_unsquashed();
+        
+        arac::common::Buffer& input_gate_squashed();
+        arac::common::Buffer& input_gate_unsquashed();
+
+        arac::common::Buffer& forget_gate_squashed();
+        arac::common::Buffer& forget_gate_unsquashed();
 
     protected:
         
@@ -37,13 +48,15 @@ class MdlstmLayer : public arac::structure::modules::Module
         int _timedim;
         
         arac::common::Buffer _input_squashed;
+        
         arac::common::Buffer _input_gate_squashed;
         arac::common::Buffer _input_gate_unsquashed;
+        
         arac::common::Buffer _output_gate_squashed;
         arac::common::Buffer _output_gate_unsquashed;
+        
         arac::common::Buffer _forget_gate_unsquashed;
         arac::common::Buffer _forget_gate_squashed;
-        
         
         // Intermediate buffers.
         double* _input_p;
@@ -59,9 +72,64 @@ class MdlstmLayer : public arac::structure::modules::Module
 };
 
 
+inline
+arac::common::Buffer& 
+MdlstmLayer::input_squashed()
+{
+    return _input_squashed;
 }
+
+
+inline
+arac::common::Buffer& 
+MdlstmLayer::output_gate_squashed()
+{
+    return _output_gate_squashed;
+    
 }
+
+
+inline
+arac::common::Buffer&
+MdlstmLayer::output_gate_unsquashed()
+{
+    return _output_gate_unsquashed;
 }
+
+
+inline
+arac::common::Buffer& 
+MdlstmLayer::input_gate_squashed()
+{
+    return _input_gate_squashed;
+}
+
+
+inline
+arac::common::Buffer& 
+MdlstmLayer::input_gate_unsquashed()
+{
+    return _input_gate_unsquashed;
+}
+
+
+inline
+arac::common::Buffer&
+MdlstmLayer::forget_gate_squashed()
+{
+    return _forget_gate_squashed;
+}
+
+
+inline
+arac::common::Buffer& 
+MdlstmLayer::forget_gate_unsquashed()
+{
+    return _forget_gate_unsquashed;
+}
+
+
+} } }  // Namespace.
 
 
 #endif
