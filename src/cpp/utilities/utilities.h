@@ -12,16 +12,12 @@ namespace arac {
 namespace utilities {
 
 
-
 void
 print_parameters(arac::structure::networks::Network& net);
 
 
 void
 print_derivatives(arac::structure::networks::Network& net);
-
-
-
 
 
 } } // Namespace
