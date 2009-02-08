@@ -93,7 +93,8 @@ class NetworkTestCase(TestCase):
             #         print getattr(_net[module.name], bn)
             #         print "-" * 5
             #     print "=" * 20
-            
+
+            print pybrain_res, arac_res
             self.assertArrayNear(pybrain_res, arac_res)
             error = scipy.random.random(net.outdim)
             pybrain_res = net.backActivate(error)
@@ -359,6 +360,17 @@ class TestNetworkUses(NetworkTestCase):
         hiddenmesh = ModuleMesh.constructWithLayers(TanhLayer, hsize, hdims, 'hidden')
         net = BorderSwipingNetwork(inmesh, hiddenmesh, outmesh, predefined = predefined)
         self.equivalence_feed_forward(net, net.convertToFastNetwork())
+        
+    def testMdlstm(self):
+        net = FeedForwardNetwork()
+        net.addInputModule(LinearLayer(3, name='in'))
+        net.addModule(MDLSTMLayer(3, 3, name='hidden'))
+        net.addOutputModule(LinearLayer(2, name='out'))
+        net.addConnection(FullConnection(net['in'], net['hidden']))
+        net.addConnection(FullConnection(net['hidden'], net['out']))
+        net.sortModules()
+        self.equivalence_feed_forward(net, net.convertToFastNetwork())
+        
         
 
 if __name__ == "__main__":
