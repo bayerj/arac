@@ -17,3 +17,4 @@ src/python/arac/cppbridge.py
 src/swig/cppbridge.py
 src/swig/cppbridge_wrap.cpp
 test-arac
+docs/output/
