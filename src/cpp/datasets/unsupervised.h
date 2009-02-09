@@ -13,27 +13,51 @@ namespace arac {
 namespace datasets {
     
 
-// TODO: document.
+///
+/// UnsupervisedDataset objects hold single data rows.
+///
 
 template<typename SampleType>
 class UnsupervisedDataset 
 {
     public: 
-    
+
+        ///
+        /// Create a new UnsupervisedDataset object where each sample is of
+        /// the given samplesize.
+        ///
         UnsupervisedDataset(int samplesize);
+        
+        ///
+        /// Destroy the UnsupervisedDataset object.
+        ///
         virtual ~UnsupervisedDataset();
         
-        // Return the the size of a sample.
+        ///
+        /// Return the the size of a sample.
+        ///
         int samplesize();
 
-        // Return the number of rows currently in the dataset.
+        ///
+        /// Return the number of rows currently in the dataset.
+        ///
         virtual int size();
         
+        ///
+        /// Return a reference to the sample at the given index.
+        ///
         const SampleType& operator[](int index);
         
     private:
         
+        ///
+        /// The size of a sample.
+        ///
         int _samplesize;
+        
+        ///
+        /// Vector that holds the samples in the dataset.
+        ///
         std::vector<SampleType> _rows;
         
 };

@@ -15,30 +15,57 @@ namespace arac {
 namespace datasets {
     
 
-// TODO: document.
+///
+/// SupervisedDataset objects hold pairs of data, each of possibly different 
+/// types.
+///
 
 template<typename SampleType, typename TargetType>
 class SupervisedDataset : public UnsupervisedDataset<SampleType>
 {
     public: 
     
+        ///
+        /// Create a new SupervisedDataset object with the given samplesize and
+        /// the given targetsize.
+        ///
         SupervisedDataset(int samplesize, int targetsize);
+        
+        /// 
+        /// Destroy the SupervisedDataset object.
+        ///
         virtual ~SupervisedDataset();
         
+        ///
+        /// Return the amount of rows in the dataset.
+        ///
         virtual int size();
         
-        // Return the the size of a target.
+        ///
+        /// Return the the size of a target.
+        ///
         int targetsize();
 
-        // Add another row to the dataset.
+        ///
+        /// Add another row to the dataset.
+        ///
         void append(SampleType sample, TargetType target);
         
+        ///
+        /// Return the (sample, target) pair of the dataset at the given index.
+        ///
         const std::pair<SampleType, TargetType>& operator[](int index);
         
     private:
  
+        ///
+        /// Size of a single target.
+        ///
         int _targetsize;
         
+        /// 
+        /// Vector that holds the (sample, target) pairs.
+        ///
         std::vector<std::pair<SampleType, TargetType> > _rows;
         
 };
