@@ -14,15 +14,15 @@
 namespace arac {
 namespace common {
 
-//
-// Buffer objects hold pointers to arrays which are serving as 
-// inputs/outputs/errors/etc. to modules. 
-//
-// A buffer is organized in different rows which are held as a vector of double
-// pointers. 
-// A buffer may either "own" its arrays or not own them. In the first case, the 
-// buffer frees the memory of the arrays on destruction. 
-//
+///
+/// Buffer objects hold pointers to arrays which are serving as 
+/// inputs/outputs/errors/etc. to modules. 
+///
+/// A buffer is organized in different rows which are held as a vector of double
+/// pointers. 
+/// A buffer may either "own" its arrays or not own them. In the first case, the 
+/// buffer frees the memory of the arrays on destruction. 
+///
 
 class Buffer
 {
@@ -31,44 +31,74 @@ class Buffer
         Buffer(int rowsize, bool owner=true);
         virtual ~Buffer();
         
-        // Add the contents at the given pointer to the last buffer row.
+        ///
+        /// Add the contents at the given pointer to the last buffer row. If an
+        /// index is given, the content will be added to that buffer row.
+        ///
         void add(double* addend_p, int index=-1);
         
-        // Add another row to the buffer's contents.
+        ///
+        /// Append an empty  row to the buffer's contents.
+        ///
         void expand();
         
-        // Set all the contents to zero. 
+        ///
+        /// Set all the contents to zero. 
+        ///
         void clear();
-        
-        // Set all the contents of a specific buffer to zero.
+
+        ///
+        /// Set all the contents of a specific row to zero.
+        ///
         void clear_at(int index);
-        
-        // Free the memory held by the Buffer object.
+
+        ///
+        /// Free the memory held by the Buffer object. Do nothing if the buffer
+        /// does not own the memory.
+        ///
         void free_memory();
         
-        // Add the given pointer as a row.
+        ///
+        /// Add the given pointer as a row. Attention: This removes ownership 
+        /// for all buffers.
+        ///
         void append(double* row);
-        
-        // Make the Buffer own the memory.
+
+        ///
+        /// Mark the Buffer as the owner of the memory.
+        ///
         void make_owner();
-        
-        // Tell wether the Buffer owns the memory.
+
+        ///
+        /// Tell wether the Buffer is the owner of the memory.
+        ///
         bool owner();
-        
-        // Return the size of a single row in the Buffer.
+
+        ///
+        /// Return the size of a single row in the Buffer.
+        ///
         int rowsize();
         
-        // Set the size of a specific row.
+        ///
+        /// Set the size of a single row.
+        ///
         void set_rowsize(int value);
         
-        // Return the number of rows in the buffer.
+        ///
+        /// Return the number of rows in the buffer.
+        ///
         int size();
-        
-        // Return the pointer at the given index.
+
+        ///
+        /// Return a pointer to the row at the given index.
+        ///
         double* operator [](int index);
         
     protected:
         
+        ///
+        /// Vector that holds the pointer to the rows.
+        ///
         DoublePtrVec _content;
         int _rowsize;
         bool _owner;

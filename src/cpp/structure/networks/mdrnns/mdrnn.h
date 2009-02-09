@@ -20,22 +20,51 @@ namespace networks {
 namespace mdrnns {
 
 
+/// 
+/// Template class to implement a grid of modules in order to process 
+/// multidimensional sequences.
+/// 
+
 template <class module_type>
 class Mdrnn : public BaseMdrnn, public arac::structure::Parametrized
 {
     public:
         
+        /// 
+        /// Create a new Mdrnn object for the given timedim with layers of size
+        /// hiddensize.
+        ///
         Mdrnn(int timedim, int hiddensize);
         virtual ~Mdrnn();
 
+        ///
+        /// Set the length of the current sequence in the given dimension.
+        ///
         void set_sequence_shape(int dim, int val);
+        
+        ///
+        /// Return the length of the current sequence in the given dimension.
+        ///
         const double* get_sequence_shape();
 
+        ///
+        /// Return the amount of items in the sequence. Each item is a vector
+        /// of the size of a block.
+        ///
         int sequencelength();
 
+        ///
+        /// Set the shape of a block along the given dimension.
+        ///
         void set_block_shape(int dim, int val);
+        
+        ///
+        /// Return the shape of a block alogn the given dimension.
+        ///
         const double* get_block_shape();
 
+        /// Return the size of single item. This equals the product of the
+        /// sidelength's of each block.
         int blocksize();
 
         void sort();
@@ -60,10 +89,10 @@ class Mdrnn : public BaseMdrnn, public arac::structure::Parametrized
         double* _sequence_shape_p;
         double* _block_shape_p;
         
-        // Size of the previous dimensions in memory; example: if a shape of 
-        // (4, 4, 4) is given, each element holds the product of the previous
-        // dimensions: (1, 4, 16) with the special case of the first element 
-        // being one.
+        /// Size of the previous dimensions in memory; example: if a shape of 
+        /// (4, 4, 4) is given, each element holds the product of the previous
+        /// dimensions: (1, 4, 16) with the special case of the first element 
+        /// being one.
         double* _multiplied_sizes_p;
         
         module_type* _module_p;

@@ -2,6 +2,10 @@
 // (c) 2008 by Justin S Bayer, <bayer.justin@googlemail.com>
 
 
+// This file holds (mathematical) functions that are used at several places. It
+// is not intended for framework-, utility-, convenience functions or the like.
+
+
 #ifndef Arac_COMMON_FUNCTIONS_INCLUDED
 #define Arac_COMMON_FUNCTIONS_INCLUDED
 

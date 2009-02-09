@@ -16,12 +16,17 @@ namespace modules {
 using arac::structure::modules::Module;
 
 
-// TODO: document.
-
+///
+/// A SigmoidLayer object is of the same in- and outputsize and transforms its
+/// input by applying the sigmoidal function to each component.
+///
 class SigmoidLayer : public Module
 {
     public:
 
+        /// 
+        /// Create a new SigmoidLayer object of the given size.
+        ///
         SigmoidLayer(int size);
         virtual ~SigmoidLayer();
 

@@ -16,12 +16,17 @@ namespace modules {
 using arac::structure::modules::Module;
 
 
-// TODO: document.
-
+///
+/// A TanhLayer object is of the same in- and outputsize and transforms its
+/// input by applying the tan hyperbolicus function to each component.
+///
 class TanhLayer : public Module
 {
     public:
 
+        /// 
+        /// Create a new TanhLayer object of the given size.
+        ///
         TanhLayer(int size);
         virtual ~TanhLayer();
         

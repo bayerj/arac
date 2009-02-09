@@ -13,31 +13,94 @@ namespace arac {
 namespace structure {
 namespace modules {
 
-
-// TODO: document.
+///
+/// MdlstmLayer objects implement the MDLSTM algorithm as introduced by Alex 
+/// Graves. They are a generalization of the LSTM algorithm and suited for
+/// multidimensional sequences. 
+///
+/// MdlstmLayer objects have a special input layout which is outlined below.
+///
+/// Let s be the size of the layer and d the timedimension.
+///
+/// Layout of inputs and outputs
+/// ----------------------------
+/// Depending on how many "real" inputs the layer is given, there will be
+///
+///     I = (3 + 2 * d) * s
+///     
+/// inputs over all, where s is the size (= the "true" input) and d is the
+/// dimensionality of the MDRNN. The input layout is as follows:
+///
+///     Name            Size in doubles
+///     -------------------------------
+///     input gate      s
+///     forget gate     s * d
+///     input           s
+///     output gate     s
+///     states          s * d
+///
+/// The output layout corresponds to
+///
+///      Name            Size in doubles
+///      -------------------------------
+///      output          s
+///      states          s
+///
 
 class MdlstmLayer : public arac::structure::modules::Module
 {
     public:
 
+        ///
+        /// Create a new MdlstmLayer object of the given timedim and size.
+        ///
         MdlstmLayer(int timedim, int size);
+
+        ///
+        /// Destroy the MdlstmLayer object.
+        ///
         virtual ~MdlstmLayer();
         
+        ///
+        /// Return a reference to the input_squashed Buffer.
+        ///
         arac::common::Buffer& input_squashed();
-        
+
+        ///
+        /// Return a reference to the output_gate_squashed Buffer.
+        ///
         arac::common::Buffer& output_gate_squashed();
+
+        ///
+        /// Return a reference to the output_gate_unsquashed Buffer.
+        ///
         arac::common::Buffer& output_gate_unsquashed();
-        
+
+        ///
+        /// Return a reference to the input_gate_squashed Buffer.
+        ///
         arac::common::Buffer& input_gate_squashed();
+
+        ///
+        /// Return a reference to the input_gate_unsquashed Buffer.
+        ///
         arac::common::Buffer& input_gate_unsquashed();
 
+        ///
+        /// Return a reference to the forget_gate_squashed Buffer.
+        ///
         arac::common::Buffer& forget_gate_squashed();
+
+        ///
+        /// Return a reference to the forget_gate_unsquashed Buffer.
+        ///
         arac::common::Buffer& forget_gate_unsquashed();
 
     protected:
-        
-        // Set the intermediate buffers to zero.
-        // TODO: find better name.
+
+        /// 
+        /// Set all the contents of the intermediate buffers to zero,
+        ///
         void clear_intermediates();
         
         virtual void _forward();

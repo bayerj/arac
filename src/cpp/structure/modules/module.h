@@ -14,8 +14,10 @@ namespace arac {
 namespace structure {
 namespace modules {
     
-
-// TODO: document.
+///
+/// A module is something that has input data and produces output data out of 
+/// this. The inputs and outputs do not necessarily have to be of the same size.
+/// 
 
 class Module : public arac::structure::Component
 {
@@ -23,55 +25,88 @@ class Module : public arac::structure::Component
 
         Module();
         
-        // Create a new module and allocate the necessary buffers.
+        ///
+        /// Create a new module and allocate the necessary buffers.
+        ///
         Module(int insize, int outsize);
-        
-        // Destroy the module. Depending on the ownership, the arrays are 
-        // deallocated.
+
+        ///
+        /// Destroy the module. 
+
         virtual ~Module();
-        
+
+        ///
+        /// Interpret the input and produce the modules output by this.
+        ///
         virtual void forward();
     
-        // Add the contents at the given pointer to the input.
+        ///
+        /// Add the contents at the given pointer to the input.
+        ///
         void add_to_input(double* addend_p);
-        
-        // Add the contents at the given pointer to the outerror.
+
+        ///
+        /// Add the contents at the given pointer to the outerror.
+        ///
         void add_to_outerror(double* addend_p);
         
-        // Clear input, output, inerror and outerror by setting them to zero.
+        ///
+        /// Clear input, output, inerror and outerror by setting them to zero.
+        ///
         virtual void clear();
-        
-        // Return the input Buffer.
+
+        ///
+        /// Return a reference to the input Buffer.
+        ///
         arac::common::Buffer& input();
         
-        // Return the output Buffer.
+        ///
+        /// Return a reference the output Buffer.
+        ///
         arac::common::Buffer& output();
         
-        // Return the inerror Buffer.
+        ///
+        /// Return a reference to the inerror Buffer.
+        ///
         arac::common::Buffer& inerror();
         
-        // Return the outerror Buffer.
+        ///
+        /// Return a reference to the outerror Buffer.
+        ///
         arac::common::Buffer& outerror();
         
-        // Return the input size of the module.
+        ///
+        /// Return the input size of the module.
+        ///
         int insize();
         
-        // Return the output size of the module.
+        ///
+        /// Return the output size of the module.
+        ///
         int outsize();
 
-        // Tell if the modules internal pointer points to the last timestep.
+        ///
+        /// Tell if the modules internal timestep counter points to the last timestep.
+        ///
         bool last_timestep();
 
         
     protected:
 
-        // Initialize all the buffers.
+        ///
+        /// Initialize all the buffers.
+        ///
         virtual void init_buffers();
         
-        // Free the space used by the buffers.
+        ///
+        /// Free the space used by the buffers. Do nothing if the buffers are 
+        /// not the owners of the memory.
+        ///
         virtual void free_buffers();
         
-        // Expand the size of all the buffers.
+        ///
+        /// Expand the size of all the buffers by one row.
+        ///
         virtual void expand();
 
         int _insize;

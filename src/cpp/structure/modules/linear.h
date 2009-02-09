@@ -17,12 +17,18 @@ namespace modules {
 using arac::structure::modules::Module;
 
 
-// TODO: document.
+///
+/// A LinearLayer object is of equal in- and outputsize. It does not transform
+// the input in any way.
+///
 
 class LinearLayer : public Module
 {
     public:
 
+        /// 
+        /// Create a LinearLayer object of the given size.
+        ///
         LinearLayer(int size);
         virtual ~LinearLayer();
 

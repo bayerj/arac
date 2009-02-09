@@ -17,13 +17,23 @@ namespace modules {
 using arac::structure::modules::Module;
 
 
-// TODO: document.
-
+///
+/// Layer that implements a differntial version of the IF ... construct.
+/// The input is double the size of the output. The outout is defined to be
+/// sig(x0) * x1.
+///
 class GateLayer : public Module
 {
     public:
 
+        ///
+        /// Create a new GateLayer object of the gíven size.
+        ///
         GateLayer(int size);
+        
+        /// 
+        /// Destroy the GateLayer object.
+        ///
         virtual ~GateLayer();
 
     protected:

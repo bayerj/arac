@@ -15,11 +15,24 @@ namespace networks {
 namespace mdrnns {
 
 
+///
+/// Baseclass for all kinds of multidimensional recurrent neural networks.
+/// The common API is a time dimensions, which specifies the dimensionality of
+/// the sequence. 
+///
+
 class BaseMdrnn : public BaseNetwork
 {
     public:
         
+        ///
+        /// Create a new BaseMdrnn object.
+        ///
         BaseMdrnn(int timedim);
+        
+        ///
+        /// Destroy the BaseMdrnn object.
+        ///
         virtual ~BaseMdrnn();
 
     protected:

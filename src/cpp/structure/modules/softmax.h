@@ -16,13 +16,21 @@ namespace modules {
 using arac::structure::modules::Module;
 
 
-// TODO: document.
-
+///
+/// The softmax layer transforms all its inputs to add up to 1.0 in the output.
+///
 class SoftmaxLayer : public Module
 {
     public:
 
+        ///
+        /// Create a new SoftmaxLayer object.
+        ///
         SoftmaxLayer(int size);
+        
+        ///
+        /// Destroy the SoftmaxLayer object.
+        ///
         virtual ~SoftmaxLayer();
 
     protected:

@@ -16,17 +16,33 @@ namespace structure {
 namespace modules {
 
 
-// TODO: document.
+///
+/// Layer that implements the long short-term memory algorithm. Needs to be
+/// sequential.
+///
+/// LstmLayers are superior to normal layers in terms of remembering inputs
+/// longer ago. They keep an additional buffer, the state.
+///
+/// For more information on the algorithm visit:
+///     http://www.idsia.ch/~juergen/lstm/
+///
 
 class LstmLayer : public Module
 {
     public:
 
+        ///
+        /// Create a new LstmLayer with size outputs. The layer will have four
+        /// times as many inputs.
+        ///
         LstmLayer(int size);
         virtual ~LstmLayer();
         
         virtual void set_mode(arac::structure::Component::Mode mode);
         
+        ///
+        /// Return a reference to the state buffer.
+        ///
         arac::common::Buffer& state();
         arac::common::Buffer& state_error();
         
@@ -46,7 +62,9 @@ class LstmLayer : public Module
         void fill_internal_state_error();
         void retrieve_internal_state_error();
         
-        // wrapped MdlstmLayer
+        ///
+        /// Since the lstm cell is a special case of the mdlstm cell, the lstm
+        /// layer is implemented by wrapping an MdlstmLayer object.
         MdlstmLayer _mdlstm;
 
         arac::common::Buffer* _state_p;

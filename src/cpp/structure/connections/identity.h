@@ -19,13 +19,25 @@ using namespace arac::structure::modules;
 using arac::structure::Component;
 
 
-// TODO: document.
-
+///
+/// An identity connection connects two modules by adding the output of the
+/// íncoming module to the input of the outgoing module.
+///
 class IdentityConnection : public Connection 
 {
     public:
-
+        
+        ///
+        /// Create a new IdentityConnection between two modules, where the
+        /// output size of the incoming module equals the input size of the 
+        /// outgoing module.
+        ///
         IdentityConnection(Module* incoming_p, Module* outgoing_p);
+
+        ///
+        /// Create a new IdentityConnection between two modules. Slices have to
+        /// be of the same length.
+        ///
         IdentityConnection(Module* incoming_p, Module* outgoing_p,
                            int incomingstart, int incomingstop, 
                            int outgoingstart, int outgoingstop);

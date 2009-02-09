@@ -17,13 +17,21 @@ namespace modules {
 using arac::structure::modules::Module;
 
 
-// TODO: document.
-
+///
+/// Bias objects are objects that have a constant output of 1.0. 
+///
 class Bias : public Module
 {
 
     public:
+        ///
+        /// Create a new Bias object.
+        ///
         Bias();
+        
+        ///
+        /// Destroy the Bias object.
+        ///
         virtual ~Bias();
 
     protected:

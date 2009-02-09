@@ -27,32 +27,68 @@ using arac::structure::Component;
 using arac::structure::Parametrized;
 
 
-// TODO: document.
-
+///
+/// Network objects hold a graph of modules as nodes and connections as edges
+/// to process an output.
+///
 class Network : public BaseNetwork
 {
     public: 
         
+        ///
+        /// Different roles that modules can take in a Network object.
+        ///
         enum ModuleType {
+            // Modules of this type have no special role.
             Simple = 0,
+            // The input of modules of this type is also input of the network.
             InputModule = 1,
+            // The output of modules of this type is also output of the network.
             OutputModule = 2,
+            // Combination of InputModule and OutputModule.
             InputOutputModule = 3
         };
         
+        ///
+        /// Create a new Network object.
+        ///
         Network();
+        
+        ///
+        /// Destroy the Network object.
+        ///
         virtual ~Network();
         
+        ///
+        /// Set the buffers of all the modules in the network to zero.
+        ///
         virtual void clear();
         
+        ///
+        /// Add a module of the given type to the Network object.
+        ///
         void add_module(Module* module_p, ModuleType type=Simple);
         
+        ///
+        /// Add a connection to the Network object.
+        ///
         void add_connection(Connection* con_p);
 
+        ///
+        /// Set the derivatives of all the Parametrized objects in the network
+        /// to zero.
         virtual void clear_derivatives();
 
+        ///
+        /// Return a vector to all the Parametrized objects in the Network.
+        ///
         const std::vector<Parametrized*>& parametrizeds() const;
         
+        ///
+        /// Fill the parametrizers of all Parametrized objects in the network
+        /// with random values.
+        ///
+        // TODO: allow specification of intervals.
         void randomize();
         
     protected:
@@ -62,7 +98,9 @@ class Network : public BaseNetwork
         
         void add_component(Component* comp_p);
 
-        // Fill count with the amount of incoming edges for every module.
+        ///
+        /// Fill count with the amount of incoming edges for every module.
+        ///
         void incoming_count(std::map<Module*, int>& count);
         
         virtual void sort();
