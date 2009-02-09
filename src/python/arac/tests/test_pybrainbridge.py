@@ -71,18 +71,18 @@ class NetworkTestCase(TestCase):
             pybrain_res = net.backActivate(error)
             arac_res = _net.backActivate(error)
 
-            if (pybrain_res != arac_res).any():
-                for module in net.modulesSorted:
-                    for bn, _ in module.bufferlist:
-                        buf =  getattr(net[module.name], bn)
-                        _buf =  getattr(_net[module.name], bn)
-                        if (buf == _buf).all():
-                            continue
-                        print module.name, bn
-                        print (buf - _buf).max()
-                        # print buf 
-                        # print _buf
-                        print "-" * 20
+            # if (pybrain_res != arac_res).any():
+            #     for module in net.modulesSorted:
+            #         for bn, _ in module.bufferlist:
+            #             buf =  getattr(net[module.name], bn)
+            #             _buf =  getattr(_net[module.name], bn)
+            #             if (buf == _buf).all():
+            #                 continue
+            #             print module.name, bn
+            #             print (buf - _buf).max()
+            #             # print buf 
+            #             # print _buf
+            #             print "-" * 20
 
             self.assertArrayNear(pybrain_res, arac_res)
             if hasattr(_net, '_derivs'):
@@ -390,6 +390,7 @@ class TestNetworkUses(NetworkTestCase):
         net.addOutputModule(LinearLayer(1, name='out'))
         net.addConnection(FullConnection(net['in'], net['hidden']))
         net.addConnection(FullConnection(net['hidden'], net['out']))
+        net.sortModules()
         self.equivalence_feed_forward(net, net.convertToFastNetwork())
         
 
