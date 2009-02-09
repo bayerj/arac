@@ -8,12 +8,20 @@ __author__ = 'Justin S Bayer, bayer.justin@googlemail.com'
 import distutils
 import glob
 import os
+import os.path
 import sys
 
 from distutils.ccompiler import new_compiler
 from setuptools import setup, find_packages
 
 import numpy.distutils
+
+
+basepath, fn = os.path.split(__file__)
+prepend_path = lambda x: os.path.join(basepath, x)
+
+
+class AracCompileError(Exception): pass
 
 
 def make_compiler(compiler_cmd='g++'):
@@ -62,10 +70,11 @@ def compile_arac():
              'src/cpp/structure/networks/*.cpp',
              'src/cpp/structure/networks/mdrnns/*.cpp',
     )
+    globs = (prepend_path(i) for i in globs)
     sources = sum((glob.glob(i) for i in globs), [])
 
     compiler = make_compiler()
-    objects = compiler.compile(sources, extra_postargs=['-g', '-O3'])
+    objects = compiler.compile(sources, extra_postargs=['-g', '-O3', '-fPIC'])
     compiler.add_library_dir('.')
     compiler.link_shared_lib(
         objects=objects, 
@@ -77,20 +86,20 @@ def compile_arac():
 def compile_swig():
     compiler = make_compiler()
     compiler.add_library('arac')
-    objects = compiler.compile(['src/swig/cppbridge_wrap.cpp'],
-                               extra_postargs=['-Wno-long-double'])
+    objects = compiler.compile([prepend_path('src/swig/cppbridge_wrap.cc')],
+			       extra_postargs=['-fPIC'])
+    extra_postargs = ['-fPIC', '-flat_namespace', '-Wno-long-double']
+    if sys.platform == 'darwin':
+    	extra_postargs += ['-undefined suppress'] 
     compiler.link_shared_lib(
         objects=objects,
-        output_dir='src/python/arac/',
+        output_dir=prepend_path('src/python/arac/'),
         output_libname='_cppbridge',
         target_lang='c++',
-        extra_postargs=['-bundle', 
-                        '-undefined suppress', 
-                        '-flat_namespace',
-                        '-Wno-long-double']
+        extra_postargs=extra_postargs
     )
-    os.rename('src/python/arac/lib_cppbridge.so', 
-              'src/python/arac/_cppbridge.so')
+    os.rename(prepend_path('src/python/arac/lib_cppbridge.so'), 
+              prepend_path('src/python/arac/_cppbridge.so'))
 
     
 def compile_test():    # Now compile test.                         
