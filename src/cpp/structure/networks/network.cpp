@@ -145,20 +145,6 @@ Network::_backward()
         error_p += size;
     }
     
-    // Backward non recurrent components in reverse topological order.
-    std::vector<Component*>::reverse_iterator riter;
-    for(riter = _components_sorted.rbegin(); 
-        riter != _components_sorted.rend();
-        riter++)
-    {
-        Component* comp_p = *riter;
-        if (comp_p->error_agnostic())
-        {
-            continue;
-        }
-        comp_p->backward();
-    }
-    
     // First backward recurrent components.
     std::vector<Component*>::iterator iter;
     for(iter = _components_rec.begin(); 
@@ -166,6 +152,20 @@ Network::_backward()
         iter++)
     {
         Component* comp_p = *iter;
+        if (comp_p->error_agnostic())
+        {
+            continue;
+        }
+        comp_p->backward();
+    }
+    
+    // Backward non recurrent components in reverse topological order.
+    std::vector<Component*>::reverse_iterator riter;
+    for(riter = _components_sorted.rbegin(); 
+        riter != _components_sorted.rend();
+        riter++)
+    {
+        Component* comp_p = *riter;
         if (comp_p->error_agnostic())
         {
             continue;
