@@ -22,41 +22,99 @@ namespace arac {
 namespace optimization {
     
     
-// TODO: document.
+///
+/// Template class for Backprop optimizers.
+///
+/// Each optimizer holds its own implementation of how to process a sample.
+///
+
 template<typename SampleType, typename TargetType>
 class Backprop
 {
     public: 
-    
+        
+        ///
+        /// Backprop implementaion specific dataset type on which a network
+        /// is to be trained.
+        ///
         typedef SupervisedDataset<SampleType, TargetType> DatasetType;
     
+        ///
+        /// Create a new Backprop optimizer object with which the given network
+        /// can be trained on the given dataset.
+        ///
         Backprop(Network& network, DatasetType& dataset);
+        
+        ///
+        /// Destroy the Backprop object.
+        ///
         virtual ~Backprop();
         
+        ///
+        /// Return a reference to the network of the optimizer.
+        ///
         Network& network();
         
+        ///
+        /// Return a reference to the dataset of the optimizer.
+        ///
         DatasetType& dataset();
         
+        ///
+        /// Return the learningrate of the trainer.
+        ///
         const double& learningrate();
         
+        ///
+        /// Set the learningrate of the trainer.
+        ///
         void set_learningrate(const double value);
 
+        ///
+        /// Return a pointer to the last error.
+        ///
         const double* error();
         
+        ///
+        /// Pick a random sample from the dataset and perform one step of
+        /// backpropagation.
+        ///
+        /// This method calls the methods process_sample and learn, of which the
+        /// former is to be implemented by subclasses.
         void train_stochastic();
         
     protected:
         
+        ///
+        /// Adapt the parameters of the network according to its derivatives.
+        ///
         void learn();
         
+        ///
+        /// Network to be optimized optimizer.
+        ///
         Network& _network;
+        
+        ///
+        /// Dataset the network is to be optimized upon.
+        ///
         DatasetType& _dataset;
+        
+        ///
+        /// The learning rate of the optimizer.
+        ///
         double _learningrate;
+        
+        ///
+        /// The last error during process_sample.
+        ///
         double* _error_p;
-
-        // FIXME: this function should be abstract instead. But in that case,
-        // classes inheriting from this class which give a definition for the
-        // concrete class are still abstract somehow. wtf...?
+        
+        ///
+        /// Method that processes a sample from the dataset and its target. This
+        /// method has to be implemented for each (SampleType, TargetType) 
+        /// combination.
+        ///
         virtual void process_sample(SampleType inpt, TargetType target)  = 0;
 
 };
@@ -159,6 +217,12 @@ Backprop<SampleType, TargetType>::learn()
 //
 // Spezializations.
 //
+
+
+///
+/// SimpleBackprop optimizers are used to train a feedforward network on a 
+/// dataset that consists of independet sample and target vectors.
+///
  
 class SimpleBackprop : public Backprop<double*, double*> 
 {
@@ -171,6 +235,11 @@ class SimpleBackprop : public Backprop<double*, double*>
         virtual void process_sample(double* input_p, double* target_p);
 };
 
+
+///
+/// SemiSequentialBackprop optimizers are used to train networks that map 
+/// sequences to vectors.
+///
 
 class SemiSequentialBackprop : public Backprop<Sequence, double*>
 {
@@ -187,6 +256,10 @@ class SemiSequentialBackprop : public Backprop<Sequence, double*>
         double* _output_p;
 };
 
+///
+/// SequentialBackprop optimizers are used for networks that map sequences to
+/// sequences of the same length.
+///
 
 class SequentialBackprop : public Backprop<Sequence, Sequence>
 {
