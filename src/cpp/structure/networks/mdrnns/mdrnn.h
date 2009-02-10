@@ -45,7 +45,7 @@ class Mdrnn : public BaseMdrnn, public arac::structure::Parametrized
         ///
         /// Return the length of the current sequence in the given dimension.
         ///
-        const double* get_sequence_shape();
+        int get_sequence_shape(int dim);
 
         ///
         /// Return the amount of items in the sequence. Each item is a vector
@@ -59,9 +59,9 @@ class Mdrnn : public BaseMdrnn, public arac::structure::Parametrized
         void set_block_shape(int dim, int val);
         
         ///
-        /// Return the shape of a block alogn the given dimension.
+        /// Return the shape of a block along the given dimension.
         ///
-        const double* get_block_shape();
+        int get_block_shape(int dim);
 
         /// Return the size of single item. This equals the product of the
         /// sidelength's of each block.
@@ -86,14 +86,14 @@ class Mdrnn : public BaseMdrnn, public arac::structure::Parametrized
         int _sequencelength;
         int _blocksize;
         
-        double* _sequence_shape_p;
-        double* _block_shape_p;
+        int* _sequence_shape_p;
+        int* _block_shape_p;
         
         /// Size of the previous dimensions in memory; example: if a shape of 
         /// (4, 4, 4) is given, each element holds the product of the previous
         /// dimensions: (1, 4, 16) with the special case of the first element 
         /// being one.
-        double* _multiplied_sizes_p;
+        int* _multiplied_sizes_p;
         
         module_type* _module_p;
         
@@ -126,10 +126,10 @@ Mdrnn<module_type>::set_sequence_shape(int dim, int val)
 
 template <class module_type>
 inline
-const double*
-Mdrnn<module_type>::get_sequence_shape()
+int
+Mdrnn<module_type>::get_sequence_shape(int dim)
 {
-    return _sequence_shape_p;
+    return _sequence_shape_p[dim];
 }
 
 
@@ -166,10 +166,10 @@ Mdrnn<module_type>::set_block_shape(int dim, int val)
 
 template <class module_type>
 inline
-const double*
-Mdrnn<module_type>::get_block_shape()
+int
+Mdrnn<module_type>::get_block_shape(int dim)
 {
-    return _block_shape_p;
+    return _block_shape_p[dim];
 }
 
 

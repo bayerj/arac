@@ -19,13 +19,12 @@ using arac::structure::networks::mdrnns::Mdrnn;
 template <class module_type>
 Mdrnn<module_type>::Mdrnn(int timedim, int hiddensize) :
     BaseMdrnn(timedim),
-    Parametrized(hiddensize * hiddensize * timedim),
     _hiddensize(hiddensize),
     _module_p(0)
 {
-    _sequence_shape_p = new double[_timedim];
-    _block_shape_p = new double[_timedim];
-    _multiplied_sizes_p = new double[_timedim];
+    _sequence_shape_p = new int[_timedim];
+    _block_shape_p = new int[_timedim];
+    _multiplied_sizes_p = new int[_timedim];
     for(int i = 0; i < _timedim; i++)
     {
         set_sequence_shape(i, 1);
