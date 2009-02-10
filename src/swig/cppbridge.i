@@ -13,10 +13,11 @@
 using namespace arac::common;
 using namespace arac::datasets;
 using namespace arac::optimization;
+using namespace arac::structure;
 using namespace arac::structure::connections;
 using namespace arac::structure::modules;
 using namespace arac::structure::networks;
-using namespace arac::structure;
+using namespace arac::structure::networks::mdrnns;
 
 
 void init_buffer(Buffer& buffer, double* content_p, int length, int rowsize)
@@ -54,7 +55,6 @@ PyObject* PyArray_2DFromDoublePointer(int dim1, int dim2, double* data_p)
 %include "typemaps.i"
 %include "std_vector.i"
 %template(VectorParametrized) std::vector<Parametrized*>;
-
 
 %include "numpy.i"
 %init %{
@@ -751,4 +751,32 @@ class SequentialBackprop
         ~SequentialBackprop();
     
         void train_stochastic();
+};
+
+
+class SigmoidMdrnn
+{
+    public:
+        SigmoidMdrnn(int timedim, int hiddensize);
+        ~SigmoidMdrnn();
+        
+        void set_sequence_shape(int dim, int val);
+        int get_sequence_shape(int dim);
+        int sequencelength();
+        void set_block_shape(int dim, int val);
+        int get_block_shape(int dim);
+};
+
+
+class TanhMdrnn
+{
+    public:
+        TanhMdrnn(int timedim, int hiddensize);
+        ~TanhMdrnn();
+        
+        void set_sequence_shape(int dim, int val);
+        int get_sequence_shape(int dim);
+        int sequencelength();
+        void set_block_shape(int dim, int val);
+        int get_block_shape(int dim);
 };
