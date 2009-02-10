@@ -34,7 +34,7 @@ class MdlstmLayer : public arac::structure::modules::Module
         arac::common::Buffer& forget_gate_squashed();
         arac::common::Buffer& forget_gate_unsquashed();
 
-    protected:
+    private:
         
         // Set the intermediate buffers to zero.
         // TODO: find better name.
@@ -59,7 +59,8 @@ class MdlstmLayer : public arac::structure::modules::Module
         arac::common::Buffer _forget_gate_squashed;
         
         // Intermediate buffers.
-        double* _input_p;
+        double* _inter_input_p;
+        double* _output_state_p;
         double* _input_state_p;
         double* _output_error_p;
         double* _output_state_error_p;

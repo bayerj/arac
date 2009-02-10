@@ -26,9 +26,10 @@ MdlstmLayer::MdlstmLayer(int size, int timedim) :
     _forget_gate_squashed(size * timedim),
     _forget_gate_unsquashed(size * timedim)
 {
-    _input_p = new double[size];
+    _inter_input_p = new double[size];
     _input_state_p = new double[size];
     _output_error_p = new double[size];
+    _output_state_p = new double[size];
     _output_state_error_p = new double[size];
     _output_gate_error_p = new double[size];
     _forget_gate_error_p = new double[size * _timedim];
@@ -41,9 +42,10 @@ MdlstmLayer::MdlstmLayer(int size, int timedim) :
 
 MdlstmLayer::~MdlstmLayer() 
 {
-    delete[] _input_p;
+    delete[] _inter_input_p;
     delete[] _input_state_p;
     delete[] _output_error_p;
+    delete[] _output_state_p;
     delete[] _output_state_error_p;
     delete[] _output_gate_error_p;
     delete[] _forget_gate_error_p;
@@ -58,9 +60,10 @@ void
 MdlstmLayer::clear_intermediates()
 {
     int size = _outsize / 2;
-    memset(_input_p, 0, sizeof(double) * size);
+    memset(_inter_input_p, 0, sizeof(double) * size);
     memset(_input_state_p, 0, sizeof(double) * size);
     memset(_output_error_p, 0, sizeof(double) * size);
+    memset(_output_state_p, 0, sizeof(double) * size);
     memset(_output_state_error_p, 0, sizeof(double) * size);
     memset(_output_gate_error_p, 0, sizeof(double) * size);
     memset(_forget_gate_error_p, 0, sizeof(double) * size * _timedim);
@@ -88,11 +91,8 @@ MdlstmLayer::expand()
 void
 MdlstmLayer::_forward()
 {
+    clear_intermediates();
     int size = _outsize / 2;
-    
-    double input_p[size];
-    double inputstate_p[size];
-    double outputstate_p[size];
     
     double (*gate_squasher) (double) = sigmoid;
     double (*cell_squasher) (double) = tanh_;
@@ -123,7 +123,7 @@ MdlstmLayer::_forward()
     
     for (int j = 0; j < size * _timedim ; j++, i++)
     {
-        inputstate_p[j] = inputbuffer_p[i];
+        _input_state_p[j] = inputbuffer_p[i];
     }
     
     // TODO: include peepholes
@@ -163,7 +163,7 @@ MdlstmLayer::_forward()
     // Calculate the current cell state.
     for (int i = 0; i < size; i++)
     {
-        outputstate_p[i] = _input_gate_squashed[_timestep][i] \
+        _output_state_p[i] = _input_gate_squashed[_timestep][i] \
             * _input_squashed[_timestep][i];
     }
 
@@ -173,8 +173,8 @@ MdlstmLayer::_forward()
         for (int j = 0; j < size; j++)
         {
             int index = size * i + j;
-            outputstate_p[j] += \
-                _forget_gate_squashed[_timestep][index] * inputstate_p[index];
+            _output_state_p[j] += \
+                _forget_gate_squashed[_timestep][index] * _input_state_p[index];
             
         }
     }
@@ -201,8 +201,8 @@ MdlstmLayer::_forward()
     for (int i = 0; i < size; i++)
     {
         outputbuffer_p[i] = _output_gate_squashed[_timestep][i] *
-            output_squasher(outputstate_p[i]);
-        outputbuffer_p[i + size] = outputstate_p[i];
+            output_squasher(_output_state_p[i]);
+        outputbuffer_p[i + size] = _output_state_p[i];
     }
 }
 
@@ -228,7 +228,7 @@ MdlstmLayer::_backward()
     int i, j;
     for (i = size + size * _timedim, j = 0; j < size; j++, i++)
     {
-        _input_p[j] = inputbuffer_p[i];
+        _inter_input_p[j] = inputbuffer_p[i];
     }
 
     for (i = 3 * size + size * _timedim, j = 0; j < size * _timedim ; j++, i++)
@@ -285,7 +285,7 @@ MdlstmLayer::_backward()
     {
         _input_error_p[i] = \
             _input_gate_squashed[this_timestep][i] \
-            * cell_squasher_prime(_input_p[i]) \
+            * cell_squasher_prime(_inter_input_p[i]) \
             * _state_error_p[i];
     }
     
