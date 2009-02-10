@@ -78,6 +78,19 @@ Mdrnn<module_type>::sort()
     _module_p = new module_type(_hiddensize * _blocksize);
     _module_p->set_mode(Component::Sequential);
     
+    // Delete connections from previous sortings.
+    std::vector<FullConnection*>::iterator con_iter;
+    for (con_iter = _connections.begin();
+         con_iter != _connections.end();
+         con_iter++)
+    {
+         delete (*con_iter);
+    }
+    _connections.clear();
+
+    // Also clear the parametrized vector.
+    _parametrizeds.clear();
+    
     // Initialize recurrent self connections.
     int recurrency = 1;
     for(int i = 0; i < _timedim; i++)
@@ -86,8 +99,8 @@ Mdrnn<module_type>::sort()
         con_p->set_mode(Component::Sequential);
         con_p->set_recurrent(recurrency);
         recurrency *= _sequence_shape_p[i] / _block_shape_p[i];
-        con_p->set_parameters(_parameters_p + i * _hiddensize * _hiddensize);
         _connections.push_back(con_p);
+        _parametrizeds.push_back(con_p);
     }
     
     // Ininitialize buffers.

@@ -26,7 +26,7 @@ namespace mdrnns {
 /// 
 
 template <class module_type>
-class Mdrnn : public BaseMdrnn, public arac::structure::Parametrized
+class Mdrnn : public BaseMdrnn
 {
     public:
         
@@ -245,5 +245,6 @@ Mdrnn<module_type>::index_by_coords(int& index, double* coords_p)
 //  for details.
 
 #include "mdrnn.cpp"
+
 
 #endif

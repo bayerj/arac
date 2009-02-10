@@ -1518,12 +1518,15 @@ TEST(TestNetwork, TestMdrnn)
     Mdrnn<LinearLayer> net(2, 1);
     net.set_sequence_shape(0, 2);
     net.set_sequence_shape(1, 2);
+    net.sort();
     
     double* params_p = new double[2];
     params_p[0] = 0.5;
     params_p[1] = 2;
+
     
-    net.set_parameters(params_p);
+    net.parametrizeds()[0]->set_parameters(params_p);
+    net.parametrizeds()[1]->set_parameters(params_p + 1);
     
     double* input_p = new double[4];
     input_p[0] = 1;
