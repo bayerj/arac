@@ -526,7 +526,6 @@ class SupervisedSimpleDataset
        virtual int size();
        int samplesize();
        int targetsize();
-       
 };
 
 
@@ -541,6 +540,42 @@ class SupervisedSimpleDataset
             return;
         }
         $self->append(sample_p, target_p);
+    }
+};
+
+
+class SupervisedSemiSequentialDataset
+{
+   public:
+       SupervisedSemiSequentialDataset(int samplesize, int targetsize);
+       ~SupervisedSemiSequentialDataset();
+       
+       virtual int size();
+       int samplesize();
+       int targetsize();
+};
+
+
+%apply (double* INPLACE_ARRAY2, int DIM1, int DIM2, 
+        double* INPLACE_ARRAY1, int DIM1)
+{
+    (double* sequence_p, int samplelength, int sequencelength, 
+     double* target_p, int targetlength)
+};
+
+
+%extend SupervisedSemiSequentialDataset
+{
+    void append(double* sequence_p, int samplelength, int sequencelength, 
+                double* target_p, int targetlength)
+    {
+        if (samplelength != $self->samplesize() or targetlength != $self->targetsize()) {
+            PyErr_Format(PyExc_ValueError, "Arrays of lengths (%d,%d) given",
+                         samplelength, targetlength);
+            return;
+        }
+        Sequence seq(sequencelength, samplelength, sequence_p);
+        $self->append(seq, target_p);
     }
 };
 
