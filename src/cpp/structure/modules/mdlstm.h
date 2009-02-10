@@ -55,8 +55,8 @@ class MdlstmLayer : public arac::structure::modules::Module
         arac::common::Buffer _output_gate_squashed;
         arac::common::Buffer _output_gate_unsquashed;
         
-        arac::common::Buffer _forget_gate_unsquashed;
         arac::common::Buffer _forget_gate_squashed;
+        arac::common::Buffer _forget_gate_unsquashed;
         
         // Intermediate buffers.
         double* _inter_input_p;
@@ -70,6 +70,8 @@ class MdlstmLayer : public arac::structure::modules::Module
         double* _input_error_p;
         double* _input_state_error_p;
         double* _state_error_p;
+        
+        double* _outputbuffer_p;
 };
 
 

@@ -197,12 +197,12 @@ MdlstmLayer::_forward()
             gate_squasher(_output_gate_unsquashed[_timestep][i]);
     }
     // Save the results to the outputbuffer.
-    double* outputbuffer_p = output()[_timestep];
+    _outputbuffer_p = output()[_timestep];
     for (int i = 0; i < size; i++)
     {
-        outputbuffer_p[i] = _output_gate_squashed[_timestep][i] *
+        _outputbuffer_p[i] = _output_gate_squashed[_timestep][i] *
             output_squasher(_output_state_p[i]);
-        outputbuffer_p[i + size] = _output_state_p[i];
+        _outputbuffer_p[i + size] = _output_state_p[i];
     }
 }
 
@@ -215,10 +215,10 @@ MdlstmLayer::_backward()
     int this_timestep = timestep() - 1;
     
     double (*cell_squasher) (double) = tanh_;
-    double (*output_squasher) (double) = tanh_;
+    // double (*output_squasher) (double) = tanh_;
     double (*gate_squasher_prime) (double) = sigmoidprime;
     double (*cell_squasher_prime) (double) = tanhprime;
-    double (*output_squasher_prime) (double) = tanhprime;
+    // double (*output_squasher_prime) (double) = tanhprime;
 
     // Split the whole input into the right chunks
     double* inputbuffer_p = input()[this_timestep];
