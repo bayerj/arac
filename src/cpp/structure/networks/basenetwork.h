@@ -7,6 +7,7 @@
 
 
 #include "../modules/module.h"
+#include "../parametrized.h"
 
 
 namespace arac {
@@ -60,11 +61,38 @@ class BaseNetwork : public arac::structure::modules::Module
         ///
         virtual void sort() = 0;
         
+        ///
+        /// Return a vector to all the Parametrized objects in the Network.
+        ///
+        const std::vector<Parametrized*>& parametrizeds() const;
+        
+        ///
+        /// Fill the parametrizers of all Parametrized objects in the network
+        /// with random values.
+        ///
+        // TODO: allow specification of intervals.
+        void randomize();
+        
+        ///
+        /// Set the derivatives of all the Parametrized objects in the network
+        /// to zero.
+        ///
+        virtual void clear_derivatives();
+        
     protected:
         
         bool _dirty;
         
+        std::vector<arac::structure::Parametrized*> _parametrizeds;
 };
+
+
+inline
+const std::vector<Parametrized*>&
+BaseNetwork::parametrizeds() const
+{
+    return _parametrizeds;
+}
 
 
 }

@@ -12,7 +12,7 @@
 #include "../datasets/datasets.h"
 
 
-using arac::structure::networks::Network;
+using arac::structure::networks::BaseNetwork;
 using arac::structure::Parametrized;
 using arac::datasets::SupervisedDataset;
 using arac::datasets::Sequence;
@@ -43,7 +43,7 @@ class Backprop
         /// Create a new Backprop optimizer object with which the given network
         /// can be trained on the given dataset.
         ///
-        Backprop(Network& network, DatasetType& dataset);
+        Backprop(BaseNetwork& network, DatasetType& dataset);
         
         ///
         /// Destroy the Backprop object.
@@ -53,7 +53,7 @@ class Backprop
         ///
         /// Return a reference to the network of the optimizer.
         ///
-        Network& network();
+        BaseNetwork& network();
         
         ///
         /// Return a reference to the dataset of the optimizer.
@@ -93,7 +93,7 @@ class Backprop
         ///
         /// Network to be optimized optimizer.
         ///
-        Network& _network;
+        BaseNetwork& _network;
         
         ///
         /// Dataset the network is to be optimized upon.
@@ -121,7 +121,7 @@ class Backprop
 
 
 template<typename SampleType, typename TargetType>
-Backprop<SampleType, TargetType>::Backprop(Network& network, 
+Backprop<SampleType, TargetType>::Backprop(BaseNetwork& network, 
                                             DatasetType& dataset) :
     _network(network),
     _dataset(dataset),
@@ -142,7 +142,7 @@ Backprop<SampleType, TargetType>::~Backprop()
 
 
 template<typename SampleType, typename TargetType>
-Network&
+BaseNetwork&
 Backprop<SampleType, TargetType>::network()
 {
     return _network;
@@ -227,7 +227,7 @@ Backprop<SampleType, TargetType>::learn()
 class SimpleBackprop : public Backprop<double*, double*> 
 {
     public:
-        SimpleBackprop(Network& network, 
+        SimpleBackprop(BaseNetwork& network, 
                        SupervisedDataset<double*, double*>& dataset);
         ~SimpleBackprop();
     
@@ -245,7 +245,7 @@ class SemiSequentialBackprop : public Backprop<Sequence, double*>
 {
     
     public:
-        SemiSequentialBackprop(Network& network,
+        SemiSequentialBackprop(BaseNetwork& network,
                                SupervisedDataset<Sequence, double*>& dataset);
         ~SemiSequentialBackprop();
 
@@ -264,7 +264,7 @@ class SemiSequentialBackprop : public Backprop<Sequence, double*>
 class SequentialBackprop : public Backprop<Sequence, Sequence>
 {
     public:
-        SequentialBackprop(Network& network, 
+        SequentialBackprop(BaseNetwork& network, 
                            SupervisedDataset<Sequence, Sequence>& dataset);
         ~SequentialBackprop();
 

@@ -15,7 +15,7 @@ using arac::optimization::SequentialBackprop;
 using arac::structure::Parametrized;
 
 
-SimpleBackprop::SimpleBackprop(Network& network, 
+SimpleBackprop::SimpleBackprop(BaseNetwork& network, 
                SupervisedDataset<double*, double*>& dataset) :
                Backprop<double*, double*>(network, dataset) {}   
            
@@ -35,7 +35,7 @@ SimpleBackprop::process_sample(double* sample_p, double* target_p)
 
 
 SemiSequentialBackprop::SemiSequentialBackprop(
-    Network& network,
+    BaseNetwork& network,
     SupervisedDataset<Sequence, double*>& dataset) :
     Backprop<Sequence, double*>(network, dataset) 
 {
@@ -76,7 +76,7 @@ SemiSequentialBackprop::process_sample(Sequence input, double* target_p)
 
 
 SequentialBackprop::SequentialBackprop(
-    Network& network, 
+    BaseNetwork& network, 
     SupervisedDataset<Sequence, Sequence>& dataset) :
     Backprop<Sequence, Sequence>(network, dataset) {}
 

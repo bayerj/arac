@@ -88,6 +88,32 @@ BaseNetwork::back_activate(const double* outerror_p, double* inerror_p)
 }
 
 
+void
+BaseNetwork::clear_derivatives()
+{
+    std::vector<Parametrized*>::iterator param_iter;
+    for (param_iter = _parametrizeds.begin();
+         param_iter != _parametrizeds.end();
+         param_iter++)
+    {
+        (*param_iter)->clear_derivatives();
+    }
+}
+
+
+void
+BaseNetwork::randomize()
+{
+    std::vector<Parametrized*>::iterator param_iter;
+    for (param_iter = _parametrizeds.begin();
+         param_iter != _parametrizeds.end();
+         param_iter++)
+    {
+        (*param_iter)->randomize();
+    }
+}
+
+
 }
 }
 }

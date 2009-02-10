@@ -74,22 +74,6 @@ class Network : public BaseNetwork
         ///
         void add_connection(Connection* con_p);
 
-        ///
-        /// Set the derivatives of all the Parametrized objects in the network
-        /// to zero.
-        virtual void clear_derivatives();
-
-        ///
-        /// Return a vector to all the Parametrized objects in the Network.
-        ///
-        const std::vector<Parametrized*>& parametrizeds() const;
-        
-        ///
-        /// Fill the parametrizers of all Parametrized objects in the network
-        /// with random values.
-        ///
-        // TODO: allow specification of intervals.
-        void randomize();
         virtual void sort();
         
     protected:
@@ -113,16 +97,7 @@ class Network : public BaseNetwork
         std::map<Module*, ModuleType> _modules;
         std::vector<Connection*> _connections;
         std::map<Module*, std::vector<Connection*> > _outgoing_connections;
-        std::vector<Parametrized*> _parametrizeds;
 };
-
-
-inline
-const std::vector<Parametrized*>&
-Network::parametrizeds() const
-{
-    return _parametrizeds;
-}
  
     
 }
