@@ -15,7 +15,7 @@ using arac::common::tanh_;
 using arac::structure::modules::MdlstmLayer;
 
 
-MdlstmLayer::MdlstmLayer(int size, int timedim) :
+MdlstmLayer::MdlstmLayer(int timedim, int size) :
     Module((3 + 2 * timedim) * size, 2 * size),
     _timedim(timedim),
     _input_squashed(size),
