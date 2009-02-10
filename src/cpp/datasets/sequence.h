@@ -27,8 +27,8 @@ class Sequence
         
     private:
         int _length;
-        const double* _data_p;
         int _itemsize;
+        const double* _data_p;
 };
 
 
