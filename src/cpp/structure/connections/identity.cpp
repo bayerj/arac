@@ -46,11 +46,11 @@ IdentityConnection::_forward()
         return;
     }
     
-    double* sourcebuffer_p = _recurrent ? _incoming_p->output()[timestep() - 1] :
-                                          _incoming_p->output()[timestep()];
+    double* sourcebuffer_p = _recurrent ? incoming()->output()[timestep() - 1] :
+                                          incoming()->output()[timestep()];
     sourcebuffer_p += _incomingstart;
     
-    double* sinkbuffer_p = _outgoing_p->input()[_timestep] + _outgoingstart;
+    double* sinkbuffer_p = outgoing()->input()[timestep()] + _outgoingstart;
     int size = (_incomingstop - _incomingstart);
     for(int i = 0; i < size; i++)
     {
