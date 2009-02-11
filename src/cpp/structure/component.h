@@ -144,16 +144,6 @@ class Component
 };
 
 
-inline Component::Component() : 
-    _timestep(0),
-    _sequencelength(0),
-    _mode(Component::Simple)
-{
-}
-
-inline Component::~Component() {}
-
-
 inline
 void
 Component::forward()
