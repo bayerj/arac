@@ -29,6 +29,7 @@ MdlstmLayer::MdlstmLayer(int timedim, int size) :
 {
     _inter_input_p = new double[size];
     _input_state_p = new double[size * _timedim];
+    _input_state_error_p = new double[size * _timedim];
     _output_error_p = new double[size];
     _output_state_p = new double[size * _timedim];
     _output_state_error_p = new double[size * _timedim];
@@ -36,7 +37,6 @@ MdlstmLayer::MdlstmLayer(int timedim, int size) :
     _forget_gate_error_p = new double[size * _timedim];
     _input_gate_error_p = new double[size];
     _input_error_p = new double[size];
-    _input_state_error_p = new double[size * _timedim];
     _state_error_p = new double[size * _timedim];
 }
 

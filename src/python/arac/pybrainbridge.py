@@ -161,7 +161,6 @@ class PybrainAracMapper(object):
         proxy.init_forget_gate_squashed(layer.forgetgate);
         
         return proxy
-        
 
     def _parametrized_connection_handler(self, con):
         try:

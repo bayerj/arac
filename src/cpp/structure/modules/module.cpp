@@ -75,7 +75,6 @@ Module::clear()
     {
         _input_p->clear();
     }
-    
     if (_output_p != 0)
     {
         _output_p->clear();
