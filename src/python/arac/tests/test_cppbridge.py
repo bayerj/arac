@@ -72,8 +72,39 @@ class TestStructure(TestCase):
         l = arac.cppbridge.MdlstmLayer(1, s)
         self.assertEqual(l.insize(), 5 * s)
         self.assertEqual(l.outsize(), 2 * s)
+        
+        
+class TestDatasets(TestCase):
 
+    # TODO: Test multiple data rows.
+    # TODO: Test out-of-bounds access.
 
+    def testSupervisedSimpleDataset(self):
+        ds = arac.cppbridge.SupervisedSimpleDataset(1, 1)
+        sample = scipy.random.random(1)
+        target = scipy.random.random(1)
+        ds.append(sample, target)
+        self.assertEqual(1, ds.size())
+        self.assertArrayEqual(ds.sample(0), sample)
+        self.assertArrayEqual(ds.target(0), target)
+
+    def testSupervisedSemiSequentialDataset(self):
+        ds = arac.cppbridge.SupervisedSemiSequentialDataset(1, 1)
+        sampleseq = scipy.random.random((1, 2))
+        target = scipy.random.random(1)
+        ds.append(sampleseq, target)
+        self.assertEqual(1, ds.size())
+        self.assertArrayEqual(ds.sample(0), sampleseq)
+        self.assertArrayEqual(ds.target(0), target)
+        
+    def testSupervisedSequentialDataset(self):
+        ds = arac.cppbridge.SupervisedSequentialDataset(1, 1)
+        sampleseq = scipy.random.random((1, 2))
+        targetseq = scipy.random.random((1, 2))
+        ds.append(sampleseq, targetseq)
+        self.assertEqual(1, ds.size())
+        self.assertArrayEqual(ds.sample(0), sampleseq)
+        self.assertArrayEqual(ds.target(0), targetseq)
 
 
 if __name__ == "__main__":

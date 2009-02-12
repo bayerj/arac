@@ -24,6 +24,9 @@ TEST(TestSequence, TestConstruction)
     
     Sequence seq(5, 2, data_p);
     
+    EXPECT_EQ(5, seq.length());
+    EXPECT_EQ(2, seq.itemsize());
+    
     EXPECT_DOUBLE_EQ(1, seq[0][0]) << "Sequence data not correct.";
     EXPECT_DOUBLE_EQ(2, seq[0][1]) << "Sequence data not correct.";
     EXPECT_DOUBLE_EQ(4, seq[1][0]) << "Sequence data not correct.";
@@ -73,6 +76,9 @@ TEST(TestDataset_sequence_array, TestConstruction)
     SupervisedSemiSequentialDataset ds(2, 1);
     ds.append(first, first_target);
     ds.append(second, second_target);
+    
+    EXPECT_EQ(2, ds.size())
+        << "Wrong size of dataset.";
     
     EXPECT_EQ(1, ds[0].first[0][0]);
     EXPECT_EQ(2, ds[0].first[0][1]);
