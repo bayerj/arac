@@ -105,7 +105,30 @@ class TestDatasets(TestCase):
         self.assertEqual(1, ds.size())
         self.assertArrayEqual(ds.sample(0), sampleseq)
         self.assertArrayEqual(ds.target(0), targetseq)
+        
+        
+class TestOptimizers(TestCase):
+    
+    # TODO: Make the tests somehow reasonable. Here, it is only tested that the
+    # optimizers don't crash and that the API does not throw any errors.
+    
+    def testSimpleBackprop(self):
+        ds = arac.cppbridge.SupervisedSimpleDataset(1, 1)
+        # Add some data points to the dataset.
+        for _ in xrange(5):
+            ds = arac.append(scipy.random.random(1), scipy.random.random(1))
 
-
+        l1 = arac.cppbridge.LinearLayer(1)
+        l2 = arac.cppbridge.LinearLayer(1)
+        net = arac.cppbridge.Network()
+        net.add_module(l1, arac.cppbridge.Network.InputModule)
+        net.add_module(l2, arac.cppbridge.Network.OutputModule)
+        con = arac.cppbridge.FullConnection(l1, l2)
+        net.add_connection(con)
+        optimizer = arac.cppbridge.SimpleBackprop(net, ds)
+        for _ in xrange(10):
+            optimizer.train_stochastic()
+        
+        
 if __name__ == "__main__":
     unittest.main()  
