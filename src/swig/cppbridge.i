@@ -533,13 +533,40 @@ class SupervisedSimpleDataset
     void append(double* sample_p, int samplelength, 
                 double* target_p, int targetlength)
     {
-        if (samplelength != $self->samplesize() or targetlength != $self->targetsize()) {
+        if (samplelength != $self->samplesize() or \
+            targetlength != $self->targetsize()) {
             PyErr_Format(PyExc_ValueError, "Arrays of lengths (%d,%d) given",
                          samplelength, targetlength);
             return;
         }
         $self->append(sample_p, target_p);
     }
+    
+    PyObject* sample(int index)
+    {
+        int n_dims = 1;
+        int* dims = new int[1];
+        dims[0] = $self->samplesize();
+        SupervisedSimpleDataset& ds = *($self);
+        return PyArray_FromDimsAndData(
+            n_dims, dims, PyArray_DOUBLE, (char*) ds[index].first);
+    }
+    
+    PyObject* target(int index)
+    {
+        int n_dims = 1;
+        int* dims = new int[1];
+        dims[0] = $self->targetsize();
+        SupervisedSimpleDataset& ds = *($self);
+        return PyArray_FromDimsAndData(
+            n_dims, dims, PyArray_DOUBLE, (char*) ds[index].second);
+    }
+};
+
+
+%apply (double* INPLACE_ARRAY2, int DIM1, int DIM2)
+{
+    (double* sequence_p, int samplelength, int sequencelength)
 };
 
 
@@ -555,32 +582,144 @@ class SupervisedSemiSequentialDataset
 };
 
 
-%apply (double* INPLACE_ARRAY2, int DIM1, int DIM2, 
-        double* INPLACE_ARRAY1, int DIM1)
-{
-    (double* sequence_p, int samplelength, int sequencelength, 
-     double* target_p, int targetlength)
-};
-
-
 %extend SupervisedSemiSequentialDataset
 {
     void append(double* sequence_p, int samplelength, int sequencelength, 
                 double* target_p, int targetlength)
     {
-        if (samplelength != $self->samplesize() or targetlength != $self->targetsize()) {
-            PyErr_Format(PyExc_ValueError, "Arrays of lengths (%d,%d) given",
+        if (samplelength != $self->samplesize() or \
+            targetlength != $self->targetsize()) {
+            PyErr_Format(PyExc_ValueError, "Arrays of lengths (%d, %d) given",
                          samplelength, targetlength);
             return;
         }
         Sequence seq(sequencelength, samplelength, sequence_p);
         $self->append(seq, target_p);
     }
+    
+    PyObject* sample(int index)
+    {
+        SupervisedSemiSequentialDataset& ds = *($self);
+        Sequence& seq = ds[index].first;
+        char* data_p = (char*) seq[0];
+        
+        int n_dims = 2;
+        int* dims = new int[2];
+        dims[0] = 0;
+        dims[1] = seq.itemsize();
+        
+        return PyArray_FromDimsAndData(n_dims, dims, PyArray_DOUBLE, data_p);
+    }
+    
+    PyObject* target(int index)
+    {
+        int n_dims = 1;
+        int* dims = new int[1];
+        dims[0] = $self->targetsize();
+        SupervisedSemiSequentialDataset& ds = *($self);
+        return PyArray_FromDimsAndData(
+            n_dims, dims, PyArray_DOUBLE, (char*) ds[index].second);
+    }
 };
 
 
-// SupervisedSequentialDataset
-// SupervisedSimpleDataset;
-// UnsupervisedSimpleDataset;
-// UnsupervisedSequenceDataset;
+%apply (double* INPLACE_ARRAY2, int DIM1, int DIM2) {
+    (double* samplesequence_p, int samplelength, int samplesequencelength), 
+    (double* targetsequence_p, int targetlength, int targetsequencelength)
+};
 
+
+class SupervisedSequentialDataset
+{
+   public:
+       SupervisedSequentialDataset(int samplesize, int targetsize);
+       ~SupervisedSequentialDataset();
+       
+       virtual int size();
+       int samplesize();
+       int targetsize();
+};
+
+
+%extend SupervisedSequentialDataset
+{
+    void append(double* samplesequence_p, int samplelength, int samplesequencelength, 
+                double* targetsequence_p, int targetlength, int targetsequencelength)
+    {
+        if (samplelength != $self->samplesize() or targetlength != $self->targetsize()) {
+            PyErr_Format(PyExc_ValueError, "Arrays of lengths (%d,%d) given",
+                         samplelength, targetlength);
+            return;
+        }
+        if (samplesequencelength != targetsequencelength) {
+            PyErr_Format(PyExc_ValueError, 
+                "Sequences have to be of same length.");
+            return;
+        }
+        
+        Sequence sampleseq(samplesequencelength, samplelength, samplesequence_p);
+        Sequence targetseq(targetsequencelength, targetlength, targetsequence_p);
+        $self->append(sampleseq, targetseq);
+    }
+    
+    PyObject* sample(int index)
+    {
+        SupervisedSequentialDataset& ds = *($self);
+        Sequence& seq = ds[index].first;
+        char* data_p = (char*) seq[0];
+        
+        int n_dims = 2;
+        int* dims = new int[2];
+        dims[0] = 0;
+        dims[1] = seq.itemsize();
+        
+        return PyArray_FromDimsAndData(n_dims, dims, PyArray_DOUBLE, data_p);
+    }
+
+    PyObject* target(int index)
+    {
+        SupervisedSequentialDataset& ds = *($self);
+        Sequence& seq = ds[index].second;
+        char* data_p = (char*) seq[0];
+        
+        int n_dims = 2;
+        int* dims = new int[2];
+        dims[0] = 0;
+        dims[1] = seq.itemsize();
+        
+        return PyArray_FromDimsAndData(n_dims, dims, PyArray_DOUBLE, data_p);
+    }
+};
+
+%clear (double* INPLACE_ARRAY2, int DIM1, int DIM2);
+
+class SimpleBackprop
+{
+    public:
+        SimpleBackprop(BaseNetwork& network, SupervisedSimpleDataset& ds);
+        virtual ~SimpleBackprop();
+    
+        void train_stochastic();    
+};
+
+
+class SemiSequentialBackprop
+{
+    public:
+
+        SemiSequentialBackprop(BaseNetwork& network, 
+                               SupervisedSemiSequentialDataset& ds);
+        ~SemiSequentialBackprop();
+    
+        void train_stochastic();    
+};
+
+
+class SequentialBackprop
+{
+    public:
+        SequentialBackprop(BaseNetwork& network, SupervisedSequentialDataset& ds);
+        ~SequentialBackprop();
+    
+        void train_stochastic();
+};
