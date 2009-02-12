@@ -655,7 +655,6 @@ class SupervisedSemiSequentialDataset
     {
         SupervisedSemiSequentialDataset& ds = *($self);
         Sequence& seq = ds[index].first;
-        
         return PyArray_2DFromDoublePointer(seq.itemsize(), seq.length(), seq[0]);
     }
     
