@@ -37,8 +37,6 @@ class TestStructure(TestCase):
         params = scipy.array((1, 2, 3, 4), dtype='float64')
         derivs = scipy.zeros(4)
         con = arac.cppbridge.FullConnection(l1, l2, params, derivs, 0, 2, 0, 2)
-        # con = arac.cppbridge.IdentityConnection(l1, l2, 0, 2, 0, 2)
-        
         net = arac.cppbridge.Network()
         net.add_module(l1, arac.cppbridge.Network.InputModule)
         net.add_module(l2, arac.cppbridge.Network.OutputModule)

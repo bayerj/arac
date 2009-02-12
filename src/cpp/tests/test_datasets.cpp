@@ -157,17 +157,12 @@ TEST(TestDataset_array_array, TestConstruction)
 }
 
 
-TEST(TestDataSet_sequential_array, TestConstruction)
+TEST(TestDataSet_sequential_sequential, TestConstruction)
 {
     
     
 }
 
-
-TEST(TestSemiSequentialDataset, TestConstruction)
-{
-    
-}
 
         
 }  // namespace
