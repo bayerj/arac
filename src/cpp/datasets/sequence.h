@@ -18,17 +18,17 @@ class Sequence
 {
     public:
         
-        Sequence(int length, int itemsize, const double* data_p);
+        Sequence(int length, int itemsize, double* data_p);
         virtual ~Sequence();
         
         int length() const;
         int itemsize() const;
-        const double* operator[](int index) const;
+        double* operator[](int index);
         
     private:
         int _length;
         int _itemsize;
-        const double* _data_p;
+        double* _data_p;
 };
 
 
@@ -49,12 +49,13 @@ Sequence::itemsize() const
 
 
 inline
-const double*
-Sequence::operator[](int index) const
+double*
+Sequence::operator[](int index)
 {
     assert(index < length());
     return _data_p + _itemsize * index;
 }
+
 
 
 } } // Namespace.

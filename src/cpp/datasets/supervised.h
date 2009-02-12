@@ -54,7 +54,7 @@ class SupervisedDataset : public UnsupervisedDataset<SampleType>
         ///
         /// Return the (sample, target) pair of the dataset at the given index.
         ///
-        const std::pair<SampleType, TargetType>& operator[](int index);
+        std::pair<SampleType, TargetType>& operator[](int index);
         
     private:
  
@@ -107,9 +107,10 @@ SupervisedDataset<SampleType, TargetType>::append(
 
 
 template<typename SampleType, typename TargetType>
-const std::pair<SampleType, TargetType>& 
+std::pair<SampleType, TargetType>& 
 SupervisedDataset<SampleType, TargetType>::operator[](int index)
 {
+    assert(index < size());
     return _rows[index];
 }
 

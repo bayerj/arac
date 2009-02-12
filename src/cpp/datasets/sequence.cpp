@@ -8,7 +8,7 @@
 using arac::datasets::Sequence;
 
 
-Sequence::Sequence(int length, int itemsize, const double* data_p) :
+Sequence::Sequence(int length, int itemsize, double* data_p) :
     _length(length),
     _itemsize(itemsize),
     _data_p(data_p)
