@@ -1513,9 +1513,9 @@ TEST(TestNetwork, TestRecurrentNetworkTimesteps) {
 }
         
         
-TEST(TestNetwork, TestMdrnn)
+TEST(TestNetwork, TestLinearMdrnn)
 {
-    Mdrnn<LinearLayer> net(2, 1);
+    LinearMdrnn net(2, 1);
     net.set_sequence_shape(0, 2);
     net.set_sequence_shape(1, 2);
     net.sort();
