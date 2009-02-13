@@ -81,6 +81,7 @@ class Backprop
         ///
         /// This method calls the methods process_sample and learn, of which the
         /// former is to be implemented by subclasses.
+        ///
         void train_stochastic();
         
     protected:
