@@ -519,26 +519,30 @@ class LinearConnection : public Connection, public Parametrized
 };    
 
 
-class BaseNetwork : public Module
+%feature("notabstract") Network;
+class Network : public BaseNetwork
 {
-    
-    public:
-        BaseNetwork();
-        virtual ~BaseNetwork();
-    
-        virtual void activate(double* input_p, double* output_p);
-        virtual void back_activate(double* outerror_p, double* inerror_p);
-        virtual void forward();
+    public: 
         
-    protected:
-        virtual void sort() = 0;
-};
-
-
-%extend BaseNetwork
+        enum ModuleType {
+            Simple = 0,
+            InputModule = 1,
+            OutputModule = 2,
+            InputOutputModule = 3
+        };
+        Network();
+        virtual ~Network();
+        virtual void clear();
+        virtual void clear_derivatives();
+        void add_module(Module* module_p, ModuleType type=Simple);
+        void add_connection(Connection* con_p);
+};        
+        
+        
+%extend Network
 {
-    virtual void activate(double* input_p, int inlength, 
-                          double* output_p, int outlength)
+    void activate(double* input_p, int inlength, 
+                  double* output_p, int outlength)
     {
         // TODO: check bounds of in and output
         // if (inlength != $self->insize()) {
@@ -570,87 +574,6 @@ class BaseNetwork : public Module
 };
 
 
-%feature("notabstract") Network;
-class Network : public BaseNetwork
-{
-    public: 
-        
-        enum ModuleType {
-            Simple = 0,
-            InputModule = 1,
-            OutputModule = 2,
-            InputOutputModule = 3
-        };
-        Network();
-        virtual ~Network();
-        virtual void clear();
-        virtual void clear_derivatives();
-        void add_module(Module* module_p, ModuleType type=Simple);
-        void add_connection(Connection* con_p);
-};        
-        
-        
-class BaseMdrnn : public BaseNetwork {};
-
-
-%feature("notabstract") SigmoidMdrnn;
-class SigmoidMdrnn : public BaseMdrnn
-{
-    public:
-        SigmoidMdrnn(int timedim, int hiddensize);
-        ~SigmoidMdrnn();
-        
-        // TODO: remove this; sorting should be implicit, but does not work for
-        // mdrnns somehow.
-        virtual void sort();
-        
-        void set_sequence_shape(int dim, int val);
-        int get_sequence_shape(int dim);
-        int sequencelength();
-        void set_block_shape(int dim, int val);
-        int get_block_shape(int dim);
-        
-};
-
-
-%feature("notabstract") TanhMdrnn;
-class TanhMdrnn : public BaseMdrnn
-{
-    public:
-        TanhMdrnn(int timedim, int hiddensize);
-        ~TanhMdrnn();
-        
-        // TODO: remove this; sorting should be implicit, but does not work for
-        // mdrnns somehow.
-        virtual void sort();
-        
-        void set_sequence_shape(int dim, int val);
-        int get_sequence_shape(int dim);
-        int sequencelength();
-        void set_block_shape(int dim, int val);
-        int get_block_shape(int dim);
-};
-
-
-%feature("notabstract") LinearMdrnn;
-class LinearMdrnn : public BaseMdrnn
-{
-    public:
-        LinearMdrnn(int timedim, int hiddensize);
-        ~LinearMdrnn();
-        
-        // TODO: remove this; sorting should be implicit, but does not work for
-        // mdrnns somehow.
-        virtual void sort();
-        
-        void set_sequence_shape(int dim, int val);
-        int get_sequence_shape(int dim);
-        int sequencelength();
-        void set_block_shape(int dim, int val);
-        int get_block_shape(int dim);
-};
-
-        
 %apply (double* INPLACE_ARRAY1, int DIM1) {(double* sample_p, int samplelength), 
                                            (double* target_p, int targetlength)};
 
@@ -831,3 +754,29 @@ class SequentialBackprop
 };
 
 
+class SigmoidMdrnn
+{
+    public:
+        SigmoidMdrnn(int timedim, int hiddensize);
+        ~SigmoidMdrnn();
+        
+        void set_sequence_shape(int dim, int val);
+        int get_sequence_shape(int dim);
+        int sequencelength();
+        void set_block_shape(int dim, int val);
+        int get_block_shape(int dim);
+};
+
+
+class TanhMdrnn
+{
+    public:
+        TanhMdrnn(int timedim, int hiddensize);
+        ~TanhMdrnn();
+        
+        void set_sequence_shape(int dim, int val);
+        int get_sequence_shape(int dim);
+        int sequencelength();
+        void set_block_shape(int dim, int val);
+        int get_block_shape(int dim);
+};

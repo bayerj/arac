@@ -7,6 +7,7 @@
 
 
 #include <iostream>
+#include <cstring>
 
 #include "mdrnn.h"
 
@@ -161,6 +162,7 @@ Mdrnn<module_type>::_backward()
 {
     // We keep the coordinates of the current block in here.
     double* coords_p = new double[_timedim];
+    memset(coords_p, 0, sizeof(double) * _timedim);
     // TODO: save memory by not copying but referencing.
     for(int i = sequencelength() - 1; i >= 0; i--)
     {
