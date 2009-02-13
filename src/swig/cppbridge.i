@@ -315,7 +315,6 @@ class MdlstmLayer : public Module
 }
 
 
-
 %feature("notabstract") PartialSoftmaxLayer;
 class PartialSoftmaxLayer : public Module
 {
