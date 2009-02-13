@@ -106,13 +106,23 @@ class TestStructure(TestCase):
         net = arac.cppbridge.LinearMdrnn(2, 1)
         net.set_sequence_shape(0, 2)
         net.set_sequence_shape(1, 2)
+        net.sort()
+        
+        con1, con2 = net.parametrizeds()
+        pars1, pars2 = con1.get_parameters(), con2.get_parameters()
+        pars1[0] = 0.5
+        pars2[0] = 2.0
+        
         result = scipy.zeros(4)
-        inpt = scipy.array([0., 0., 0., 0.])
+        inpt = scipy.array([1., 2., 3., 4.])
         net.activate(inpt, result)
+        self.assertArrayNear(result, scipy.array((1., 2.5, 5., 11.5)))
+        
+        error = scipy.array((-1., -2., -3., -4.))
         error = scipy.array((2., 4., 8., 10.))
         inerror = scipy.zeros(4)
         net.back_activate(error, inerror)
-        self.assert_(False, "Test not finished")
+        self.assertArrayNear(inerror, scipy.array((40., 24., 13., 10.)))
 
         
 class TestDatasets(TestCase):
