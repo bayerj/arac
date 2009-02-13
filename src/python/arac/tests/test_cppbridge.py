@@ -83,7 +83,23 @@ class TestStructure(TestCase):
         derivs = scipy.array((-1., -2., -3., -4.))
         c.set_derivatives(derivs)
         self.assertEqual(c.get_derivatives().ctypes.data, derivs.ctypes.data)
-
+        
+    def testNetworkParametrizeds(self):
+        l1 = arac.cppbridge.LinearLayer(1)
+        l2 = arac.cppbridge.LinearLayer(1)
+        l3 = arac.cppbridge.LinearLayer(1)
+        c1 = arac.cppbridge.FullConnection(l1, l2)
+        c2 = arac.cppbridge.FullConnection(l2, l3)
+        net = arac.cppbridge.Network()
+        net.add_module(l1)
+        net.add_module(l2)
+        net.add_module(l3)
+        net.add_connection(c1)
+        net.add_connection(c2)
+        paras = net.parametrizeds()
+        pointer = lambda p: p.get_parameters().ctypes.data
+        self.assertEqual(pointer(paras[0]), pointer(c1))
+        self.assertEqual(pointer(paras[1]), pointer(c2))
         
         
 class TestDatasets(TestCase):

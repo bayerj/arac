@@ -3,6 +3,7 @@
 #define SWIG_FILE_WITH_INIT
     
 #include <iostream>
+#include <vector>
 
 #include <numpy/arrayobject.h>
 
@@ -49,6 +50,12 @@ PyObject* PyArray_2DFromDoublePointer(int dim1, int dim2, double* data_p)
 
 
 %}
+
+%include "typemaps.i"
+%include "std_vector.i"
+%template(VectorParametrized) std::vector<Parametrized*>;
+
+
 %include "numpy.i"
 %init %{
     import_array();
@@ -164,17 +171,52 @@ class Module : public Component
 }
 
 
+%apply (double* INPLACE_ARRAY1, int DIM1) {(double* parameters_p, int n_parameters)};
+%apply (double* INPLACE_ARRAY1, int DIM1) {(double* derivatives_p, int n_derivatives)};
+
 class Parametrized 
 {
     public: 
         Parametrized();
         Parametrized(int size);
         virtual ~Parametrized();
-        double* get_parameters() const;
-        void set_parameters(double* parameters_p);
-        double* get_derivatives() const;
-        void set_derivatives(double* derivatives_p);
         void clear_derivatives();
+};
+
+
+%extend Parametrized
+{
+    PyObject* get_parameters()
+    {
+        return PyArray_1DFromDoublePointer($self->size(), $self->get_parameters());
+    }
+    
+    void set_parameters(double* parameters_p, int n_parameters)
+    {
+        if (n_parameters != $self->size())
+        {
+            PyErr_Format(PyExc_ValueError, "Arrays of length (%d) given",
+                         n_parameters);
+            return;
+        }
+        $self->set_parameters(parameters_p);
+    }
+    
+    PyObject* get_derivatives()
+    {
+        return PyArray_1DFromDoublePointer($self->size(), $self->get_derivatives());
+    }
+    
+    void set_derivatives(double* derivatives_p, int n_derivatives)
+    {
+        if (n_derivatives != $self->size())
+        {
+            PyErr_Format(PyExc_ValueError, "Arrays of length (%d) given",
+                         n_derivatives);
+            return;
+        }
+        $self->set_derivatives(derivatives_p);
+    }
 };
 
 
@@ -361,6 +403,8 @@ class BaseNetwork : public Module
         virtual void activate(double* input_p, double* output_p);
         virtual void back_activate(double* outerror_p, double* inerror_p);
         virtual void forward();
+        
+        std::vector<Parametrized*>& parametrizeds();
         
     protected:
         virtual void sort() = 0;
