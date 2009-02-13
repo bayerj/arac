@@ -29,6 +29,23 @@ void init_buffer(Buffer& buffer, double* content_p, int length, int rowsize)
 }
 
 
+PyObject* PyArray_1DFromDoublePointer(int dim, double* data_p)
+{
+    int* dims = new int[1];
+    dims[0] = dim;
+    return PyArray_FromDimsAndData(1, dims, PyArray_DOUBLE, (char*) data_p);
+}
+
+
+PyObject* PyArray_2DFromDoublePointer(int dim1, int dim2, double* data_p)
+{
+    int* dims = new int[2];
+    dims[0] = dim1;
+    dims[1] = dim2;
+    return PyArray_FromDimsAndData(2, dims, PyArray_DOUBLE, (char*) data_p);
+}
+
+
 %}
 %include "numpy.i"
 %init %{
@@ -544,22 +561,14 @@ class SupervisedSimpleDataset
     
     PyObject* sample(int index)
     {
-        int n_dims = 1;
-        int* dims = new int[1];
-        dims[0] = $self->samplesize();
         SupervisedSimpleDataset& ds = *($self);
-        return PyArray_FromDimsAndData(
-            n_dims, dims, PyArray_DOUBLE, (char*) ds[index].first);
+        return PyArray_1DFromDoublePointer($self->samplesize(), ds[index].first);        
     }
     
     PyObject* target(int index)
     {
-        int n_dims = 1;
-        int* dims = new int[1];
-        dims[0] = $self->targetsize();
         SupervisedSimpleDataset& ds = *($self);
-        return PyArray_FromDimsAndData(
-            n_dims, dims, PyArray_DOUBLE, (char*) ds[index].second);
+        return PyArray_1DFromDoublePointer($self->targetsize(), ds[index].second);
     }
 };
 
@@ -601,24 +610,14 @@ class SupervisedSemiSequentialDataset
     {
         SupervisedSemiSequentialDataset& ds = *($self);
         Sequence& seq = ds[index].first;
-        char* data_p = (char*) seq[0];
         
-        int n_dims = 2;
-        int* dims = new int[2];
-        dims[0] = 0;
-        dims[1] = seq.itemsize();
-        
-        return PyArray_FromDimsAndData(n_dims, dims, PyArray_DOUBLE, data_p);
+        return PyArray_2DFromDoublePointer(seq.itemsize(), seq.length(), seq[0]);
     }
     
     PyObject* target(int index)
     {
-        int n_dims = 1;
-        int* dims = new int[1];
-        dims[0] = $self->targetsize();
         SupervisedSemiSequentialDataset& ds = *($self);
-        return PyArray_FromDimsAndData(
-            n_dims, dims, PyArray_DOUBLE, (char*) ds[index].second);
+        return PyArray_1DFromDoublePointer($self->targetsize(), ds[index].second);
     }
 };
 
@@ -666,28 +665,14 @@ class SupervisedSequentialDataset
     {
         SupervisedSequentialDataset& ds = *($self);
         Sequence& seq = ds[index].first;
-        char* data_p = (char*) seq[0];
-        
-        int n_dims = 2;
-        int* dims = new int[2];
-        dims[0] = 0;
-        dims[1] = seq.itemsize();
-        
-        return PyArray_FromDimsAndData(n_dims, dims, PyArray_DOUBLE, data_p);
+        return PyArray_2DFromDoublePointer(seq.itemsize(), seq.length(), seq[0]);
     }
 
     PyObject* target(int index)
     {
         SupervisedSequentialDataset& ds = *($self);
         Sequence& seq = ds[index].second;
-        char* data_p = (char*) seq[0];
-        
-        int n_dims = 2;
-        int* dims = new int[2];
-        dims[0] = 0;
-        dims[1] = seq.itemsize();
-        
-        return PyArray_FromDimsAndData(n_dims, dims, PyArray_DOUBLE, data_p);
+        return PyArray_2DFromDoublePointer(seq.itemsize(), seq.length(), seq[0]);
     }
 };
 
