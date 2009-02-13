@@ -1524,7 +1524,6 @@ TEST(TestNetwork, TestMdrnn)
     params_p[0] = 0.5;
     params_p[1] = 2;
 
-    
     net.parametrizeds()[0]->set_parameters(params_p);
     net.parametrizeds()[1]->set_parameters(params_p + 1);
     
