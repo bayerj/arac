@@ -73,6 +73,18 @@ class TestStructure(TestCase):
         self.assertEqual(l.insize(), 5 * s)
         self.assertEqual(l.outsize(), 2 * s)
         
+    def testParametrized(self):
+        l1 = arac.cppbridge.LinearLayer(2)
+        l2 = arac.cppbridge.LinearLayer(2)
+        c = arac.cppbridge.FullConnection(l1, l2)
+        params = scipy.array((1., 2., 3., 4.))
+        c.set_parameters(params)
+        self.assertEqual(c.get_parameters().ctypes.data, params.ctypes.data)
+        derivs = scipy.array((-1., -2., -3., -4.))
+        c.set_derivatives(derivs)
+        self.assertEqual(c.get_derivatives().ctypes.data, derivs.ctypes.data)
+
+        
         
 class TestDatasets(TestCase):
 
