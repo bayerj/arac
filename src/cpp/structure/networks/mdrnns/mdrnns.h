@@ -11,6 +11,7 @@
 #include "../../modules/modules.h"
 
 
+typedef Mdrnn<arac::structure::modules::LinearLayer> LinearMdrnn;
 typedef Mdrnn<arac::structure::modules::SigmoidLayer> SigmoidMdrnn;
 typedef Mdrnn<arac::structure::modules::TanhLayer> TanhMdrnn;
 
