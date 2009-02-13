@@ -64,7 +64,7 @@ class BaseNetwork : public arac::structure::modules::Module
         ///
         /// Return a vector to all the Parametrized objects in the Network.
         ///
-        const std::vector<Parametrized*>& parametrizeds() const;
+        std::vector<Parametrized*>& parametrizeds();
         
         ///
         /// Fill the parametrizers of all Parametrized objects in the network
@@ -88,8 +88,8 @@ class BaseNetwork : public arac::structure::modules::Module
 
 
 inline
-const std::vector<Parametrized*>&
-BaseNetwork::parametrizeds() const
+std::vector<Parametrized*>&
+BaseNetwork::parametrizeds()
 {
     return _parametrizeds;
 }
