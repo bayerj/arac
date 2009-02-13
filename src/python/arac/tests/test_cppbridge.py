@@ -37,6 +37,7 @@ class TestStructure(TestCase):
         params = scipy.array((1, 2, 3, 4), dtype='float64')
         derivs = scipy.zeros(4)
         con = arac.cppbridge.FullConnection(l1, l2, params, derivs, 0, 2, 0, 2)
+        
         net = arac.cppbridge.Network()
         net.add_module(l1, arac.cppbridge.Network.InputModule)
         net.add_module(l2, arac.cppbridge.Network.OutputModule)
@@ -100,7 +101,19 @@ class TestStructure(TestCase):
         pointer = lambda p: p.get_parameters().ctypes.data
         self.assertEqual(pointer(paras[0]), pointer(c1))
         self.assertEqual(pointer(paras[1]), pointer(c2))
-        
+
+    def testMdrnn(self):
+        net = arac.cppbridge.LinearMdrnn(2, 1)
+        net.set_sequence_shape(0, 2)
+        net.set_sequence_shape(1, 2)
+        result = scipy.zeros(4)
+        inpt = scipy.array([0., 0., 0., 0.])
+        net.activate(inpt, result)
+        error = scipy.array((2., 4., 8., 10.))
+        inerror = scipy.zeros(4)
+        net.back_activate(error, inerror)
+        self.assert_(False, "Test not finished")
+
         
 class TestDatasets(TestCase):
 
