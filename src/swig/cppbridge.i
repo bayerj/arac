@@ -18,6 +18,7 @@ using namespace arac::structure::connections;
 using namespace arac::structure::modules;
 using namespace arac::structure::networks;
 using namespace arac::structure::networks::mdrnns;
+using namespace arac::utilities;
 
 
 void init_buffer(Buffer& buffer, double* content_p, int length, int rowsize)
@@ -411,6 +412,44 @@ class BaseNetwork : public Module
 };
 
 
+%extend BaseNetwork
+{
+    // TODO: don't make the API request a output array, but return a PyObject*
+    // instead.
+    
+    virtual void activate(double* input_p, int inlength, 
+                          double* output_p, int outlength)
+    {
+        // TODO: check bounds of in and output
+        // if (inlength != $self->insize()) {
+        //     PyErr_Format(PyExc_ValueError, 
+        //                  "Input has wrong size: %d instead of %d",
+        //                  inlength, $self->insize());
+        //     return;
+        // }
+        // if (outlength != $self->outsize()) {
+        //     PyErr_Format(PyExc_ValueError, 
+        //                  "Output has wrong size: %d instead of %d",
+        //                  outlength, $self->outsize());
+        //     return;
+        // }
+
+        $self->activate(input_p, output_p);
+    }
+
+    virtual void back_activate(double* outerror_p, int outlength, 
+                               double* inerror_p, int inlength)
+    {
+        if (inlength != $self->insize() or outlength != $self->outsize()) {
+            PyErr_Format(PyExc_ValueError, "Arrays of lengths (%d,%d) given",
+                         inlength, outlength);
+            return;
+        }
+        $self->back_activate(outerror_p, inerror_p);
+    }
+};
+
+
 %feature("notabstract") FullConnection;
 class FullConnection : public Connection, public Parametrized
 {
@@ -539,41 +578,66 @@ class Network : public BaseNetwork
 };        
         
         
-%extend Network
+class BaseMdrnn : public BaseNetwork {};
+
+
+%feature("notabstract") SigmoidMdrnn;
+class SigmoidMdrnn : public BaseMdrnn
 {
-    void activate(double* input_p, int inlength, 
-                  double* output_p, int outlength)
-    {
-        // TODO: check bounds of in and output
-        // if (inlength != $self->insize()) {
-        //     PyErr_Format(PyExc_ValueError, 
-        //                  "Input has wrong size: %d instead of %d",
-        //                  inlength, $self->insize());
-        //     return;
-        // }
-        // if (outlength != $self->outsize()) {
-        //     PyErr_Format(PyExc_ValueError, 
-        //                  "Output has wrong size: %d instead of %d",
-        //                  outlength, $self->outsize());
-        //     return;
-        // }
-
-        $self->activate(input_p, output_p);
-    }
-
-    virtual void back_activate(double* outerror_p, int outlength, 
-                               double* inerror_p, int inlength)
-    {
-        if (inlength != $self->insize() or outlength != $self->outsize()) {
-            PyErr_Format(PyExc_ValueError, "Arrays of lengths (%d,%d) given",
-                         inlength, outlength);
-            return;
-        }
-        $self->back_activate(outerror_p, inerror_p);
-    }
+    public:
+        SigmoidMdrnn(int timedim, int hiddensize);
+        ~SigmoidMdrnn();
+        
+        // TODO: remove this; sorting should be implicit, but does not work for
+        // mdrnns somehow.
+        virtual void sort();
+        
+        void set_sequence_shape(int dim, int val);
+        int get_sequence_shape(int dim);
+        int sequencelength();
+        void set_block_shape(int dim, int val);
+        int get_block_shape(int dim);
 };
 
 
+%feature("notabstract") TanhMdrnn;
+class TanhMdrnn : public BaseMdrnn
+{
+    public:
+        TanhMdrnn(int timedim, int hiddensize);
+        ~TanhMdrnn();
+        
+        // TODO: remove this; sorting should be implicit, but does not work for
+        // mdrnns somehow.
+        virtual void sort();
+        
+        void set_sequence_shape(int dim, int val);
+        int get_sequence_shape(int dim);
+        int sequencelength();
+        void set_block_shape(int dim, int val);
+        int get_block_shape(int dim);
+};
+
+
+%feature("notabstract") LinearMdrnn;
+class LinearMdrnn : public BaseMdrnn
+{
+    public:
+        LinearMdrnn(int timedim, int hiddensize);
+        ~LinearMdrnn();
+        
+        // TODO: remove this; sorting should be implicit, but does not work for
+        // mdrnns somehow.
+        virtual void sort();
+        
+        void set_sequence_shape(int dim, int val);
+        int get_sequence_shape(int dim);
+        int sequencelength();
+        void set_block_shape(int dim, int val);
+        int get_block_shape(int dim);
+};
+
+        
 %apply (double* INPLACE_ARRAY1, int DIM1) {(double* sample_p, int samplelength), 
                                            (double* target_p, int targetlength)};
 
@@ -754,29 +818,3 @@ class SequentialBackprop
 };
 
 
-class SigmoidMdrnn
-{
-    public:
-        SigmoidMdrnn(int timedim, int hiddensize);
-        ~SigmoidMdrnn();
-        
-        void set_sequence_shape(int dim, int val);
-        int get_sequence_shape(int dim);
-        int sequencelength();
-        void set_block_shape(int dim, int val);
-        int get_block_shape(int dim);
-};
-
-
-class TanhMdrnn
-{
-    public:
-        TanhMdrnn(int timedim, int hiddensize);
-        ~TanhMdrnn();
-        
-        void set_sequence_shape(int dim, int val);
-        int get_sequence_shape(int dim);
-        int sequencelength();
-        void set_block_shape(int dim, int val);
-        int get_block_shape(int dim);
-};
