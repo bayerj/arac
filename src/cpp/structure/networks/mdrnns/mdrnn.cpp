@@ -106,7 +106,7 @@ Mdrnn<module_type>::sort()
     // Ininitialize buffers.
     init_buffers();
     
-    // Indicate thast the net is ready for use.
+    // Indicate that the net is ready for use.
     _dirty = false;
 }
 
