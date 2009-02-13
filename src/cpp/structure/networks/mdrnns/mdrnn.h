@@ -24,6 +24,9 @@ namespace mdrnns {
 /// Template class to implement a grid of modules in order to process 
 /// multidimensional sequences.
 /// 
+/// The networks is presented the whole input at once. It holds an internal
+/// structure of modules, which this input will be distributed to on activation.
+///
 
 template <class module_type>
 class Mdrnn : public BaseMdrnn
@@ -77,6 +80,7 @@ class Mdrnn : public BaseMdrnn
         
         void init_multiplied_sizes();
         
+        // FIXME: This should be done with integers!
         void next_coords(double* coords);
         void coords_by_index(double* coords_p, int index);
         void index_by_coords(int& index, double* coords_p);
@@ -217,6 +221,7 @@ Mdrnn<module_type>::coords_by_index(double* coords_p, int index)
         index = index % divisor;
     }
 }
+
 
 template <class module_type>
 inline
