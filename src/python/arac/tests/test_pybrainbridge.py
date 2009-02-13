@@ -57,33 +57,12 @@ class NetworkTestCase(TestCase):
             inpt = scipy.random.random(net.indim)
             pybrain_res = net.activate(inpt)
             arac_res = _net.activate(inpt)
-            if (pybrain_res != arac_res).any():
-                for module in net.modulesSorted:
-                    for bn, _ in module.bufferlist:
-                        print module.name, bn
-                        print getattr(net[module.name], bn)
-                        print getattr(_net[module.name], bn)
-                        print "-" * 20
             self.assertArrayNear(pybrain_res, arac_res)
 
         for _ in xrange(self.runs):
             error = scipy.random.random(net.outdim)
             pybrain_res = net.backActivate(error)
             arac_res = _net.backActivate(error)
-
-            # if (pybrain_res != arac_res).any():
-            #     for module in net.modulesSorted:
-            #         for bn, _ in module.bufferlist:
-            #             buf =  getattr(net[module.name], bn)
-            #             _buf =  getattr(_net[module.name], bn)
-            #             if (buf == _buf).all():
-            #                 continue
-            #             print module.name, bn
-            #             print (buf - _buf).max()
-            #             # print buf 
-            #             # print _buf
-            #             print "-" * 20
-
             self.assertArrayNear(pybrain_res, arac_res)
             if hasattr(_net, '_derivs'):
                 self.assertArrayNear(_net.derivs, net.derivs)
