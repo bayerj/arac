@@ -116,7 +116,7 @@ class TestOptimizers(TestCase):
         ds = arac.cppbridge.SupervisedSimpleDataset(1, 1)
         # Add some data points to the dataset.
         for _ in xrange(5):
-            ds = arac.append(scipy.random.random(1), scipy.random.random(1))
+            ds.append(scipy.random.random(1), scipy.random.random(1))
 
         l1 = arac.cppbridge.LinearLayer(1)
         l2 = arac.cppbridge.LinearLayer(1)
