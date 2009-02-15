@@ -10,6 +10,7 @@
 #include "full.h"
 #include "identity.h"
 #include "linear.h"
+#include "permutation.h"
 
 
 #endif

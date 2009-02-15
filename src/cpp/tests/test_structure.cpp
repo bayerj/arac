@@ -1616,5 +1616,52 @@ TEST(TestNetwork, NetworkClearConnection)
         << "Timestep was not reseted.";
 }
 
+ 
+TEST(TestConnections, TestPermutationConnection)
+{
+    std::vector<int> perm;
+    perm.push_back(2);
+    perm.push_back(1);
+    perm.push_back(0);
+    perm.push_back(4);
+    perm.push_back(3);
+    
+    LinearLayer* inlayer_p = new LinearLayer(5);
+    LinearLayer* outlayer_p = new LinearLayer(5);
+    PermutationConnection* con = \
+        new PermutationConnection(inlayer_p, outlayer_p, perm);
+        
+    inlayer_p->output()[0][0] = 0;
+    inlayer_p->output()[0][1] = 1;
+    inlayer_p->output()[0][2] = 2;
+    inlayer_p->output()[0][3] = 3;
+    inlayer_p->output()[0][4] = 4;
+    
+    con->forward();
+    
+    EXPECT_EQ(outlayer_p->input()[0][0], 2);
+    EXPECT_EQ(outlayer_p->input()[0][1], 1);
+    EXPECT_EQ(outlayer_p->input()[0][2], 0);
+    EXPECT_EQ(outlayer_p->input()[0][3], 4);
+    EXPECT_EQ(outlayer_p->input()[0][4], 3);
+    
+    outlayer_p->inerror()[0][0] = 0;
+    outlayer_p->inerror()[0][1] = -1;
+    outlayer_p->inerror()[0][2] = -2;
+    outlayer_p->inerror()[0][3] = -3;
+    outlayer_p->inerror()[0][4] = -4;
+
+    con->backward();
+    
+    inlayer_p->outerror()[0][0] = -2;
+    inlayer_p->outerror()[0][1] = -1;
+    inlayer_p->outerror()[0][2] = 0;
+    inlayer_p->outerror()[0][3] = -3;
+    inlayer_p->outerror()[0][4] = -4;
+}
+
+
+
+
         
 }  // namespace
