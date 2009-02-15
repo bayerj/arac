@@ -1661,6 +1661,40 @@ TEST(TestConnections, TestPermutationConnection)
 }
 
 
+TEST(TestConnections, TestConvolutionalConnection)
+{
+    LinearLayer* inlayer_p = new LinearLayer(3);
+    LinearLayer* outlayer_p = new LinearLayer(15);
+    ConvolutionalConnection* con_p = new \
+        ConvolutionalConnection(inlayer_p, outlayer_p, 1, 5);
+        
+    double* params_p = new double[5];
+    params_p[0] = 1;
+    params_p[0] = 2;
+    params_p[0] = 3;
+    params_p[0] = 4;
+    params_p[0] = 5;
+            
+    con_p->set_parameters(params_p);
+    
+    inlayer_p->output()[0][0] = 2;
+    inlayer_p->output()[0][1] = 3;
+    inlayer_p->output()[0][2] = 6;
+    
+    con_p->forward();
+    
+    double solution_p[15] = {2., 4., 6., 8., 10., 
+                             3., 6., 9., 12., 15.,
+                             6., 12., 18., 24., 30.};
+                          
+    for (int i = 0; i < 15; i++)
+    {
+        EXPECT_EQ(solution_p[i], outlayer_p->output()[0][i])
+            << "Wrong input for outlayer at " << i;
+    }
+    
+    ASSERT_TRUE(false) << "Backward pass untested.";
+}
 
 
         
