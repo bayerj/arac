@@ -25,6 +25,11 @@ print_activations(arac::structure::networks::Network& net,
                   arac::datasets::SupervisedDataset<double*, double*>& ds);
 
 
+void block_permutation(std::vector<int>& perm, 
+                       std::vector<int>& sequence_shape,
+                       std::vector<int>& block_shape);
+
+
 } } // Namespace
 
 
