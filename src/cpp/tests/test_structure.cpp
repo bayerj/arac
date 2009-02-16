@@ -1661,19 +1661,19 @@ TEST(TestConnections, TestPermutationConnection)
 }
 
 
-TEST(TestConnections, TestConvolutionalConnection)
+TEST(TestConnections, TestWeightShareConnection)
 {
     LinearLayer* inlayer_p = new LinearLayer(3);
     LinearLayer* outlayer_p = new LinearLayer(15);
-    ConvolutionalConnection* con_p = new \
-        ConvolutionalConnection(inlayer_p, outlayer_p, 1, 5);
+    WeightShareConnection* con_p = new \
+        WeightShareConnection(inlayer_p, outlayer_p, 1, 5);
         
     double* params_p = new double[5];
     params_p[0] = 1;
-    params_p[0] = 2;
-    params_p[0] = 3;
-    params_p[0] = 4;
-    params_p[0] = 5;
+    params_p[1] = 2;
+    params_p[2] = 3;
+    params_p[3] = 4;
+    params_p[4] = 5;
             
     con_p->set_parameters(params_p);
     
@@ -1689,13 +1689,44 @@ TEST(TestConnections, TestConvolutionalConnection)
                           
     for (int i = 0; i < 15; i++)
     {
-        EXPECT_EQ(solution_p[i], outlayer_p->output()[0][i])
+        EXPECT_EQ(solution_p[i], outlayer_p->input()[0][i])
             << "Wrong input for outlayer at " << i;
     }
     
-    ASSERT_TRUE(false) << "Backward pass untested.";
+    outlayer_p->inerror()[0][0] = -1;
+    outlayer_p->inerror()[0][1] = -2;
+    outlayer_p->inerror()[0][2] = -3;
+    outlayer_p->inerror()[0][3] = -4;
+    outlayer_p->inerror()[0][4] = -5;
+    outlayer_p->inerror()[0][5] = -6;
+    outlayer_p->inerror()[0][6] = -7;
+    outlayer_p->inerror()[0][7] = -8;
+    outlayer_p->inerror()[0][8] = -9;
+    outlayer_p->inerror()[0][9] = -10;
+    outlayer_p->inerror()[0][10] = -11;
+    outlayer_p->inerror()[0][11] = -12;
+    outlayer_p->inerror()[0][12] = -13;
+    outlayer_p->inerror()[0][13] = -14;
+    outlayer_p->inerror()[0][14] = -15;
+
+    con_p->backward();
+    
+    double backsolution_p[3] = {-55, -130, -205};
+    for (int i = 0; i < 3; i++)
+    {
+        ASSERT_EQ(backsolution_p[i], inlayer_p->outerror()[0][i])
+            << "Wrong error for inlayer at " << i;
+    }
+    
+    double derivsolution_p[5] = {-86.,  -97., -108., -119., -130.};
+    for (int i = 0; i < 5; i++)
+    {
+        ASSERT_EQ(derivsolution_p[i], con_p->get_derivatives()[i])
+            << "Wrong error for inlayer at " << i;
+    }
 }
 
 
+// TODO: Add a recurrency test fort WeightShareConnection.
         
 }  // namespace
