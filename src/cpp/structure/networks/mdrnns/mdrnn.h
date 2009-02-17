@@ -76,6 +76,9 @@ class Mdrnn : public BaseMdrnn
         
         virtual void _backward();
         
+        virtual void clear();
+        virtual void clear_derivatives();
+        
     protected:
         
         void init_multiplied_sizes();

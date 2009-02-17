@@ -119,6 +119,28 @@ Mdrnn<module_type>::sort()
 
 template <class module_type>
 void
+Mdrnn<module_type>::clear()
+{
+    _module_p->clear();
+}
+
+
+template <class module_type>
+void
+Mdrnn<module_type>::clear_derivatives()
+{
+    std::vector<FullConnection*>::iterator coniter;
+    for (coniter = _connections.begin();
+         coniter != _connections.end();
+         coniter++)
+    {
+        (*coniter)->clear_derivatives();
+    }
+}
+
+
+template <class module_type>
+void
 Mdrnn<module_type>::_forward()
 {
     // We keep the coordinates of the current block in here.
