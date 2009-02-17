@@ -103,6 +103,11 @@ Mdrnn<module_type>::sort()
         _connections.push_back(con_p);
         _parametrizeds.push_back(con_p);
     }
+
+    // Add a connection from the bias.
+    FullConnection* con_p = new FullConnection(&_bias, _module_p);
+    _parametrizeds.push_back(con_p);
+    _connections.push_back(con_p);
     
     // Ininitialize buffers.
     init_buffers();

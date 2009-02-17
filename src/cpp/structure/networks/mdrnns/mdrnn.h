@@ -100,6 +100,7 @@ class Mdrnn : public BaseMdrnn
         int* _multiplied_sizes_p;
         
         module_type* _module_p;
+        arac::structure::modules::Bias _bias;
         
         std::vector<arac::structure::connections::FullConnection*> _connections;
 };
