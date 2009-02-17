@@ -123,11 +123,6 @@ Mdrnn<module_type>::set_sequence_shape(int dim, int val)
     _dirty = true;
     _sequence_shape_p[dim] = val;
     
-    _sequencelength = 1;
-    for (int i = 0; i < _timedim; i++)
-    {
-        _sequencelength *= _sequence_shape_p[i];
-    }
     update_sizes();
 }
 
@@ -136,15 +131,20 @@ inline
 void
 Mdrnn<module_type>::update_sizes()
 {
-    if (blocksize() != 0)
-    {
-        _insize = sequencelength();
-        _outsize = sequencelength() / blocksize();
-    }
-    else
+    if (blocksize() == 0)
     {
         _dirty = true;
+        return;
     }
+
+    _sequencelength = 1;
+    for (int i = 0; i < _timedim; i++)
+    {
+        _sequencelength *= _sequence_shape_p[i] / _block_shape_p[i];
+    }
+
+    _insize = sequencelength() * blocksize();
+    _outsize = sequencelength();
 }
 
 
@@ -172,6 +172,7 @@ void
 Mdrnn<module_type>::set_block_shape(int dim, int val)
 {
     assert(dim < _timedim);
+    assert(val > 0);
     if (_block_shape_p[dim] == val)
     {
         return;

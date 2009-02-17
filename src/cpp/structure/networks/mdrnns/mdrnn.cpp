@@ -70,6 +70,7 @@ Mdrnn<module_type>::sort()
 {
     // Initialize multilied sizes.
     init_multiplied_sizes();
+    update_sizes();
     
     // Initialize module.
     if (_module_p != 0)
