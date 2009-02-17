@@ -84,6 +84,7 @@ class Mdrnn : public BaseMdrnn
         void next_coords(double* coords);
         void coords_by_index(double* coords_p, int index);
         void index_by_coords(int& index, double* coords_p);
+        void update_sizes();
         
         int _hiddensize;
         
@@ -124,8 +125,23 @@ Mdrnn<module_type>::set_sequence_shape(int dim, int val)
     {
         _sequencelength *= _sequence_shape_p[i];
     }
-    _insize = _sequencelength;
-    _outsize = _sequencelength;
+    update_sizes();
+}
+
+template <class module_type>
+inline
+void
+Mdrnn<module_type>::update_sizes()
+{
+    if (blocksize() != 0)
+    {
+        _insize = sequencelength();
+        _outsize = sequencelength() / blocksize();
+    }
+    else
+    {
+        _dirty = true;
+    }
 }
 
 
@@ -166,6 +182,7 @@ Mdrnn<module_type>::set_block_shape(int dim, int val)
     {
         _blocksize *= _block_shape_p[i];
     }
+    update_sizes();
 }
 
 
