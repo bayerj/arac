@@ -822,6 +822,7 @@ class SimpleBackprop
         virtual ~SimpleBackprop();
     
         void train_stochastic();    
+        void set_learningrate(const double value);
 };
 
 
@@ -834,6 +835,7 @@ class SemiSequentialBackprop
         ~SemiSequentialBackprop();
     
         void train_stochastic();    
+        void set_learningrate(const double value);
 };
 
 
@@ -844,6 +846,7 @@ class SequentialBackprop
         ~SequentialBackprop();
     
         void train_stochastic();
+        void set_learningrate(const double value);
 };
 
 
