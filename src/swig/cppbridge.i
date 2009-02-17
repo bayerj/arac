@@ -412,7 +412,6 @@ class BaseNetwork : public Module
         
         std::vector<Parametrized*>& parametrizeds();
         
-    protected:
         virtual void sort() = 0;
 };
 
@@ -603,6 +602,8 @@ class Network : public BaseNetwork
         virtual void clear_derivatives();
         void add_module(Module* module_p, ModuleType type=Simple);
         void add_connection(Connection* con_p);
+        virtual void sort();
+
 };        
         
         
