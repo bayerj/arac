@@ -103,7 +103,34 @@ class TestStructure(TestCase):
         self.assertEqual(pointer(paras[1]), pointer(c2))
         
     def testWeightShareConnection(self):
-        pass
+        l1 = arac.cppbridge.LinearLayer(3)
+        l2 = arac.cppbridge.LinearLayer(15)
+        c = arac.cppbridge.WeightShareConnection(l1, l2, 1, 5)
+        params = scipy.array((1, 2, 3, 4, 5), dtype='float64')
+        derivs = scipy.zeros(5)
+        c.set_parameters(params)
+        c.set_derivatives(derivs)
+        net = arac.cppbridge.Network()
+        net.add_module(l1, arac.cppbridge.Network.InputModule)
+        net.add_module(l2, arac.cppbridge.Network.OutputModule)
+        net.add_connection(c)
+        
+        inpt = scipy.array((2, 3, 6), dtype='float64')
+        result = scipy.zeros(15)
+        net.activate(inpt, result)
+        solution = scipy.array((2., 4., 6., 8., 10., 
+                                3., 6., 9., 12., 15.,
+                                6., 12., 18., 24., 30.))
+        self.assertArrayNear(result, solution)
+        
+        error = scipy.array([(-i - 1) for i in range(15)], dtype='float64')
+        inerror = scipy.zeros(3)
+        net.back_activate(error, inerror)
+        solution = scipy.array((-55, -130, -205), dtype='float64')
+        self.assertArrayNear(inerror, solution)
+        
+        solution = scipy.array((-86.,  -97., -108., -119., -130.))
+        self.assertArrayNear(derivs, solution)
         
     def testBlockPermutationConnection(self):
         l1 = arac.cppbridge.LinearLayer(16)
@@ -120,7 +147,6 @@ class TestStructure(TestCase):
         solution = scipy.array(
             (0, 1, 4, 5, 2, 3, 6, 7, 8, 9, 12, 13, 10, 11, 14, 15), 
             dtype='float64')
-        print result
         self.assertArrayNear(solution, result)
 
     def testMdrnn(self):
