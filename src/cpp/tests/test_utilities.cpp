@@ -51,7 +51,7 @@ TEST(TestBlockPermutation, Test34_12) {
 }
 
 
-TEST(TestBlockPermutation, Test2dim442_221) 
+TEST(TestBlockPermutation, Test442_221) 
 {
     std::vector<int> perm, shape, blockshape;
     
@@ -75,7 +75,7 @@ TEST(TestBlockPermutation, Test2dim442_221)
 }
 
 
-TEST(TestBlockPermutation, Test2dim442_222) {
+TEST(TestBlockPermutation, Test442_222) {
     std::vector<int> perm, shape, blockshape;
     
     shape.push_back(4);
