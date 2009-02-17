@@ -1661,6 +1661,48 @@ TEST(TestConnections, TestPermutationConnection)
 }
 
 
+TEST(TestConnections, TestBlockPermutationConnection)
+{
+    std::vector<int> sequence_shape;
+    sequence_shape.push_back(4);
+    sequence_shape.push_back(4);
+    
+    std::vector<int> block_shape;
+    block_shape.push_back(2);
+    block_shape.push_back(2);
+
+    LinearLayer* inlayer_p = new LinearLayer(16);
+    LinearLayer* outlayer_p = new LinearLayer(16);
+    BlockPermutationConnection* con_p = new BlockPermutationConnection(
+        inlayer_p, outlayer_p, sequence_shape, block_shape);
+        
+    Network net;
+    net.add_module(inlayer_p, Network::InputModule);
+    net.add_module(outlayer_p, Network::OutputModule);
+    net.add_connection(con_p);
+        
+    double* input_p = new double[16];
+        
+    for (int i = 0; i < 16; i++) 
+    {
+        input_p[i] = i; 
+    }
+
+    net.activate(input_p);
+
+    double solution_p[16] = {
+        0, 1, 4, 5, 2, 3, 6, 7, 8, 9, 12, 13, 10, 11, 14, 15
+    };
+    
+    for (int i = 0; i < 16; i++)
+    {
+        net.output()[0][i] = solution_p[i];
+    }
+}
+
+// TODO: Add recurrency test for BlockPermutationConnection.
+
+
 TEST(TestConnections, TestWeightShareConnection)
 {
     LinearLayer* inlayer_p = new LinearLayer(3);

@@ -33,7 +33,7 @@ class WeightShareConnection : public Connection, public Parametrized
         /// Create a new ConvolutionalConnection object.
         ///
         WeightShareConnection(Module* incoming_p, Module* outgoing_p, 
-                                int inchunk, int outchunk);
+                              int inchunk, int outchunk);
 
         ///
         /// Create a new ConvolutionalConnection object and use the

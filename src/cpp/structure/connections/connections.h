@@ -12,6 +12,7 @@
 #include "identity.h"
 #include "linear.h"
 #include "permutation.h"
+#include "blockpermutation.h"
 
 
 #endif

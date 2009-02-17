@@ -53,9 +53,14 @@ PyObject* PyArray_2DFromDoublePointer(int dim1, int dim2, double* data_p)
 
 %}
 
+
 %include "typemaps.i"
 %include "std_vector.i"
-%template(VectorParametrized) std::vector<Parametrized*>;
+namespace std
+{
+    %template(VectorParametrized) std::vector<Parametrized*>;
+    %template(VectorInt) std::vector<int>;
+}
 
 %include "numpy.i"
 %init %{
@@ -556,6 +561,29 @@ class LinearConnection : public Connection, public Parametrized
             }
         }
 };    
+
+
+%feature("notabstract") BlockPermutationConnection;
+class BlockPermutationConnection : public Connection
+{
+    public:
+        BlockPermutationConnection(Module* incoming_p, Module* outgoing_p, 
+                                   std::vector<int> sequence_shape,
+                                   std::vector<int> block_shape);
+        virtual ~BlockPermutationConnection();
+        
+        std::vector<int>& permutation();
+};
+
+
+%feature("notabstract") WeightShareConnection;
+class WeightShareConnection : public Connection, public Parametrized
+{
+    public:
+        WeightShareConnection(Module* incoming_p, Module* outgoing_p, 
+                              int inchunk, int outchunk);
+        ~WeightShareConnection();
+};
 
 
 %feature("notabstract") Network;

@@ -101,6 +101,27 @@ class TestStructure(TestCase):
         pointer = lambda p: p.get_parameters().ctypes.data
         self.assertEqual(pointer(paras[0]), pointer(c1))
         self.assertEqual(pointer(paras[1]), pointer(c2))
+        
+    def testWeightShareConnection(self):
+        pass
+        
+    def testBlockPermutationConnection(self):
+        l1 = arac.cppbridge.LinearLayer(16)
+        l2 = arac.cppbridge.LinearLayer(16)
+        c1 = arac.cppbridge.BlockPermutationConnection(l1, l2, (4, 4), (2, 2))
+        # c1 = arac.cppbridge.IdentityConnection(l1, l2)
+        net = arac.cppbridge.Network()
+        net.add_module(l1, arac.cppbridge.Network.InputModule)
+        net.add_module(l2, arac.cppbridge.Network.OutputModule)
+        net.add_connection(c1)
+        result = scipy.zeros(16)
+        inpt = scipy.array([float(i) for i in range(16)])
+        net.activate(inpt, result)
+        solution = scipy.array(
+            (0, 1, 4, 5, 2, 3, 6, 7, 8, 9, 12, 13, 10, 11, 14, 15), 
+            dtype='float64')
+        print result
+        self.assertArrayNear(solution, result)
 
     def testMdrnn(self):
         net = arac.cppbridge.LinearMdrnn(2, 1)

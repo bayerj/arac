@@ -13,6 +13,14 @@ using arac::structure::Parametrized;
 using arac::structure::modules::Module;
 
 
+PermutationConnection::PermutationConnection(
+    Module* incoming_p, Module* outgoing_p) : 
+    Connection(incoming_p, outgoing_p)
+{
+    
+}
+
+
 PermutationConnection::PermutationConnection(Module* incoming_p, Module* outgoing_p, 
                                              std::vector<int> permutation) :
     Connection(incoming_p, outgoing_p),
@@ -29,7 +37,6 @@ PermutationConnection::~PermutationConnection()
 {
     
 }
-
 
 
 void

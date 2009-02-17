@@ -31,6 +31,8 @@ class PermutationConnection : public Connection
         ///
         /// Create a new PermutationConnection object.
         ///
+        PermutationConnection(Module* incoming_p, Module* outgoing_p);
+        
         PermutationConnection(Module* incoming_p, Module* outgoing_p, 
                               std::vector<int> permutation);
 
@@ -40,6 +42,9 @@ class PermutationConnection : public Connection
         virtual ~PermutationConnection();
         
         const std::vector<int>& permutation() const;
+        std::vector<int>& permutation();
+        
+        void set_permutation(std::vector<int> perm);
         
     protected:
         std::vector<int> _permutation;
@@ -54,6 +59,22 @@ const std::vector<int>&
 PermutationConnection::permutation() const
 {
     return _permutation;
+}
+
+
+inline
+std::vector<int>& 
+PermutationConnection::permutation()
+{
+    return _permutation;
+}
+
+
+inline
+void
+PermutationConnection::set_permutation(std::vector<int> permutation)
+{
+    _permutation = permutation;
 }
 
     
