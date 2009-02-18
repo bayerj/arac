@@ -1791,6 +1791,42 @@ TEST(TestConnections, TestWeightShareConnection)
 }
 
 
+TEST(TestNetworkSorting, RegressionWeightBlockPermute)
+{
+    LinearLayer inlayer(4);
+    LinearLayer hidden1(4);
+    PartialSoftmaxLayer hidden2(4, 2);
+    LinearLayer outlayer(4);
+    
+    std::vector<int> seqshape;
+    seqshape.push_back(2);
+    seqshape.push_back(2);
+    
+    std::vector<int> blockshape;
+    blockshape.push_back(1);
+    blockshape.push_back(1);
+    
+    BlockPermutationConnection con1(&inlayer, &hidden1, seqshape, blockshape);
+    
+    WeightShareConnection con2(&hidden1, &hidden2, 2, 2);
+    IdentityConnection con3(&hidden2, &outlayer);
+    
+    Network net;
+    
+    net.add_module(&inlayer, Network::InputModule);
+    net.add_module(&hidden1);
+    net.add_module(&hidden2);
+    net.add_module(&outlayer, Network::OutputModule);
+    
+    net.add_connection(&con1);
+    net.add_connection(&con2);
+    net.add_connection(&con3);
+    
+    net.sort();
+    net.randomize();
+}
+
+
 // TODO: Add a recurrency test fort WeightShareConnection.
         
 }  // namespace
