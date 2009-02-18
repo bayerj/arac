@@ -573,6 +573,7 @@ class BlockPermutationConnection : public Connection
         virtual ~BlockPermutationConnection();
         
         std::vector<int>& permutation();
+        void invert();
 };
 
 
@@ -853,7 +854,7 @@ class SemiSequentialBackprop
         void set_learningrate(const double value);
         
         BaseNetwork& network();
-        SupervisedSimpleDataset& dataset();
+        SupervisedSemiSequentialDataset& dataset();
 };
 
 
@@ -877,15 +878,5 @@ class SequentialBackprop
         void set_learningrate(const double value);
         
         BaseNetwork& network();
-        SupervisedSimpleDataset& dataset();
+        SupervisedSequentialDataset& dataset();
 };
-
-
-%extend SemiSequentialBackprop
-{
-    PyObject* lasterror() 
-    {
-        return PyArray_1DFromDoublePointer($self->dataset().targetsize(), 
-                                           $self->error());
-    }
-}
