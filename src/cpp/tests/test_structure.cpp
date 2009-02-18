@@ -1628,7 +1628,7 @@ TEST(TestConnections, TestPermutationConnection)
     
     LinearLayer* inlayer_p = new LinearLayer(5);
     LinearLayer* outlayer_p = new LinearLayer(5);
-    PermutationConnection* con = \
+    PermutationConnection* con_p = \
         new PermutationConnection(inlayer_p, outlayer_p, perm);
         
     inlayer_p->output()[0][0] = 0;
@@ -1637,7 +1637,7 @@ TEST(TestConnections, TestPermutationConnection)
     inlayer_p->output()[0][3] = 3;
     inlayer_p->output()[0][4] = 4;
     
-    con->forward();
+    con_p->forward();
     
     EXPECT_EQ(outlayer_p->input()[0][0], 2);
     EXPECT_EQ(outlayer_p->input()[0][1], 1);
@@ -1651,13 +1651,35 @@ TEST(TestConnections, TestPermutationConnection)
     outlayer_p->inerror()[0][3] = -3;
     outlayer_p->inerror()[0][4] = -4;
 
-    con->backward();
+    con_p->backward();
     
     inlayer_p->outerror()[0][0] = -2;
     inlayer_p->outerror()[0][1] = -1;
     inlayer_p->outerror()[0][2] = 0;
     inlayer_p->outerror()[0][3] = -3;
     inlayer_p->outerror()[0][4] = -4;
+}
+
+
+TEST(TestConnections, TestPermutationConnectionInvert)
+{
+    std::vector<int> perm;
+    perm.push_back(2);
+    perm.push_back(0);
+    perm.push_back(1);
+    perm.push_back(3);
+    
+    LinearLayer* layer_p = new LinearLayer(4);
+    PermutationConnection* con_p = \
+        new PermutationConnection(layer_p, layer_p, perm);
+        
+    con_p->invert();
+    
+    std::vector<int>& invperm = con_p->permutation();
+    EXPECT_EQ(1, invperm[0]);
+    EXPECT_EQ(2, invperm[1]);
+    EXPECT_EQ(0, invperm[2]);
+    EXPECT_EQ(3, invperm[3]);
 }
 
 
