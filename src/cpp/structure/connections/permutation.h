@@ -46,6 +46,11 @@ class PermutationConnection : public Connection
         
         void set_permutation(std::vector<int> perm);
         
+        ///
+        /// Invert the current permutation.
+        ///
+        void invert();
+        
     protected:
         std::vector<int> _permutation;
         

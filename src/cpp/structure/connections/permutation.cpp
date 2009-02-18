@@ -40,6 +40,21 @@ PermutationConnection::~PermutationConnection()
 
 
 void
+PermutationConnection::invert()
+{
+    std::vector<int> old = permutation();
+    std::vector<int>::const_iterator permiter;
+    int i = 0;
+    for (permiter = old.begin(), i = 0; 
+         permiter != old.end();
+         permiter++, i++)
+    {
+        _permutation[*permiter] = i;
+    }
+}
+
+
+void
 PermutationConnection::_forward()
 {
     if (timestep() - get_recurrent() < 0)
