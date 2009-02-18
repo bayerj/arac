@@ -213,7 +213,7 @@ Mdrnn<module_type>::_backward()
             }
             j++;
         }
-        _module_p->add_to_outerror(outerror()[timestep() - 1] + blocksize() * i);
+        _module_p->add_to_outerror(outerror()[timestep() - 1] + i);
         _module_p->backward();
         next_coords(coords_p);
     }
