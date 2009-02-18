@@ -73,7 +73,7 @@ class Backprop
         ///
         /// Return a pointer to the last error.
         ///
-        const double* error();
+        double* error();
         
         ///
         /// Pick a random sample from the dataset and perform one step of
@@ -175,7 +175,7 @@ Backprop<SampleType, TargetType>::set_learningrate(const double value)
 
 
 template<typename SampleType, typename TargetType>
-const double*
+double*
 Backprop<SampleType, TargetType>::error()
 {
     return _error_p;
