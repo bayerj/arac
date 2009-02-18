@@ -28,9 +28,12 @@ Mdrnn<module_type>::Mdrnn(int timedim, int hiddensize) :
     _multiplied_sizes_p = new int[_timedim];
     for(int i = 0; i < _timedim; i++)
     {
-        set_sequence_shape(i, 1);
-        set_block_shape(i, 1);
+        // We cannot use the setters here, because they invoke the recalculation
+        // which results in undefined behaviour.
+        _sequence_shape_p[i] = 1;
+        _block_shape_p[i] = 1;
     }
+    update_sizes();
 }
 
 
@@ -61,6 +64,29 @@ Mdrnn<module_type>::init_multiplied_sizes()
         _multiplied_sizes_p[i] = size;
         size *= _sequence_shape_p[i];
     }
+}
+
+
+template <class module_type>
+void
+Mdrnn<module_type>::update_sizes()
+{
+    _blocksize = 1;
+    for (int i = 0; i < _timedim; i++)
+    {
+        _blocksize *= _block_shape_p[i];
+    }
+    assert(_blocksize > 0);
+    
+    _sequencelength = 1;
+    for (int i = 0; i < _timedim; i++)
+    {
+        _sequencelength *= _sequence_shape_p[i];
+    }
+    
+    _sequencelength /= _blocksize;
+    _insize = _sequencelength * _blocksize;
+    _outsize = _sequencelength;
 }
 
 

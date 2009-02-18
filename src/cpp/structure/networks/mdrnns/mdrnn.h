@@ -120,31 +120,9 @@ Mdrnn<module_type>::set_sequence_shape(int dim, int val)
     {
         return;
     }
-    _dirty = true;
     _sequence_shape_p[dim] = val;
-    
+    _dirty = true;
     update_sizes();
-}
-
-template <class module_type>
-inline
-void
-Mdrnn<module_type>::update_sizes()
-{
-    if (blocksize() == 0)
-    {
-        _dirty = true;
-        return;
-    }
-
-    _sequencelength = 1;
-    for (int i = 0; i < _timedim; i++)
-    {
-        _sequencelength *= _sequence_shape_p[i] / _block_shape_p[i];
-    }
-
-    _insize = sequencelength() * blocksize();
-    _outsize = sequencelength();
 }
 
 
@@ -160,9 +138,9 @@ Mdrnn<module_type>::get_sequence_shape(int dim)
 template <class module_type>
 inline
 int
-Mdrnn<module_type>::blocksize()
+Mdrnn<module_type>::sequencelength()
 {
-    return _blocksize;
+    return _sequencelength;
 }
 
 
@@ -202,9 +180,9 @@ Mdrnn<module_type>::get_block_shape(int dim)
 template <class module_type>
 inline
 int
-Mdrnn<module_type>::sequencelength()
+Mdrnn<module_type>::blocksize()
 {
-    return _sequencelength;
+    return _blocksize;
 }
 
 
