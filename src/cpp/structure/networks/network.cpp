@@ -229,6 +229,10 @@ Network::incoming_count(std::map<Module*, int>& count)
 void
 Network::sort()
 {
+    if (!_dirty)
+    {
+        return;
+    }
     // Result lists.
     std::vector<Module*> sorted;
     std::vector<Module*>::iterator mod_iter;
@@ -239,7 +243,7 @@ Network::sort()
     std::map<Module*, int> count;
     std::map<Module*, int>::iterator count_iter;
     incoming_count(count);
-
+    
     // Make up a vector of all nodes with no incoming connections.
     std::vector<Module*> roots;
     for(count_iter = count.begin(); 
