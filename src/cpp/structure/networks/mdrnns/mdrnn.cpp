@@ -86,7 +86,7 @@ Mdrnn<module_type>::update_sizes()
     
     _sequencelength /= _blocksize;
     _insize = _sequencelength * _blocksize;
-    _outsize = _sequencelength;
+    _outsize = _sequencelength * _hiddensize;
 }
 
 
@@ -203,9 +203,9 @@ Mdrnn<module_type>::_forward()
     std::vector<double*>::iterator dblp_iter;
     for(int i = 0; i < sequencelength(); i++)
     {
-        memcpy(output()[timestep()] + i * blocksize(), 
+        memcpy(output()[timestep()] + i * _hiddensize, 
                _module_p->output()[i], 
-               blocksize() * sizeof(double));
+               _hiddensize * sizeof(double));
     }
 }
 
