@@ -413,6 +413,7 @@ class BaseNetwork : public Module
         std::vector<Parametrized*>& parametrizeds();
         
         virtual void sort() = 0;
+        virtual void randomize();
 };
 
 
@@ -823,7 +824,21 @@ class SimpleBackprop
     
         void train_stochastic();    
         void set_learningrate(const double value);
+        
+        BaseNetwork& network();
+        SupervisedSimpleDataset& dataset();
+        
 };
+
+
+%extend SimpleBackprop
+{
+    PyObject* lasterror() 
+    {
+        return PyArray_1DFromDoublePointer($self->dataset().targetsize(), 
+                                           $self->error());
+    }
+}
 
 
 class SemiSequentialBackprop
@@ -836,7 +851,20 @@ class SemiSequentialBackprop
     
         void train_stochastic();    
         void set_learningrate(const double value);
+        
+        BaseNetwork& network();
+        SupervisedSimpleDataset& dataset();
 };
+
+
+%extend SemiSequentialBackprop
+{
+    PyObject* lasterror() 
+    {
+        return PyArray_1DFromDoublePointer($self->dataset().targetsize(), 
+                                           $self->error());
+    }
+}
 
 
 class SequentialBackprop
@@ -847,6 +875,17 @@ class SequentialBackprop
     
         void train_stochastic();
         void set_learningrate(const double value);
+        
+        BaseNetwork& network();
+        SupervisedSimpleDataset& dataset();
 };
 
 
+%extend SemiSequentialBackprop
+{
+    PyObject* lasterror() 
+    {
+        return PyArray_1DFromDoublePointer($self->dataset().targetsize(), 
+                                           $self->error());
+    }
+}
