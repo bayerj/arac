@@ -79,6 +79,7 @@ inline
 void
 PermutationConnection::set_permutation(std::vector<int> permutation)
 {
+    assert(permutation.size() == incoming()->outsize());
     _permutation = permutation;
 }
 
