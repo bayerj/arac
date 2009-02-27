@@ -36,7 +36,8 @@ Module::Module(int insize, int outsize) :
 }
 
 
-Module::~Module() {
+Module::~Module() 
+{
     free_buffers(); 
 }
 
@@ -62,7 +63,10 @@ Module::forward()
     Component::forward();
     if (sequential())
     {
-        expand();
+        if ((input().size() <= timestep()) || output().size() <= timestep())
+        {
+            expand();
+        }
     }
 }
 
