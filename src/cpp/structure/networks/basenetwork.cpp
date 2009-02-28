@@ -98,6 +98,14 @@ BaseNetwork::clear_derivatives()
     {
         (*param_iter)->clear_derivatives();
     }
+    
+    std::vector<BaseNetwork*>::iterator net_iter;
+    for (net_iter = networks().begin();
+         net_iter != networks().end();
+         net_iter++)
+    {
+        (*net_iter)->clear_derivatives();
+    }
 }
 
 
@@ -111,6 +119,14 @@ BaseNetwork::randomize()
     {
         (*param_iter)->randomize();
     }
+    std::vector<BaseNetwork*>::iterator net_iter;
+    for (net_iter = networks().begin();
+         net_iter != networks().end();
+         net_iter++)
+    {
+        (*net_iter)->randomize();
+    }
+
 }
 
 

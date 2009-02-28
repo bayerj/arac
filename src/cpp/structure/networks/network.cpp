@@ -199,6 +199,10 @@ Network::add_component(Component* comp_p)
     {
         _parametrizeds.push_back(parametrized_p);
     }
+    if (BaseNetwork* basenetwork_p = dynamic_cast<BaseNetwork*>(comp_p))
+    {
+        _networks.push_back(basenetwork_p);
+    }
 }
 
 

@@ -64,7 +64,12 @@ class BaseNetwork : public arac::structure::modules::Module
         ///
         /// Return a vector to all the Parametrized objects in the Network.
         ///
-        std::vector<Parametrized*>& parametrizeds();
+        std::vector<arac::structure::Parametrized*>& parametrizeds();
+        
+        ///
+        /// Return a vector to all BaseNetwork objects in the Network.
+        ///
+        std::vector<BaseNetwork*>& networks();
         
         ///
         /// Fill the parametrizers of all Parametrized objects in the network
@@ -84,6 +89,8 @@ class BaseNetwork : public arac::structure::modules::Module
         bool _dirty;
         
         std::vector<arac::structure::Parametrized*> _parametrizeds;
+        std::vector<BaseNetwork*> _networks;
+
 };
 
 
@@ -92,6 +99,14 @@ std::vector<Parametrized*>&
 BaseNetwork::parametrizeds()
 {
     return _parametrizeds;
+}
+
+
+inline
+std::vector<BaseNetwork*>&
+BaseNetwork::networks()
+{
+    return _networks;
 }
 
 

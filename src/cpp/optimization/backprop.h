@@ -87,10 +87,15 @@ class Backprop
     protected:
         
         ///
-        /// Adapt the parameters of the network according to its derivatives.
+        /// Adapt the parameters of this network.
         ///
         void learn();
-        
+
+        ///
+        /// Adapt the parameters of the network according to its derivatives.
+        ///
+        void learn(BaseNetwork& network_p);
+
         ///
         /// Network to be optimized optimizer.
         ///
@@ -200,9 +205,24 @@ template<typename SampleType, typename TargetType>
 void 
 Backprop<SampleType, TargetType>::learn()
 {
+    learn(network());
+    std::vector<BaseNetwork*>::iterator net_iter;
+    for (net_iter = network().networks().begin();
+         net_iter != network().networks().end();
+         net_iter++)
+    {
+        learn(**net_iter);
+    }
+}
+
+
+template<typename SampleType, typename TargetType>
+void 
+Backprop<SampleType, TargetType>::learn(BaseNetwork& network)
+{
     std::vector<Parametrized*>::const_iterator param_iter;
-    for (param_iter = network().parametrizeds().begin();
-         param_iter != network().parametrizeds().end();
+    for (param_iter = network.parametrizeds().begin();
+         param_iter != network.parametrizeds().end();
          param_iter++)
     {
         double* params_p = (*param_iter)->get_parameters();

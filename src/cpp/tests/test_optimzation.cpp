@@ -133,5 +133,7 @@ TEST(TestBackprop, TestStochasticStepSequenceSequence)
         << "Parameters not learned correctly.";
 }
 
+     
+// TODO: write a test for contained networks.
         
 }  // namespace
