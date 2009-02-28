@@ -247,23 +247,6 @@ Mdrnn<module_type>::_backward()
         next_coords(coords_p);
     }
     
-    std::vector<FullConnection*>::iterator con_iter;
-    for(con_iter = _connections.begin(); 
-        // All but the bias connection.
-        con_iter != _connections.end(); 
-        con_iter++)
-    {
-        // std::cout << coords_p[j] << " ";
-        // If the current coordinate is zero, we are at a border of the 
-        // input in that dimension. In that case, the connections may not be
-        // forwarded, since we don't want to look around corners.
-        for (int k = 0; k < (*con_iter)->size(); k++)
-        {
-            std::cout << (*con_iter)->get_derivatives()[k] << " ";
-        }
-        std::cout << std::endl;
-    }
-
     // Copy the output to the mdrnns outputbuffer.
     // TODO: save memory by not copying but referencing.
     for(int i = 0; i < sequencelength(); i++)
