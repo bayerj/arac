@@ -63,7 +63,7 @@ class Network : public BaseNetwork
         /// Set the buffers of all the modules in the network to zero.
         ///
         virtual void clear();
-        
+
         ///
         /// Add a module of the given type to the Network object.
         ///
