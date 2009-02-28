@@ -656,6 +656,30 @@ TEST(TestModules, MdlstmLayer) {
 }
 
 
+TEST(TestModules, ErrorScalingLayer)
+{
+    std::vector<double> scale;
+    scale.push_back(1);
+    scale.push_back(2);
+    scale.push_back(3);
+    scale.push_back(4);
+    scale.push_back(5.5);
+    ErrorScalingLayer layer(5, scale);
+    double input_p[5] = {2, 3, 4, 5, 6};
+    layer.add_to_input(input_p);
+    layer.forward();
+    double error_p[5] = {9, 10, 11, 12, 13};
+    layer.add_to_outerror(error_p);
+    layer.backward();
+    double solution_p[5] = {9, 20, 33, 48, 71.5};
+    for (int i = 0; i < 5; i++)
+    {
+        EXPECT_DOUBLE_EQ(solution_p[i], layer.inerror()[0][i])
+            << "Wrong error at " << i;
+    }
+}
+
+
 TEST(TestConnections, IdentityConnection) {
     LinearLayer* inlayer_p = new LinearLayer(2);
     LinearLayer* outlayer_p = new LinearLayer(2);

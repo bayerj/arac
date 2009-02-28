@@ -61,6 +61,7 @@ namespace std
     %template(VectorParametrized) std::vector<Parametrized*>;
     %template(VectorBaseNetwork) std::vector<BaseNetwork*>;
     %template(VectorInt) std::vector<int>;
+    %template(VectorDouble) std::vector<double>;
 }
 
 %include "numpy.i"
@@ -290,6 +291,15 @@ class LinearLayer : public Module
     public:
         LinearLayer(int size);
         virtual ~LinearLayer();
+};
+
+
+%feature("notabstract") ErrorScalingLayer;
+class ErrorScalingLayer : public Module
+{
+    public:
+        ErrorScalingLayer(int size, std::vector<double> scale);
+        virtual ~ErrorScalingLayer();
 };
 
 
