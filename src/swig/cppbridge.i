@@ -59,6 +59,7 @@ PyObject* PyArray_2DFromDoublePointer(int dim1, int dim2, double* data_p)
 namespace std
 {
     %template(VectorParametrized) std::vector<Parametrized*>;
+    %template(VectorBaseNetwork) std::vector<BaseNetwork*>;
     %template(VectorInt) std::vector<int>;
 }
 
@@ -411,6 +412,8 @@ class BaseNetwork : public Module
         virtual void forward();
         
         std::vector<Parametrized*>& parametrizeds();
+        
+        std::vector<BaseNetwork*>& networks();
         
         virtual void sort() = 0;
         virtual void randomize();
