@@ -14,10 +14,8 @@ Component::Component() :
 {
 }
 
+
 Component::~Component() {}
-
-
-
 
 
 int
