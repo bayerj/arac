@@ -81,7 +81,8 @@ void FullConnection::_forward()
     source_p += _incomingstart;
 
     cblas_dgemv(CblasRowMajor, 
-                // Transpose the matrix since we want to multiply from the right
+                // Do not transpose the matrix since we want to multiply from 
+                // the right
                 CblasNoTrans,
                 // Dimensions of the matrix
                 outdim,        
@@ -125,16 +126,30 @@ void FullConnection::_backward()
     double* input_p = _incoming_p->output()[this_timestep] \
                       + _incomingstart;
 
-    // TODO: use BLAS for this.
-    double* weights_p = get_parameters();
-    for (int i = 0; i < outdim; i++)
-    {
-        for (int j = 0; j < indim; j++)
-        {
-            inerror_p[j] += *weights_p * outerror_p[i];
-            weights_p++;
-        }
-    }
+    cblas_dgemv(CblasColMajor, 
+                // Do not transpose the matrix since we want to multiply from 
+                // the right
+                CblasNoTrans,
+                // Dimensions of the matrix
+                indim,        
+                outdim,
+                // Scalar for the matrix
+                1.0,                    
+                // Pointer to the matrix
+                get_parameters(),    
+                // Dimension of the vector
+                indim,
+                // Pointer to the vector
+                outerror_p,
+                // Some incrementer.
+                1,                      
+                // Scalar of the target vector
+                1.0,                    
+                // Pointer to the target vector
+                inerror_p,
+                // Incrementer.
+                1);   
+
 
     double* derivs_p = get_derivatives();
     for (int i = 0; i < outdim; i++)
