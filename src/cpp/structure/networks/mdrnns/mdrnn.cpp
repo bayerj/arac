@@ -103,7 +103,7 @@ Mdrnn<module_type>::sort()
     {
         delete _module_p;
     }
-    _module_p = new module_type(_hiddensize * _blocksize);
+    _module_p = new module_type(_hiddensize);
     _module_p->set_mode(Component::Sequential);
     
     // Delete connections from previous sortings.
@@ -223,9 +223,11 @@ Mdrnn<module_type>::_backward()
         std::vector<FullConnection*>::iterator con_iter;
         int j = 0;
         for(con_iter = _connections.begin(); 
-            con_iter != _connections.end(); 
-            con_iter++)
+            // All but the bias connection.
+            con_iter < _connections.end(); 
+            con_iter++, j++)
         {
+            // std::cout << coords_p[j] << " ";
             // If the current coordinate is zero, we are at a border of the 
             // input in that dimension. In that case, the connections may not be
             // forwarded, since we don't want to look around corners.
@@ -237,12 +239,31 @@ Mdrnn<module_type>::_backward()
             {
                 (*con_iter)->backward();
             }
-            j++;
         }
+        // Bias connection is always backwarded.
+        _connections.back()->backward();
         _module_p->add_to_outerror(outerror()[timestep() - 1] + i);
         _module_p->backward();
         next_coords(coords_p);
     }
+    
+    std::vector<FullConnection*>::iterator con_iter;
+    for(con_iter = _connections.begin(); 
+        // All but the bias connection.
+        con_iter != _connections.end(); 
+        con_iter++)
+    {
+        // std::cout << coords_p[j] << " ";
+        // If the current coordinate is zero, we are at a border of the 
+        // input in that dimension. In that case, the connections may not be
+        // forwarded, since we don't want to look around corners.
+        for (int k = 0; k < (*con_iter)->size(); k++)
+        {
+            std::cout << (*con_iter)->get_derivatives()[k] << " ";
+        }
+        std::cout << std::endl;
+    }
+
     // Copy the output to the mdrnns outputbuffer.
     // TODO: save memory by not copying but referencing.
     for(int i = 0; i < sequencelength(); i++)
