@@ -148,6 +148,7 @@ template <class module_type>
 void
 Mdrnn<module_type>::clear()
 {
+    BaseMdrnn::clear();
     _module_p->clear();
 }
 
