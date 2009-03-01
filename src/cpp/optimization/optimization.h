@@ -7,6 +7,7 @@
 
 
 #include "backprop.h"
+#include "descent/descent.h"
 
 
 #endif
