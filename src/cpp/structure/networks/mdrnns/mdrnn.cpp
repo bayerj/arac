@@ -150,6 +150,15 @@ Mdrnn<module_type>::clear()
 {
     BaseMdrnn::clear();
     _module_p->clear();
+    _bias.clear();
+    std::vector<FullConnection*>::iterator coniter;
+    for (coniter = _connections.begin();
+         coniter != _connections.end();
+         coniter++)
+    {
+        (*coniter)->clear();
+    }
+
 }
 
 
