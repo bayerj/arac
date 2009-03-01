@@ -70,7 +70,7 @@ class Mdrnn : public BaseMdrnn
         /// sidelength's of each block.
         int blocksize();
 
-        void sort();
+        virtual void sort();
         
         virtual void _forward();
         
@@ -106,7 +106,7 @@ class Mdrnn : public BaseMdrnn
         module_type* _module_p;
         arac::structure::modules::Bias _bias;
         
-        std::vector<arac::structure::connections::FullConnection*> _connections;
+        std::vector<arac::structure::connections::Connection*> _connections;
 };
 
 

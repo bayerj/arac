@@ -13,6 +13,7 @@
 
 
 using arac::structure::Component;
+using arac::structure::connections::Connection;
 using arac::structure::connections::FullConnection;
 using arac::structure::networks::mdrnns::Mdrnn;
 
@@ -44,7 +45,7 @@ Mdrnn<module_type>::~Mdrnn()
     delete[] _block_shape_p;
     delete _module_p;
     
-    std::vector<FullConnection*>::iterator con_iter;
+    std::vector<Connection*>::iterator con_iter;
     for(con_iter = _connections.begin(); 
         con_iter != _connections.end(); 
         con_iter++)
@@ -107,7 +108,7 @@ Mdrnn<module_type>::sort()
     _module_p->set_mode(Component::Sequential);
     
     // Delete connections from previous sortings.
-    std::vector<FullConnection*>::iterator con_iter;
+    std::vector<Connection*>::iterator con_iter;
     for (con_iter = _connections.begin();
          con_iter != _connections.end();
          con_iter++)
@@ -151,7 +152,7 @@ Mdrnn<module_type>::clear()
     BaseMdrnn::clear();
     _module_p->clear();
     _bias.clear();
-    std::vector<FullConnection*>::iterator coniter;
+    std::vector<Connection*>::iterator coniter;
     for (coniter = _connections.begin();
          coniter != _connections.end();
          coniter++)
@@ -166,12 +167,12 @@ template <class module_type>
 void
 Mdrnn<module_type>::clear_derivatives()
 {
-    std::vector<FullConnection*>::iterator coniter;
-    for (coniter = _connections.begin();
-         coniter != _connections.end();
-         coniter++)
+    std::vector<Parametrized*>::iterator param_iter;
+    for (param_iter = _parametrizeds.begin();
+         param_iter != _parametrizeds.end();
+         param_iter++)
     {
-        (*coniter)->clear_derivatives();
+        (*param_iter)->clear_derivatives();
     }
 }
 
@@ -185,7 +186,7 @@ Mdrnn<module_type>::_forward()
     // TODO: save memory by not copying but referencing.
     for(int i = 0; i < sequencelength(); i++)
     {
-        std::vector<FullConnection*>::iterator con_iter;
+        std::vector<Connection*>::iterator con_iter;
         int j = 0;
         for(con_iter = _connections.begin(); 
             con_iter != _connections.end(); 
@@ -230,7 +231,7 @@ Mdrnn<module_type>::_backward()
     // TODO: save memory by not copying but referencing.
     for(int i = sequencelength() - 1; i >= 0; i--)
     {
-        std::vector<FullConnection*>::iterator con_iter;
+        std::vector<Connection*>::iterator con_iter;
         int j = 0;
         for(con_iter = _connections.begin(); 
             // All but the bias connection.
