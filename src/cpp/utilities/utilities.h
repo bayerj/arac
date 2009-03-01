@@ -31,7 +31,12 @@ void block_permutation(std::vector<int>& perm,
                        std::vector<int>& block_shape);
 
 
-void fill_random(double* sink_p, int length);
+///
+/// Fill the sink with random values from the interval [-interval, interval]. 
+/// interval defaults to 0.01.
+///
+
+void fill_random(double* sink_p, int length, double interval = 0.01);
 
 
 double
