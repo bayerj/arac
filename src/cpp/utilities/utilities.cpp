@@ -2,8 +2,11 @@
 // (c) 2008 by Justin S Bayer, <bayer.justin@googlemail.com>
 
 
-#include "utilities.h"
 #include <iostream>
+#include <cstdlib>
+
+#include "utilities.h"
+
 
 using namespace arac::structure::networks;
 using namespace arac::structure;
@@ -172,6 +175,148 @@ void block_permutation(std::vector<int>& perm,
         }
     }
 }                      
+
+
+void fill_random(double* sink_p, int length)
+{
+    srand(time(NULL));
+    for(int i = 0; i < length; i++)
+    {
+        double value = RAND_MAX - RAND_MAX / 2;
+        value /= rand();
+        sink_p[i] = value * 0.01;
+    }
+}
+
+
+void
+addscale(const double* first_p, const double* second_p, double* sink_p, 
+         size_t length, double scale)
+{
+    for (int i = 0; i < length; i++)
+    {
+        sink_p[i] = first_p[i] + (scale * second_p[i]);
+    }
+}
+
+
+void 
+square(double* target_p, size_t length)
+{
+    for (int i = 0; i < length; i++)
+    {
+        target_p[i] *= target_p[i];
+    }
+}
+
+
+double
+sum(const double* target_p, size_t length)
+{
+    double result = 0;
+    for (int i = 0; i < length; i++)
+    {
+        result += target_p[i];
+    }
+    return result;
+}
+
+
+double
+gradient_check_nonsequential(BaseNetwork& network)
+{
+    int insize = network.insize();
+    int outsize = network.outsize();
+    
+    // Build up an appropriate input.
+    double* input_p = new double[insize];
+    double* target_p = new double[outsize];
+    const double* result_p;
+    double* error_p = new double[outsize];
+    fill_random(input_p, insize);
+    fill_random(target_p, outsize);
+    
+    double epsilon = 0.0000001;
+    double biggest = 0;
+
+    // The derivative as computed by the Parametrized object.
+    double param_deriv;
+    // The derivative as computed numerically.
+    double numeric_deriv;
+    
+    // Hold pointers to all Parametrized objects here to check them 
+    // sequentially.
+    std::vector<arac::structure::Parametrized*> params(network.parametrizeds());
+    std::vector<arac::structure::Parametrized*>::iterator param_iter;
+    std::vector<arac::structure::networks::BaseNetwork*>::iterator net_iter;
+    for (net_iter = network.networks().begin();
+         net_iter != network.networks().end();
+         net_iter++)
+    {
+        for (param_iter = (*net_iter)->parametrizeds().begin();
+             param_iter != (*net_iter)->parametrizeds().end();
+             param_iter++)
+        {
+            params.push_back((*param_iter));
+        }
+    }
+    
+    // Now iterate over all parametrized objects in order to play with every 
+    // parameter to check derivative correctness.
+    for (param_iter = params.begin();
+         param_iter != params.end();
+         param_iter++)
+    {
+        Parametrized& parametrized = **param_iter;
+        for (int i = 0; i < parametrized.size(); i++)
+        {
+            // First calculate analytical derivative.
+            double& param = parametrized.get_parameters()[i];
+            network.clear();
+            network.clear_derivatives();
+            result_p = network.activate(input_p);
+            
+            addscale(target_p, result_p, error_p, outsize, -1);
+            
+            network.back_activate(error_p);
+            param_deriv = parametrized.get_derivatives()[i];
+            
+            // Calculate point behind the target.
+            network.clear();
+            network.clear_derivatives();
+            numeric_deriv = 0;
+            param += epsilon;
+            
+            result_p = network.activate(input_p);
+            addscale(target_p, result_p, error_p, outsize, -1);
+            square(error_p, outsize);
+            numeric_deriv += sum(error_p, outsize);
+
+            // Calculate before the target.
+            network.clear();
+            network.clear_derivatives();
+            param -= 2 * epsilon;
+
+            result_p = network.activate(input_p);
+            addscale(target_p, result_p, error_p, outsize, -1);
+            square(error_p, outsize);
+            numeric_deriv += sum(error_p, outsize);
+            
+            biggest = numeric_deriv > biggest ? numeric_deriv : biggest;
+            param += epsilon;
+        }
+    }
+    
+    return biggest;
+}
+
+
+double
+gradient_check(BaseNetwork& network)
+{
+    // TODO: alternative for sequential/non-sequential
+    return gradient_check_nonsequential(network);
+}
 
 
 } } // Namespace

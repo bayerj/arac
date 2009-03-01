@@ -8,6 +8,7 @@
 #include "../structure/networks/networks.h"
 #include "../datasets/datasets.h"
 
+
 namespace arac {
 namespace utilities {
 
@@ -28,6 +29,15 @@ print_activations(arac::structure::networks::Network& net,
 void block_permutation(std::vector<int>& perm, 
                        std::vector<int>& sequence_shape,
                        std::vector<int>& block_shape);
+
+
+void fill_random(double* sink_p, int length);
+
+
+double
+gradient_check(arac::structure::networks::BaseNetwork& network);
+
+
 
 
 } } // Namespace
