@@ -74,7 +74,7 @@ class StepDescender : public Descender
         /// Set the momentum.
         ///
         void set_momentum(const double value);
-        
+        void set_stepratio(double stepratio);
         
     private:
         
@@ -84,7 +84,6 @@ class StepDescender : public Descender
         double _momentum;
         double* _updates_p;
         int _n_params;
-        
 };
 
 
@@ -120,7 +119,6 @@ StepDescender::set_momentum(const double value)
 }
 
 
-    
 } } } // Namespace.
 
 
