@@ -1379,7 +1379,7 @@ TEST(TestNetwork, TestTwoLayerNetwork) {
         }
     }
     
-    EXPECT_GT(0.01, gradient_check(*net_p));
+    EXPECT_GT(0.0001, gradient_check(*net_p));
 }
  
         
@@ -1444,7 +1444,7 @@ TEST(TestNetwork, TestRecurrentLayerNetwork) {
     EXPECT_DOUBLE_EQ(-5, net_p->inerror()[0][1])
         << "Error not returned correctly.";
         
-    EXPECT_GT(0.01, gradient_check(*net_p));
+    EXPECT_GT(0.0001, gradient_check(*net_p));
 }
         
         
@@ -1618,7 +1618,7 @@ TEST(TestNetwork, TestLinearMdrnn)
     EXPECT_DOUBLE_EQ(net.inerror()[0][3], inerror_p[3])
         << "back_activate copy not correct.";
         
-    EXPECT_GT(0.01, gradient_check(net));
+    EXPECT_GT(0.0001, gradient_check(net));
 }
 
 
