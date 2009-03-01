@@ -35,13 +35,24 @@ void block_permutation(std::vector<int>& perm,
 /// Fill the sink with random values from the interval [-interval, interval]. 
 /// interval defaults to 0.01.
 ///
-
 void fill_random(double* sink_p, int length, double interval = 0.01);
 
 
+///
+/// Perform a numerical gradient check on a network. The returned value is the
+/// biggest difference between an analytical and a numerical gradient.
+///
 double
 gradient_check(arac::structure::networks::BaseNetwork& network);
 
+
+///
+/// Recursively walk a BaseNetwork topology and push all encountered 
+/// Parametrized objects to the end of a vector.
+///
+void
+parametrized_by_network(std::vector<arac::structure::Parametrized*>& params, 
+                        arac::structure::networks::BaseNetwork& net);
 
 
 

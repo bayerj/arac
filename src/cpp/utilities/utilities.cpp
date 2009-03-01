@@ -222,6 +222,28 @@ sum(const double* target_p, size_t length)
 }
 
 
+void
+parametrized_by_network(std::vector<Parametrized*>& params, BaseNetwork& net)
+{
+    std::vector<BaseNetwork*>::iterator net_iter;
+    
+    for (net_iter = net.networks().begin();
+         net_iter != net.networks().end();
+         net_iter++)
+    {
+        parametrized_by_network(params, **net_iter);
+    }
+
+    std::vector<Parametrized*>::iterator param_iter;
+    for (param_iter = net.parametrizeds().begin();
+         param_iter != net.parametrizeds().end();
+         param_iter++)
+    {
+        params.push_back(*param_iter);
+    }
+}
+
+
 double
 gradient_check_nonsequential(BaseNetwork& network)
 {
@@ -246,21 +268,10 @@ gradient_check_nonsequential(BaseNetwork& network)
     
     // Hold pointers to all Parametrized objects here to check them 
     // sequentially.
-    std::vector<arac::structure::Parametrized*> params(network.parametrizeds());
+    std::vector<Parametrized*> params;
+    parametrized_by_network(params, network);
+
     std::vector<arac::structure::Parametrized*>::iterator param_iter;
-    std::vector<arac::structure::networks::BaseNetwork*>::iterator net_iter;
-    for (net_iter = network.networks().begin();
-         net_iter != network.networks().end();
-         net_iter++)
-    {
-        for (param_iter = (*net_iter)->parametrizeds().begin();
-             param_iter != (*net_iter)->parametrizeds().end();
-             param_iter++)
-        {
-            params.push_back((*param_iter));
-        }
-    }
-    
     // Now iterate over all parametrized objects in order to play with every 
     // parameter to check derivative correctness.
     for (param_iter = params.begin();
