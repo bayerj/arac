@@ -233,8 +233,8 @@ gradient_check_nonsequential(BaseNetwork& network)
     double* target_p = new double[outsize];
     const double* result_p;
     double* error_p = new double[outsize];
-    fill_random(input_p, insize);
-    fill_random(target_p, outsize);
+    fill_random(input_p, insize, 0.5);
+    fill_random(target_p, outsize, 0.5);
     
     double epsilon = 0.0000001;
     double biggest = 0;
@@ -300,7 +300,7 @@ gradient_check_nonsequential(BaseNetwork& network)
             result_p = network.activate(input_p);
             addscale(target_p, result_p, error_p, outsize, -1);
             square(error_p, outsize);
-            numeric_deriv += sum(error_p, outsize);
+            numeric_deriv -= sum(error_p, outsize);
             
             biggest = numeric_deriv > biggest ? numeric_deriv : biggest;
             param += epsilon;
