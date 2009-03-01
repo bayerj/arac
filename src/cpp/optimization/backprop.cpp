@@ -49,7 +49,6 @@ SemiSequentialBackprop::~SemiSequentialBackprop() {}
 void
 SemiSequentialBackprop::process_sample(Sequence input, double* target_p)
 {
-    network().clear();
     memset(_output_p, 0, sizeof(double) * dataset().targetsize());
 
     // Process the sequence and sum the outputs.
@@ -87,7 +86,6 @@ SequentialBackprop::~SequentialBackprop() {}
 void 
 SequentialBackprop::process_sample(Sequence input, Sequence target)
 {
-    network().clear();
     // Process the sequence and save the outputs.
     for (int i = 0; i < input.length(); i++)
     {

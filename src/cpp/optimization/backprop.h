@@ -195,6 +195,7 @@ Backprop<SampleType, TargetType>::train_stochastic()
     
     SampleType sample = dataset()[index].first;
     TargetType target = dataset()[index].second;
+    network().clear();
     network().clear_derivatives();
     this->process_sample(sample, target);
     learn();
