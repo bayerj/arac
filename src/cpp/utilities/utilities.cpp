@@ -177,14 +177,14 @@ void block_permutation(std::vector<int>& perm,
 }                      
 
 
-void fill_random(double* sink_p, int length)
+void fill_random(double* sink_p, int length, double interval)
 {
     srand(time(NULL));
     for(int i = 0; i < length; i++)
     {
         double value = RAND_MAX - RAND_MAX / 2;
         value /= rand();
-        sink_p[i] = value * 0.01;
+        sink_p[i] = value * interval;
     }
 }
 
