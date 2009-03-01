@@ -14,6 +14,7 @@ import scipy
 
 import arac.pybrainbridge as pybrainbridge
 
+
 from arac.tests.common import TestCase
 
 from pybrain.structure import (
@@ -35,10 +36,10 @@ from pybrain.structure import (
     BorderSwipingNetwork
 )
 
+from pybrain.tests.helpers import gradientCheck
+
 
 scipy.random.seed(0)
-
-
 
 
 class NetworkTestCase(TestCase):
@@ -84,6 +85,8 @@ class NetworkTestCase(TestCase):
             self.assertArrayNear(pybrain_res, arac_res)
             if hasattr(_net, '_derivs'):
                 self.assertArrayNear(_net.derivs, net.derivs)
+                
+        self.assert_(gradientCheck(_net))
                         
     def equivalence_feed_forward(self, net, _net):
         self.sync(net, _net)
@@ -98,6 +101,8 @@ class NetworkTestCase(TestCase):
             self.assertArrayNear(pybrain_res, arac_res)
             if hasattr(_net, '_derivs'):
                 self.assertArrayNear(_net.derivs, net.derivs)
+
+        self.assert_(gradientCheck(_net))
 
 
 class TestNetworkEquivalence(NetworkTestCase):
