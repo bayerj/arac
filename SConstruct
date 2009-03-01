@@ -7,7 +7,7 @@ TARGET = '/usr/local'
 
 LIBPATH = ['/usr/lib', '.', '/usr/local/lib', '/sw/lib']
 CPPPATH = ['/usr/local/include', '/sw/include', '/usr/include']
-CCFLAGS = ['-g', '-Wall', '-O3']
+CCFLAGS = ['-g', '-O3']
 
 PYTHONPATH = [distutils.sysconfig.get_python_inc()]
 NUMPYPATH = numpy.distutils.misc_util.get_numpy_include_dirs()
@@ -21,6 +21,7 @@ library_globs = ['src/cpp/*.cpp',
                  'src/cpp/utilities/*.cpp', 
                  'src/cpp/datasets/*.cpp', 
                  'src/cpp/optimization/*.cpp', 
+                 'src/cpp/optimization/descent/*.cpp', 
                  'src/cpp/structure/*.cpp',  
                  'src/cpp/structure/connections/*.cpp',  
                  'src/cpp/structure/modules/*.cpp',  

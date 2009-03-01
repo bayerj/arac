@@ -11,6 +11,7 @@ using namespace arac::structure::connections;
 using namespace arac::structure::networks;
 using namespace arac::datasets;
 using namespace arac::optimization;
+using namespace arac::optimization::descent;
 
 
 TEST(TestBackprop, TestStochasticStepDoubleDouble)
@@ -131,6 +132,34 @@ TEST(TestBackprop, TestStochasticStepSequenceSequence)
 
     EXPECT_DOUBLE_EQ(4, con_p->get_parameters()[0])
         << "Parameters not learned correctly.";
+}
+
+
+TEST(TestDescent, TestStepDescent)
+{
+    double params_p[5] = {1, 2, 3, 4, 5};
+    double derivs_p[5] = {-1, -2, -3, -4, -5};
+    Parametrized p(5, params_p, derivs_p);
+    
+    StepDescender d(p, 0.5);
+    
+    d.notify();
+    
+    double solution_p[5] = {0.5, 1, 1.5, 2, 2.5};
+    for (int i = 0; i < 5; i++)
+    {
+        EXPECT_EQ(solution_p[i], params_p[i])
+            << "Wrong update at " << i;
+    }
+
+    d.notify();
+    
+    double solution2_p[5] = {0, 0, 0, 0, 0};
+    for (int i = 0; i < 5; i++)
+    {
+        EXPECT_EQ(solution2_p[i], params_p[i])
+            << "Wrong update at " << i;
+    }
 }
 
      
