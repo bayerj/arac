@@ -150,14 +150,12 @@ void FullConnection::_backward()
                 // Incrementer.
                 1);   
 
-
     double* derivs_p = get_derivatives();
     for (int i = 0; i < outdim; i++)
     {
         for (int j = 0; j < indim; j++)
         {
-            *derivs_p += outerror_p[i] * input_p[j];
-            derivs_p++;
+            derivs_p[i * indim + j] += outerror_p[i] * input_p[j];
         }
     }
 }
