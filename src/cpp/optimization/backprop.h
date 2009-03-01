@@ -10,12 +10,16 @@
 
 #include "../structure/networks/network.h"
 #include "../datasets/datasets.h"
+#include "descent/stepdescender.h"
+#include "descent/descender.h"
 
 
 using arac::structure::networks::BaseNetwork;
 using arac::structure::Parametrized;
 using arac::datasets::SupervisedDataset;
 using arac::datasets::Sequence;
+using arac::optimization::descent::Descender;
+using arac::optimization::descent::StepDescender;
 
 
 namespace arac {
@@ -59,16 +63,26 @@ class Backprop
         /// Return a reference to the dataset of the optimizer.
         ///
         DatasetType& dataset();
-        
+
         ///
         /// Return the learningrate of the trainer.
         ///
-        const double& learningrate();
-        
+        double learningrate();
+       
         ///
         /// Set the learningrate of the trainer.
         ///
-        void set_learningrate(const double value);
+        void set_learningrate(const double value);        
+
+        ///
+        /// Return the momentum of the trainer.
+        ///
+        double momentum();
+       
+        ///
+        /// Set the momentum of the trainer.
+        ///
+        void set_momentum(const double value);        
 
         ///
         /// Return a pointer to the last error.
@@ -92,11 +106,6 @@ class Backprop
         void learn();
 
         ///
-        /// Adapt the parameters of the network according to its derivatives.
-        ///
-        void learn(BaseNetwork& network_p);
-
-        ///
         /// Network to be optimized optimizer.
         ///
         BaseNetwork& _network;
@@ -107,9 +116,10 @@ class Backprop
         DatasetType& _dataset;
         
         ///
-        /// The learning rate of the optimizer.
+        /// Descender object that is used to follow the gradient.
         ///
-        double _learningrate;
+        // TODO: this should be of the abstract Descender class.
+        StepDescender _descender;
         
         ///
         /// The last error during process_sample.
@@ -128,10 +138,10 @@ class Backprop
 
 template<typename SampleType, typename TargetType>
 Backprop<SampleType, TargetType>::Backprop(BaseNetwork& network, 
-                                            DatasetType& dataset) :
+                                           DatasetType& dataset) :
     _network(network),
     _dataset(dataset),
-    _learningrate(0.001)
+    _descender(network, 0.005)
 {
     _network.sort();
     assert(_network.insize() == _dataset.samplesize());
@@ -162,20 +172,36 @@ Backprop<SampleType, TargetType>::dataset()
     return _dataset;
 }
  
- 
+
 template<typename SampleType, typename TargetType>
-const double&
+double
 Backprop<SampleType, TargetType>::learningrate()
 {
-    return _learningrate;
+    return _descender.stepratio();
 }
- 
- 
+
+
 template<typename SampleType, typename TargetType>
 void
 Backprop<SampleType, TargetType>::set_learningrate(const double value)
 {
-    _learningrate = value;
+    _descender.set_stepratio(value);
+}
+
+
+template<typename SampleType, typename TargetType>
+double
+Backprop<SampleType, TargetType>::momentum()
+{
+    return _descender.momentum();
+}
+
+
+template<typename SampleType, typename TargetType>
+void
+Backprop<SampleType, TargetType>::set_momentum(const double value)
+{
+    _descender.set_momentum(value);
 }
 
 
@@ -206,33 +232,7 @@ template<typename SampleType, typename TargetType>
 void 
 Backprop<SampleType, TargetType>::learn()
 {
-    learn(network());
-    std::vector<BaseNetwork*>::iterator net_iter;
-    for (net_iter = network().networks().begin();
-         net_iter != network().networks().end();
-         net_iter++)
-    {
-        learn(**net_iter);
-    }
-}
-
-
-template<typename SampleType, typename TargetType>
-void 
-Backprop<SampleType, TargetType>::learn(BaseNetwork& network)
-{
-    std::vector<Parametrized*>::const_iterator param_iter;
-    for (param_iter = network.parametrizeds().begin();
-         param_iter != network.parametrizeds().end();
-         param_iter++)
-    {
-        double* params_p = (*param_iter)->get_parameters();
-        double* derivs_p = (*param_iter)->get_derivatives();
-        for (int i = 0; i < (*param_iter)->size(); i++)
-        {
-            params_p[i] += _learningrate * derivs_p[i];
-        }
-    }
+    _descender.notify();
 }
 
 

@@ -32,13 +32,15 @@ class StepDescender : public Descender
         /// contained Network and Parametrized objects.
         ///
         StepDescender(arac::structure::networks::BaseNetwork& net, 
-                      double stepratio);
+                      double stepratio,
+                      double momentum=0.0);
         
         ///
         /// Create a Descender object that watches a Parametrized object.
         ///
         StepDescender(arac::structure::Parametrized& parametrized,
-                  double stepratio);
+                      double stepratio,
+                      double momentum=0.0);
         
         ///
         /// Destroy the Descender object.
@@ -60,12 +62,28 @@ class StepDescender : public Descender
         ///
         /// Set the current stepratio.
         ///
-        void set_stepratio(double stepratio);
+        void set_stepratio(const double stepratio);
+        
+        
+        /// 
+        /// Return the momentum.
+        ///
+        double momentum();
+
+        ///
+        /// Set the momentum.
+        ///
+        void set_momentum(const double value);
         
         
     private:
         
+        void init_updatehistory();
+        
         double _stepratio;
+        double _momentum;
+        double* _updates_p;
+        int _n_params;
         
 };
 
@@ -76,6 +94,31 @@ StepDescender::stepratio()
 {
     return _stepratio;
 }
+
+
+inline
+void
+StepDescender::set_stepratio(const double stepratio)
+{
+    _stepratio = stepratio;
+}
+
+
+inline
+double
+StepDescender::momentum()
+{
+    return _momentum;
+}
+
+
+inline
+void
+StepDescender::set_momentum(const double value)
+{
+    _momentum = value;
+}
+
 
     
 } } } // Namespace.

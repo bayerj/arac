@@ -162,6 +162,24 @@ TEST(TestDescent, TestStepDescent)
     }
 }
 
+TEST(TestDescent, TestStepDescentMomentum)
+{
+    double params_p[1] = {0};
+    double derivs_p[1] = {1};
+    Parametrized p(1, params_p, derivs_p);
+    
+    StepDescender d(p, 0.5, 0.5);
+    
+    d.notify();
+    
+    EXPECT_EQ(0.5, params_p[0]) << "Wrong update at first step.";
+
+    derivs_p[0] = 2;
+    d.notify();
+    
+    EXPECT_EQ(1.75, params_p[0]) << "Wrong update at second step.";
+}
+
      
 // TODO: write a test for contained networks.
         
