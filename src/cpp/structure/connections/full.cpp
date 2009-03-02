@@ -53,16 +53,6 @@ FullConnection::FullConnection(Module* incoming_p, Module* outgoing_p,
             
 FullConnection::~FullConnection()
 {
-    if (parameters_owner())
-    {
-        delete _parameters_p;
-        _parameters_p = 0;
-    }
-    if (derivatives_owner())
-    {
-        delete _derivatives_p;
-        _derivatives_p = 0;
-    }
 }
 
 
