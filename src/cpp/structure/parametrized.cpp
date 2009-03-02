@@ -7,6 +7,7 @@
 
 
 #include "parametrized.h"
+#include "../utilities/utilities.h"
 
 
 using arac::structure::Parametrized;
@@ -118,10 +119,5 @@ Parametrized::clear_derivatives()
 void
 Parametrized::randomize(double interval)
 {
-    for(int i = 0; i < size(); i++)
-    {
-        double param = RAND_MAX - RAND_MAX / 2;
-        param /= rand();
-        get_parameters()[i] = param;
-    }
+    arac::utilities::fill_random(get_parameters(), size(), 0.01);
 }
