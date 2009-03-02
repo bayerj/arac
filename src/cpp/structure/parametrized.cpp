@@ -21,7 +21,9 @@ Parametrized::Parametrized() :
 }
 
 
-Parametrized::Parametrized(int size) 
+Parametrized::Parametrized(int size) :
+_parameters_owner(true),
+_derivatives_owner(true)
 {
     _size = size;
     _parameters_p = new double[size];
@@ -48,11 +50,11 @@ _derivatives_owner(false)
 Parametrized::~Parametrized() {
     if (parameters_owner())
     {
-        delete _parameters_p;
+        delete[] _parameters_p;
     }
     if (derivatives_owner())
     {
-        delete _derivatives_p;
+        delete[] _derivatives_p;
     }
 }
 
@@ -83,7 +85,7 @@ Parametrized::set_parameters(double* parameters_p)
 {
     if (parameters_owner())
     {
-        delete _parameters_p;
+        delete[] _parameters_p;
     }
     _parameters_p = parameters_p;
     _parameters_owner = false;
@@ -102,7 +104,7 @@ Parametrized::set_derivatives(double* derivatives_p)
 {
     if (derivatives_owner())
     {
-        delete _derivatives_p;
+        delete[] _derivatives_p;
     }
     _derivatives_p = derivatives_p;
     _derivatives_owner = false;
