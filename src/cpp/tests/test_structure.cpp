@@ -1859,5 +1859,6 @@ TEST(TestNetworkSorting, RegressionWeightBlockPermute)
 
 
 // TODO: Add a recurrency test fort WeightShareConnection.
+// TODO: Add deep recurrency tests for other connections.
         
 }  // namespace
