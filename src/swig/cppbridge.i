@@ -681,6 +681,25 @@ class LinearMdrnn : public BaseMdrnn
         int get_block_shape(int dim);
 };
 
+
+%feature("notabstract") MdlstmMdrnn;
+class MdlstmMdrnn : public BaseMdrnn
+{
+    public:
+         MdlstmMdrnn(int timedim, int hiddensize);
+        ~MdlstmMdrnn();
+        
+        // TODO: remove this; sorting should be implicit, but does not work for
+        // mdrnns somehow.
+        virtual void sort();
+        
+        void set_sequence_shape(int dim, int val);
+        int get_sequence_shape(int dim);
+        int sequencelength();
+        void set_block_shape(int dim, int val);
+        int get_block_shape(int dim);
+};
+
         
 %apply (double* INPLACE_ARRAY1, int DIM1) {(double* sample_p, int samplelength), 
                                            (double* target_p, int targetlength)};
@@ -837,11 +856,15 @@ class SimpleBackprop
         virtual ~SimpleBackprop();
     
         void train_stochastic();    
+        
+        double learningrate();
         void set_learningrate(const double value);
+        
+        double momentum();
+        void set_momentum(const double value);
         
         BaseNetwork& network();
         SupervisedSimpleDataset& dataset();
-        
 };
 
 
@@ -864,7 +887,12 @@ class SemiSequentialBackprop
         ~SemiSequentialBackprop();
     
         void train_stochastic();    
+        
+        double learningrate();
         void set_learningrate(const double value);
+        
+        double momentum();
+        void set_momentum(const double value);
         
         BaseNetwork& network();
         SupervisedSemiSequentialDataset& dataset();
@@ -888,7 +916,12 @@ class SequentialBackprop
         ~SequentialBackprop();
     
         void train_stochastic();
+        
+        double learningrate();
         void set_learningrate(const double value);
+        
+        double momentum();
+        void set_momentum(const double value);
         
         BaseNetwork& network();
         SupervisedSequentialDataset& dataset();
