@@ -10,7 +10,7 @@
 using arac::common::Buffer;
 
 
-Buffer::Buffer(int rowsize, bool owner) : 
+Buffer::Buffer(size_t rowsize, bool owner) : 
     _rowsize(rowsize), 
     _owner(owner)
 {
@@ -27,7 +27,7 @@ Buffer::~Buffer()
 void Buffer::add(double* addend_p, int index)
 {
     double* current_p = index == -1 ? _content.back() : _content[index];
-    for(int i = 0; i < _rowsize; i++)
+    for(size_t i = 0; i < _rowsize; i++)
     {
         current_p[i] += addend_p[i];
     }
@@ -48,7 +48,7 @@ void Buffer::expand()
 
 void Buffer::clear()
 {
-    for(int i = 0; i < size(); i++)
+    for(size_t i = 0; i < size(); i++)
     {
         clear_at(i);
     }
@@ -56,7 +56,7 @@ void Buffer::clear()
 
 // TODO: write a test for this
 void
-Buffer::clear_at(int index)
+Buffer::clear_at(size_t index)
 {
     memset((void*) _content[index], 0, sizeof(double) * _rowsize);
 }
@@ -74,7 +74,3 @@ void Buffer::free_memory()
     }
     _content.clear();
 }
-
-
-
-        

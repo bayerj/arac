@@ -28,7 +28,7 @@ class Buffer
 {
     public:
         
-        Buffer(int rowsize, bool owner=true);
+        Buffer(size_t rowsize, bool owner=true);
         virtual ~Buffer();
         
         ///
@@ -50,7 +50,7 @@ class Buffer
         ///
         /// Set all the contents of a specific row to zero.
         ///
-        void clear_at(int index);
+        void clear_at(size_t index);
 
         ///
         /// Free the memory held by the Buffer object. Do nothing if the buffer
@@ -77,22 +77,22 @@ class Buffer
         ///
         /// Return the size of a single row in the Buffer.
         ///
-        int rowsize();
+        size_t rowsize();
         
         ///
         /// Set the size of a single row.
         ///
-        void set_rowsize(int value);
+        void set_rowsize(size_t value);
         
         ///
         /// Return the number of rows in the buffer.
         ///
-        int size();
+        size_t size();
 
         ///
         /// Return a pointer to the row at the given index.
         ///
-        double* operator [](int index);
+        double* operator [](size_t index);
         
     protected:
         
@@ -100,14 +100,14 @@ class Buffer
         /// Vector that holds the pointer to the rows.
         ///
         DoublePtrVec _content;
-        int _rowsize;
+        size_t _rowsize;
         bool _owner;
     
 };
 
 
 inline 
-int
+size_t
 Buffer::rowsize()
 {
     return _rowsize;
@@ -116,14 +116,14 @@ Buffer::rowsize()
 
 inline 
 void
-Buffer::set_rowsize(int value)
+Buffer::set_rowsize(size_t value)
 {
     _rowsize = value;
 }
 
 
 inline
-int 
+size_t 
 Buffer::size()
 {
     return _content.size();
@@ -132,7 +132,7 @@ Buffer::size()
     
 inline
 double*
-Buffer::operator[] (int index)
+Buffer::operator[] (size_t index)
 {
     return _content[index];
 }
