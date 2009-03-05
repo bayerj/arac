@@ -32,7 +32,7 @@ FullConnection::FullConnection(Module* incoming_p, Module* outgoing_p,
     Connection(incoming_p, outgoing_p, 
                incomingstart, incomingstop, 
                outgoingstart, outgoingstop),
-    Parametrized(incoming_p->outsize() * outgoing_p->insize())
+    Parametrized((incomingstop - incomingstart) * (outgoingstop - outgoingstart))
 {
     
 }
