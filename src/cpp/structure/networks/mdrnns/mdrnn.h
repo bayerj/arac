@@ -98,6 +98,8 @@ class Mdrnn : public BaseMdrnn
         ///
         void init_module();
         
+        module_type& module();
+        
         // FIXME: This should be done with integers!
         void next_coords(double* coords);
         void coords_by_index(double* coords_p, int index);
@@ -139,7 +141,6 @@ class Mdrnn : public BaseMdrnn
         ConPtrVectorVector _connections;
         
         void init_con_vectors();
-        
 };
 
 
@@ -216,6 +217,15 @@ int
 Mdrnn<module_type>::blocksize()
 {
     return _blocksize;
+}
+
+
+template <class module_type>
+inline
+module_type&
+Mdrnn<module_type>::module()
+{
+    return *_module_p;
 }
 
 
