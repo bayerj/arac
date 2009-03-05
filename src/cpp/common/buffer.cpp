@@ -54,7 +54,7 @@ void Buffer::clear()
     }
 }
 
-// TODO: write a test for this
+
 void
 Buffer::clear_at(size_t index)
 {
