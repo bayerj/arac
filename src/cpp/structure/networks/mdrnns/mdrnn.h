@@ -556,7 +556,7 @@ Mdrnn<module_type>::_backward()
     for(int i = 0; i < sequencelength(); i++)
     {
         memcpy(inerror()[timestep() - 1] + i * blocksize(), 
-               _module_p->outerror()[i], 
+               _module_p->inerror()[i], 
                blocksize() * sizeof(double));
     }
 }
