@@ -7,6 +7,7 @@
 
 
 #include <iostream>
+#include <cstdlib>
 
 #include "../structure/networks/network.h"
 #include "../datasets/datasets.h"
