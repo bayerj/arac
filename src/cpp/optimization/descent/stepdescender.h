@@ -75,7 +75,6 @@ class StepDescender : public Descender
         ///
         void set_momentum(const double value);
         
-        
     private:
         
         void init_updatehistory();
@@ -84,7 +83,6 @@ class StepDescender : public Descender
         double _momentum;
         double* _updates_p;
         int _n_params;
-        
 };
 
 
@@ -120,7 +118,6 @@ StepDescender::set_momentum(const double value)
 }
 
 
-    
 } } } // Namespace.
 
 
