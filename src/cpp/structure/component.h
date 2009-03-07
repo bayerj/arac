@@ -136,6 +136,8 @@ class Component
         /// subclasses.
         /// 
         virtual void _backward() = 0;
+
+    private:
         
         int _timestep;
         int _sequencelength;

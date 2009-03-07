@@ -100,26 +100,26 @@ MdlstmLayer::_forward()
     double (*output_squasher) (double) = tanh_;
     
     // Split the whole input into the right chunks
-    double* inputbuffer_p = input()[_timestep];
+    double* inputbuffer_p = input()[timestep()];
     int i = 0;
     for (int j = 0; j < size; j++, i++)
     {
-        input_gate_unsquashed()[_timestep][j] = inputbuffer_p[i];
+        input_gate_unsquashed()[timestep()][j] = inputbuffer_p[i];
     }
 
     for (int j = 0; j < size * _timedim; j++, i++)
     {
-        forget_gate_unsquashed()[_timestep][j] = inputbuffer_p[i];
+        forget_gate_unsquashed()[timestep()][j] = inputbuffer_p[i];
     }
     
     for (int j = 0; j < size; j++, i++)
     {
-        input_squashed()[_timestep][j] = cell_squasher(inputbuffer_p[i]);
+        input_squashed()[timestep()][j] = cell_squasher(inputbuffer_p[i]);
     }
 
     for (int j = 0; j < size; j++, i++)
     {
-        output_gate_unsquashed()[_timestep][j] = inputbuffer_p[i];
+        output_gate_unsquashed()[timestep()][j] = inputbuffer_p[i];
     }
     
     for (int j = 0; j < size * _timedim ; j++, i++)

@@ -139,7 +139,7 @@ inline
 bool 
 Module::last_timestep()
 {
-    return (_timestep == _input_p->size());
+    return (timestep() == _input_p->size());
 }
 
 
