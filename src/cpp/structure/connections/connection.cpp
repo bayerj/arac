@@ -41,15 +41,16 @@ Connection::~Connection()
 void
 Connection::_forward()
 {
-    if (timestep() - get_recurrent() < 0)
-    {
-        return;
-    }
-
-    // In the case of recurrent connections, all modules have already been 
+    // In the case of recurrent connections, all modules have already been
     // forwarded and thus have equal timesteps. In the case of non-recurrent
     // connections, we have to subtract one from the incoming modules timestep.
     int decr = get_recurrent() ? 0 : 1;
+
+    if ((timestep() - get_recurrent() < 0) ||
+        (_incoming_p->timestep() - decr - get_recurrent() < 0))
+    {
+        return;
+    }
 
     double* sink_p = _outgoing_p->input()[_outgoing_p->timestep()] + _outgoingstart;
     double* source_p = _incoming_p->output()[_incoming_p->timestep() - decr - get_recurrent()];
