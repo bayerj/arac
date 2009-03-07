@@ -51,11 +51,9 @@ class WeightShareConnection : public Connection, public Parametrized
         virtual void forward_process(double* sink_p, const double* source_p);
         virtual void backward_process(double* sink_p, const double* source_p);
 
-        FullConnection _con;
         int _n_chunks;
         int _inchunk;
         int _outchunk;
-        
 };    
     
 }

@@ -4,6 +4,12 @@
 
 #include <iostream>
 
+extern "C"
+{
+    #include "cblas.h"
+}
+
+
 #include "weightshare.h"
 
 
@@ -17,7 +23,6 @@ WeightShareConnection::WeightShareConnection(Module* incoming_p, Module* outgoin
                                              int inchunk, int outchunk) :
     Connection(incoming_p, outgoing_p),
     Parametrized(inchunk * outchunk),
-    _con(incoming_p, outgoing_p, 0, inchunk, 0, outchunk),
     _inchunk(inchunk),
     _outchunk(outchunk)
 {
@@ -35,23 +40,35 @@ WeightShareConnection::~WeightShareConnection()
 }
 
 
-
 void
 WeightShareConnection::forward_process(double* sink_p, const double* source_p)
 {
-    // This has to be done everytime, since it might change in the meantime. An
-    // alternative would be to make get_parameters/get_derivatives virtual, but
-    // that'd probably hit performance.
-    _con.set_parameters(get_parameters());
-    _con.set_derivatives(get_derivatives());
-    
     for (int i = 0; i < _n_chunks; i++)
     {
-        _con.set_incomingstart(i * _inchunk);
-        _con.set_incomingstop((i + 1) * _inchunk);
-        _con.set_outgoingstart(i * _outchunk);
-        _con.set_outgoingstop((i + 1) * _outchunk);
-        _con.forward();
+        cblas_dgemv(
+                CblasRowMajor, 
+                // Do not transpose the matrix since we want to multiply from 
+                // the right
+                CblasNoTrans,
+                // Dimensions of the matrix
+                _outchunk,        
+                _inchunk,
+                // Scalar for the matrix
+                1.0,                    
+                // Pointer to the matrix
+                get_parameters(),    
+                // Dimension of the vector
+                _inchunk,
+                // Pointer to the vector
+                source_p + (i * _inchunk),
+                // Some incrementer.
+                1,                      
+                // Scalar of the target vector
+                1.0,                    
+                // Pointer to the target vector
+                sink_p + (i * _outchunk),
+                // Incrementer.
+                1);   
     }
 }
 
@@ -59,16 +76,45 @@ WeightShareConnection::forward_process(double* sink_p, const double* source_p)
 void
 WeightShareConnection::backward_process(double* sink_p, const double* source_p)
 {
-    // See _forward for explanation.
-    _con.set_parameters(get_parameters());
-    _con.set_derivatives(get_derivatives());
+    int indim = _incomingstop - _incomingstart;
+    int outdim = _outgoingstop - _outgoingstart;
     
+    double* input_p = _incoming_p->output()[timestep() - 1] \
+                      + _incomingstart;
+    double* derivs_p = get_derivatives();
+
     for (int i = 0; i < _n_chunks; i++)
     {
-        _con.set_incomingstart(i * _inchunk);
-        _con.set_incomingstop((i + 1) * _inchunk);
-        _con.set_outgoingstart(i * _outchunk);
-        _con.set_outgoingstop((i + 1) * _outchunk);
-        _con.backward();
+        cblas_dgemv(CblasColMajor, 
+                // Do not transpose the matrix since we want to multiply from 
+                // the right
+                CblasNoTrans,
+                // Dimensions of the matrix
+                _inchunk,        
+                _outchunk,
+                // Scalar for the matrix
+                1.0,                    
+                // Pointer to the matrix
+                get_parameters(),    
+                // Dimension of the vector
+                _inchunk,
+                // Pointer to the vector
+                source_p + (i * _outchunk),
+                // Some incrementer.
+                1,                      
+                // Scalar of the target vector
+                1.0,                    
+                // Pointer to the target vector
+                sink_p + (i * _inchunk),
+                // Incrementer.
+                1);   
+
+      for (int j = 0; j < _outchunk; j++)
+      {
+          for (int k = 0; k < _inchunk; k++)
+          {
+              derivs_p[j * _inchunk + k] += source_p[i * _outchunk + j] * input_p[i * _inchunk + k];
+          }
+      }
     }
 }
