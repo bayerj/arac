@@ -53,6 +53,9 @@ Connection::_forward()
 
     double* sink_p = _outgoing_p->input()[_outgoing_p->timestep()] + _outgoingstart;
     double* source_p = _incoming_p->output()[_incoming_p->timestep() - decr - get_recurrent()];
+    assert(source_p != 0);
+    assert(sink_p != 0);
+
     source_p += _incomingstart;
 
     forward_process(sink_p, source_p);
