@@ -56,19 +56,11 @@ FullConnection::~FullConnection()
 }
 
 
-void FullConnection::_forward()
+void
+FullConnection::forward_process(double* sink_p, const double* source_p)
 {
-    if (timestep() - get_recurrent() < 0)
-    {
-        return;
-    }
-
     int indim = _incomingstop - _incomingstart;
     int outdim = _outgoingstop - _outgoingstart;
-
-    double* sink_p = _outgoing_p->input()[timestep()] + _outgoingstart;
-    double* source_p = _incoming_p->output()[timestep() - get_recurrent()];
-    source_p += _incomingstart;
 
     cblas_dgemv(CblasRowMajor, 
                 // Do not transpose the matrix since we want to multiply from 
@@ -96,24 +88,12 @@ void FullConnection::_forward()
 }
 
 
-void FullConnection::_backward()
+void FullConnection::backward_process(double* sink_p, const double* source_p)
 {
-    int this_timestep = timestep() - 1;
-    if (this_timestep + get_recurrent() > sequencelength())
-    {
-        return;
-    }
-    
     int indim = _incomingstop - _incomingstart;
     int outdim = _outgoingstop - _outgoingstart;
     
-    double* inerror_p = _incoming_p->outerror()[this_timestep] \
-                        + _incomingstart;
-    
-    double* outerror_p = _outgoing_p->inerror()[this_timestep + get_recurrent()] \
-                          + _outgoingstart;
-                          
-    double* input_p = _incoming_p->output()[this_timestep] \
+    double* input_p = _incoming_p->output()[timestep() - 1] \
                       + _incomingstart;
 
     cblas_dgemv(CblasColMajor, 
@@ -130,13 +110,13 @@ void FullConnection::_backward()
                 // Dimension of the vector
                 indim,
                 // Pointer to the vector
-                outerror_p,
+                source_p,
                 // Some incrementer.
                 1,                      
                 // Scalar of the target vector
                 1.0,                    
                 // Pointer to the target vector
-                inerror_p,
+                sink_p,
                 // Incrementer.
                 1);   
 
@@ -145,7 +125,7 @@ void FullConnection::_backward()
     {
         for (int j = 0; j < indim; j++)
         {
-            derivs_p[i * indim + j] += outerror_p[i] * input_p[j];
+            derivs_p[i * indim + j] += source_p[i] * input_p[j];
         }
     }
 }

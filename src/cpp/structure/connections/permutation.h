@@ -54,8 +54,8 @@ class PermutationConnection : public Connection
     protected:
         std::vector<int> _permutation;
         
-        virtual void _forward();
-        virtual void _backward();
+        void forward_process(double* sink_p, const double* source_p);
+        void backward_process(double* sink_p, const double* source_p);
 };    
 
 

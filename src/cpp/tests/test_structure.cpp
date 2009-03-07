@@ -728,8 +728,8 @@ TEST(TestConnections, RecurrentIdentityConnection) {
     inlayer_p->input()[0][0] = 2.;
     inlayer_p->input()[0][1] = 3.;
     
-    inlayer_p->forward();
     con_p->forward();
+    inlayer_p->forward();
     outlayer_p->forward();
     
     EXPECT_DOUBLE_EQ(0, outlayer_p->output()[0][0])
@@ -742,8 +742,8 @@ TEST(TestConnections, RecurrentIdentityConnection) {
     inlayer_p->input()[0][0] = 0.5;
     inlayer_p->input()[0][1] = 3.2;
     
-    inlayer_p->forward();
     con_p->forward();
+    inlayer_p->forward();
     outlayer_p->forward();
     
     EXPECT_DOUBLE_EQ(2, outlayer_p->output()[1][0])
@@ -756,8 +756,8 @@ TEST(TestConnections, RecurrentIdentityConnection) {
     outlayer_p->outerror()[1][0] = 0.5;
     outlayer_p->outerror()[1][1] = 1.2;
 
-    outlayer_p->backward();
     con_p->backward();
+    outlayer_p->backward();
     inlayer_p->backward();
     
     EXPECT_DOUBLE_EQ(0, inlayer_p->outerror()[1][0])
@@ -768,8 +768,8 @@ TEST(TestConnections, RecurrentIdentityConnection) {
     outlayer_p->outerror()[0][0] = 2.3;
     outlayer_p->outerror()[0][1] = 1.8;
 
-    outlayer_p->backward();
     con_p->backward();
+    outlayer_p->backward();
     inlayer_p->backward();
     
     EXPECT_DOUBLE_EQ(0.5, inlayer_p->outerror()[0][0])
@@ -987,8 +987,8 @@ TEST(TestConnections, RecurrentFullConnection) {
     inlayer_p->input()[0][0] = 2.;
     inlayer_p->input()[0][1] = 3.;
     
-    inlayer_p->forward();
     con_p->forward();
+    inlayer_p->forward();
     outlayer_p->forward();
     
     EXPECT_DOUBLE_EQ(0, outlayer_p->input()[0][0])
@@ -1002,8 +1002,8 @@ TEST(TestConnections, RecurrentFullConnection) {
     inlayer_p->input()[1][0] = 0.5;
     inlayer_p->input()[1][1] = 3.2;
     
-    inlayer_p->forward();
     con_p->forward();
+    inlayer_p->forward();
     outlayer_p->forward();
     
     EXPECT_DOUBLE_EQ(3, outlayer_p->output()[1][0])
@@ -1019,8 +1019,8 @@ TEST(TestConnections, RecurrentFullConnection) {
     outlayer_p->outerror()[1][1] = 1.2;
     outlayer_p->outerror()[1][2] = 3.4;
 
-    outlayer_p->backward();
     con_p->backward();
+    outlayer_p->backward();
     inlayer_p->backward();
     
     EXPECT_DOUBLE_EQ(0, inlayer_p->outerror()[1][0])
@@ -1045,8 +1045,8 @@ TEST(TestConnections, RecurrentFullConnection) {
     outlayer_p->outerror()[0][1] = 1.8;
     outlayer_p->outerror()[0][1] = 1.2;
 
-    outlayer_p->backward();
     con_p->backward();
+    outlayer_p->backward();
     inlayer_p->backward();
     
     EXPECT_DOUBLE_EQ(1, con_p->get_derivatives()[0])
@@ -1092,8 +1092,8 @@ TEST(TestConnections, DeepRecurrentFullConnection) {
     inlayer_p->input()[0][0] = 2.;
     inlayer_p->input()[0][1] = 3.;
     
-    inlayer_p->forward();
     con_p->forward();
+    inlayer_p->forward();
     outlayer_p->forward();
 
     EXPECT_DOUBLE_EQ(0, outlayer_p->input()[0][0])
@@ -1109,8 +1109,8 @@ TEST(TestConnections, DeepRecurrentFullConnection) {
     inlayer_p->input()[1][0] = 0.;
     inlayer_p->input()[1][1] = 0.;
     
-    inlayer_p->forward();
     con_p->forward();
+    inlayer_p->forward();
     outlayer_p->forward();
 
     EXPECT_DOUBLE_EQ(0, outlayer_p->input()[0][0])
@@ -1125,8 +1125,8 @@ TEST(TestConnections, DeepRecurrentFullConnection) {
     inlayer_p->input()[2][0] = 0;
     inlayer_p->input()[2][1] = 0;
     
-    inlayer_p->forward();
     con_p->forward();
+    inlayer_p->forward();
     outlayer_p->forward();
     
     EXPECT_DOUBLE_EQ(3, outlayer_p->output()[2][0])
@@ -1143,8 +1143,8 @@ TEST(TestConnections, DeepRecurrentFullConnection) {
     outlayer_p->outerror()[2][1] = 1.2;
     outlayer_p->outerror()[2][2] = 3.4;
 
-    outlayer_p->backward();
     con_p->backward();
+    outlayer_p->backward();
     inlayer_p->backward();
 
     EXPECT_DOUBLE_EQ(0.5, outlayer_p->inerror()[2][0])
@@ -1171,16 +1171,16 @@ TEST(TestConnections, DeepRecurrentFullConnection) {
         << "Backward pass not working.";
     EXPECT_DOUBLE_EQ(0, con_p->get_derivatives()[5])
         << "Backward pass not working.";
-
     
+
     // SECOND STEP BACKWARDS
     
     outlayer_p->outerror()[1][0] = -1;
     outlayer_p->outerror()[1][1] = -1;
     outlayer_p->outerror()[1][2] = -1;
 
-    outlayer_p->backward();
     con_p->backward();
+    outlayer_p->backward();
     inlayer_p->backward();
     
     EXPECT_DOUBLE_EQ(0, inlayer_p->outerror()[1][0])
@@ -1208,8 +1208,8 @@ TEST(TestConnections, DeepRecurrentFullConnection) {
     outlayer_p->outerror()[0][1] = -1;
     outlayer_p->outerror()[0][1] = -1;
 
-    outlayer_p->backward();
     con_p->backward();
+    outlayer_p->backward();
     inlayer_p->backward();
     
     EXPECT_DOUBLE_EQ(0, inlayer_p->outerror()[2][0])
@@ -1662,11 +1662,12 @@ TEST(TestConnections, TestPermutationConnection)
     PermutationConnection* con_p = \
         new PermutationConnection(inlayer_p, outlayer_p, perm);
         
-    inlayer_p->output()[0][0] = 0;
-    inlayer_p->output()[0][1] = 1;
-    inlayer_p->output()[0][2] = 2;
-    inlayer_p->output()[0][3] = 3;
-    inlayer_p->output()[0][4] = 4;
+    inlayer_p->input()[0][0] = 0;
+    inlayer_p->input()[0][1] = 1;
+    inlayer_p->input()[0][2] = 2;
+    inlayer_p->input()[0][3] = 3;
+    inlayer_p->input()[0][4] = 4;
+    inlayer_p->forward();
     
     con_p->forward();
     
@@ -1675,12 +1676,16 @@ TEST(TestConnections, TestPermutationConnection)
     EXPECT_EQ(outlayer_p->input()[0][2], 0);
     EXPECT_EQ(outlayer_p->input()[0][3], 4);
     EXPECT_EQ(outlayer_p->input()[0][4], 3);
-    
+
+    outlayer_p->forward();
+
+    outlayer_p->inerror()[0][4] = -4;
     outlayer_p->inerror()[0][0] = 0;
     outlayer_p->inerror()[0][1] = -1;
     outlayer_p->inerror()[0][2] = -2;
     outlayer_p->inerror()[0][3] = -3;
-    outlayer_p->inerror()[0][4] = -4;
+
+    outlayer_p->backward();
 
     con_p->backward();
     
@@ -1772,11 +1777,13 @@ TEST(TestConnections, TestWeightShareConnection)
             
     con_p->set_parameters(params_p);
     
-    inlayer_p->output()[0][0] = 2;
-    inlayer_p->output()[0][1] = 3;
-    inlayer_p->output()[0][2] = 6;
-    
+    inlayer_p->input()[0][0] = 2;
+    inlayer_p->input()[0][1] = 3;
+    inlayer_p->input()[0][2] = 6;
+
+    inlayer_p->forward();
     con_p->forward();
+    outlayer_p->forward();
     
     double solution_p[15] = {2., 4., 6., 8., 10., 
                              3., 6., 9., 12., 15.,
@@ -1788,23 +1795,25 @@ TEST(TestConnections, TestWeightShareConnection)
             << "Wrong input for outlayer at " << i;
     }
     
-    outlayer_p->inerror()[0][0] = -1;
-    outlayer_p->inerror()[0][1] = -2;
-    outlayer_p->inerror()[0][2] = -3;
-    outlayer_p->inerror()[0][3] = -4;
-    outlayer_p->inerror()[0][4] = -5;
-    outlayer_p->inerror()[0][5] = -6;
-    outlayer_p->inerror()[0][6] = -7;
-    outlayer_p->inerror()[0][7] = -8;
-    outlayer_p->inerror()[0][8] = -9;
-    outlayer_p->inerror()[0][9] = -10;
-    outlayer_p->inerror()[0][10] = -11;
-    outlayer_p->inerror()[0][11] = -12;
-    outlayer_p->inerror()[0][12] = -13;
-    outlayer_p->inerror()[0][13] = -14;
-    outlayer_p->inerror()[0][14] = -15;
+    outlayer_p->outerror()[0][0] = -1;
+    outlayer_p->outerror()[0][1] = -2;
+    outlayer_p->outerror()[0][2] = -3;
+    outlayer_p->outerror()[0][3] = -4;
+    outlayer_p->outerror()[0][4] = -5;
+    outlayer_p->outerror()[0][5] = -6;
+    outlayer_p->outerror()[0][6] = -7;
+    outlayer_p->outerror()[0][7] = -8;
+    outlayer_p->outerror()[0][8] = -9;
+    outlayer_p->outerror()[0][9] = -10;
+    outlayer_p->outerror()[0][10] = -11;
+    outlayer_p->outerror()[0][11] = -12;
+    outlayer_p->outerror()[0][12] = -13;
+    outlayer_p->outerror()[0][13] = -14;
+    outlayer_p->outerror()[0][14] = -15;
 
+    outlayer_p->backward();
     con_p->backward();
+    inlayer_p->backward();
     
     double backsolution_p[3] = {-55, -130, -205};
     for (int i = 0; i < 3; i++)

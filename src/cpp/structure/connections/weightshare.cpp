@@ -37,13 +37,8 @@ WeightShareConnection::~WeightShareConnection()
 
 
 void
-WeightShareConnection::_forward()
+WeightShareConnection::forward_process(double* sink_p, const double* source_p)
 {
-    if (timestep() - get_recurrent() < 0)
-    {
-        return;
-    }
-
     // This has to be done everytime, since it might change in the meantime. An
     // alternative would be to make get_parameters/get_derivatives virtual, but
     // that'd probably hit performance.
@@ -62,14 +57,8 @@ WeightShareConnection::_forward()
 
 
 void
-WeightShareConnection::_backward()
+WeightShareConnection::backward_process(double* sink_p, const double* source_p)
 {
-    int this_timestep = timestep() - 1;
-    if (this_timestep + get_recurrent() > sequencelength())
-    {
-        return;
-    }
-    
     // See _forward for explanation.
     _con.set_parameters(get_parameters());
     _con.set_derivatives(get_derivatives());

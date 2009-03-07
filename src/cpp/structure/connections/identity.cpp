@@ -38,19 +38,10 @@ IdentityConnection::~IdentityConnection()
 
 
 void
-IdentityConnection::_forward()
+IdentityConnection::forward_process(double* sink_p, const double* source_p)
 {
-    if (timestep() - get_recurrent() < 0)
-    {
-        return;
-    }
-
     int indim = _incomingstop - _incomingstart;
     int outdim = _outgoingstop - _outgoingstart;
-
-    double* sink_p = _outgoing_p->input()[timestep()] + _outgoingstart;
-    double* source_p = _incoming_p->output()[timestep() - get_recurrent()];
-    source_p += _incomingstart;
     
     int size = (_incomingstop - _incomingstart);
     for(int i = 0; i < size; i++)
@@ -61,21 +52,9 @@ IdentityConnection::_forward()
 
 
 void
-IdentityConnection::_backward()
+IdentityConnection::backward_process(double* sink_p, const double* source_p)
 {
-    int this_timestep = timestep() - 1;
-    if (this_timestep + get_recurrent() > sequencelength())
-    {
-        return;
-    }
-    
     int size = _incomingstop - _incomingstart;
-    double* sink_p = incoming()->outerror()[this_timestep] \
-                        + _incomingstart;
-    
-    double* source_p = outgoing()->inerror()[this_timestep + get_recurrent()] \
-                          + _outgoingstart;
-                          
     for(int i = 0; i < size; i++)
     {
         sink_p[i] += source_p[i];

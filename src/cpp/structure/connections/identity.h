@@ -45,8 +45,8 @@ class IdentityConnection : public Connection
     
     protected:
         
-        virtual void _forward();
-        virtual void _backward();
+        virtual void forward_process(double* sink_p, const double* source_p);
+        virtual void backward_process(double* sink_p, const double* source_p);
 };
 
 

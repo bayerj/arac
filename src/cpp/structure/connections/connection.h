@@ -105,6 +105,12 @@ class Connection : public arac::structure::Component
         Module* outgoing();
         
     protected:
+    
+        void _forward();
+        void _backward();
+
+        virtual void forward_process(double* sink_p, const double* source_p) = 0;
+        virtual void backward_process(double* sink_p, const double* source_p) = 0;
         
         Module* _incoming_p;
         Module* _outgoing_p;

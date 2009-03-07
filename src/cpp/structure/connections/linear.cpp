@@ -61,18 +61,10 @@ LinearConnection::~LinearConnection()
 }
 
 
-void LinearConnection::_forward()
+void LinearConnection::forward_process(double* sink_p, const double* source_p)
 {
-    if (timestep() - get_recurrent() < 0)
-    {
-        return;
-    }
-    
     double* weights_p = get_parameters();
-    double* source_p = incoming()->output()[timestep()] + get_incomingstart();
-    double* sink_p = outgoing()->input()[timestep()] + get_outgoingstart();
     int size = get_outgoingstop() - get_outgoingstart();
-    
     for(int i = 0; i < size; i++)
     {
         sink_p[i] += source_p[i] * weights_p[i];
@@ -80,32 +72,22 @@ void LinearConnection::_forward()
 }
 
 
-void LinearConnection::_backward()
+void LinearConnection::backward_process(double* sink_p, const double* source_p)
 {
-    int this_timestep = timestep() - 1;
-    if (this_timestep + get_recurrent() > sequencelength())
-    {
-        return;
-    }
-    
     double* weights_p = get_parameters();
-    double* outerror_p = \
-        outgoing()->inerror()[this_timestep] + get_outgoingstart();
-    double* inerror_p = \
-        incoming()->outerror()[this_timestep] + get_incomingstart();
     double* input_p = \
-        _incoming_p->output()[this_timestep] + _incomingstart;
+        _incoming_p->output()[timestep() - 1] + _incomingstart;
 
     int size = get_outgoingstop() - get_outgoingstart();
 
     for (int i = 0; i < size; i++)
     {
-        inerror_p[i] += weights_p[i] * outerror_p[i];
+        sink_p[i] += weights_p[i] * source_p[i];
     }
 
     double* derivs_p = get_derivatives();
     for (int i = 0; i < size; i++)
     {
-        derivs_p[i] += outerror_p[i] * input_p[i];
+        derivs_p[i] += source_p[i] * input_p[i];
     }
 }

@@ -55,41 +55,28 @@ PermutationConnection::invert()
 
 
 void
-PermutationConnection::_forward()
+PermutationConnection::forward_process(double* sink_p, const double* source_p)
 {
-    if (timestep() - get_recurrent() < 0)
-    {
-        return;
-    }
-
     std::vector<int>::const_iterator intiter;
     int i;
     for (intiter = permutation().begin(), i = 0; 
          intiter != permutation().end();
          intiter++, i++)
     {
-        outgoing()->input()[timestep()][*intiter] += \
-            incoming()->output()[timestep()][i];
+        sink_p[*intiter] += source_p[i];
     }
 }
 
 
 void
-PermutationConnection::_backward()
+PermutationConnection::backward_process(double* sink_p, const double* source_p)
 {
-    int this_timestep = timestep() - 1;
-    if (this_timestep + get_recurrent() > sequencelength())
-    {
-        return;
-    }
-
     std::vector<int>::const_iterator intiter;
     int i;
     for (intiter = permutation().begin(), i = 0; 
          intiter != permutation().end();
          intiter++, i++)
     {
-        incoming()->outerror()[this_timestep][i] += \
-            outgoing()->inerror()[this_timestep][*intiter];
+        sink_p[i] += source_p[*intiter];
     }
 }
