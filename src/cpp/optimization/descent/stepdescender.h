@@ -74,7 +74,6 @@ class StepDescender : public Descender
         /// Set the momentum.
         ///
         void set_momentum(const double value);
-        void set_stepratio(double stepratio);
         
     private:
         

@@ -2,11 +2,8 @@
 // (c) 2008 by Justin S Bayer, <bayer.justin@googlemail.com>
 
 
-<<<<<<< HEAD:src/cpp/optimization/descent/stepdescender.cpp
 #include <cstring>
 
-=======
->>>>>>> 8d8d0cd... Added Descender and StepDescender class for performing gradient descent.:src/cpp/optimization/descent/stepdescender.cpp
 #include "stepdescender.h"
 
 
