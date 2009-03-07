@@ -4,6 +4,7 @@ a.out
 *.os
 *.pyc
 *.so
+*.swp
 .cproject
 .dist
 .DS_Store
