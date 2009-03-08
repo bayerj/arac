@@ -103,8 +103,6 @@ class Mdrnn : public BaseMdrnn
         ///
         void delete_structure();
         
-        module_type& module();
-        
         // FIXME: This should be done with integers!
         void next_coords(double* coords);
         void coords_by_index(double* coords_p, int index);
