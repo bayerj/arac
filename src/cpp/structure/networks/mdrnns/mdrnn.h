@@ -603,19 +603,6 @@ Mdrnn<module_type>::_backward()
         double* source_p = _inmodule_p->inerror()[0];
         memcpy(sink_p, source_p, blocksize() * sizeof(double));
     }
-<<<<<<< HEAD:src/cpp/structure/networks/mdrnns/mdrnn.h
-
-=======
-    
-    // Copy the output to the mdrnns outputbuffer.
-    // TODO: save memory by not copying but referencing.
-    for(int i = 0; i < sequencelength(); i++)
-    {
-        memcpy(inerror()[timestep() - 1] + i * blocksize(), 
-               _module_p->inerror()[i], 
-               blocksize() * sizeof(double));
-    }
->>>>>>> f58b97b4d11a9b945a851b37024fe847d3bc47b2:src/cpp/structure/networks/mdrnns/mdrnn.h
 }
 
 
