@@ -162,6 +162,7 @@ TEST(TestDescent, TestStepDescent)
     }
 }
 
+
 TEST(TestDescent, TestStepDescentMomentum)
 {
     double params_p[1] = {0};
