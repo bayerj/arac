@@ -17,37 +17,66 @@ using namespace arac::structure::modules;
 
 template <>
 void
-Mdrnn<LinearLayer>::init_module()
+Mdrnn<LinearLayer>::init_structure()
 {
+    _inmodule_p = new LinearLayer(blocksize());
+
     _module_p = new LinearLayer(_hiddensize);
     _module_p->set_mode(Component::Sequential);
+
+    _feedcon_p = new IdentityConnection(_inmodule_p, _module_p, 
+                                      0, blocksize(), 0, blocksize());
+    _feedcon_p->set_mode(Component::Sequential);
 }
 
 
 template <>
 void
-Mdrnn<TanhLayer>::init_module()
+Mdrnn<TanhLayer>::init_structure()
 {
+    _inmodule_p = new LinearLayer(blocksize());
+    
     _module_p = new TanhLayer(_hiddensize);
     _module_p->set_mode(Component::Sequential);
+    
+    _feedcon_p = new IdentityConnection(_inmodule_p, _module_p, 
+                                      0, blocksize(), 0, blocksize());
+    _feedcon_p->set_mode(Component::Sequential);
 }
 
 
 template <>
 void
-Mdrnn<SigmoidLayer>::init_module()
+Mdrnn<SigmoidLayer>::init_structure()
 {
+    _inmodule_p = new LinearLayer(blocksize());
+
     _module_p = new SigmoidLayer(_hiddensize);
     _module_p->set_mode(Component::Sequential);
+
+    _feedcon_p = new IdentityConnection(_inmodule_p, _module_p,
+                                      0, blocksize(), 0, blocksize());
+    _feedcon_p->set_mode(Component::Sequential);
 }
 
 
 template <>
 void
-Mdrnn<MdlstmLayer>::init_module()
+Mdrnn<MdlstmLayer>::init_structure()
 {
+    _inmodule_p = new LinearLayer(blocksize());
+
     _module_p = new MdlstmLayer(_timedim, _hiddensize);
     _module_p->set_mode(Component::Sequential);
+    // Use a FullConnection pointer first so it can be appended to the 
+    // parametrizeds vector.
+    FullConnection* feedcon_p = \
+        new FullConnection(_inmodule_p, _module_p, 
+                           0, blocksize(),
+                           0, (3 + _timedim) * _hiddensize);
+    feedcon_p->set_mode(Component::Sequential);
+    _parametrizeds.push_back(feedcon_p);
+    _feedcon_p = feedcon_p;
 }
 
 
@@ -60,7 +89,7 @@ Mdrnn<MdlstmLayer>::sort()
     update_sizes();
 
     delete_structure();
-    init_module();
+    init_structure();
     init_con_vectors();
     
     // Also clear the parametrized vector.

@@ -96,20 +96,18 @@ class Mdrnn : public BaseMdrnn
         ///
         /// Create the hidden module.
         ///
-        void init_module();
+        void init_structure();
         
-        module_type& module();
+        ///
+        /// Free the memory held by internal structure.
+        ///
+        void delete_structure();
         
         // FIXME: This should be done with integers!
         void next_coords(double* coords);
         void coords_by_index(double* coords_p, int index);
         void index_by_coords(int& index, double* coords_p);
         void update_sizes();
-        
-        ///
-        /// Free the memory held by internal structure.
-        ///
-        void delete_structure();
         
         int _hiddensize;
         
@@ -127,8 +125,28 @@ class Mdrnn : public BaseMdrnn
         ///
         int* _multiplied_sizes_p;
         
-        module_type* _module_p;
+        ///
+        /// Mdrnn Objects are constructed as follows. The ordinary data/error
+        /// buffers are used. Internally, a new input layer is connected to a
+        /// mesh of modules which are connected with each other recurrently. 
+        ///
+        // TODO: make this description better.
+        // TODO: write getter/setter
+        arac::structure::modules::LinearLayer* _inmodule_p; 
+        module_type* _module_p; 
         arac::structure::modules::Bias _bias;
+        
+        ///
+        /// The Connection object pointed at is supposed to connect _inmodule_p 
+        /// with _module_p. It feeds the input into the main module.
+        /// 
+        // TODO: write getter/setter
+        arac::structure::connections::Connection* _feedcon_p;           
+
+        ///
+        /// Return a reference to the held object of module_type.
+        ///
+        module_type& module();
         
         ///
         /// Vector of vectors which is used to store the connections along the
@@ -285,7 +303,9 @@ template <class module_type>
 Mdrnn<module_type>::Mdrnn(int timedim, int hiddensize) :
     BaseMdrnn(timedim),
     _hiddensize(hiddensize),
-    _module_p(0)
+    _inmodule_p(0),
+    _module_p(0),
+    _feedcon_p(0)
 {
     _sequence_shape_p = new int[_timedim];
     _block_shape_p = new int[_timedim];
@@ -317,6 +337,16 @@ Mdrnn<module_type>::delete_structure()
     if (_module_p != 0)
     {
         delete _module_p;
+    }
+    
+    if (_inmodule_p != 0)
+    {
+        delete _inmodule_p;
+    }
+    
+    if (_feedcon_p != 0)
+    {
+        delete _feedcon_p;
     }
     
     ConPtrVectorVector::iterator con_vec_iter;
@@ -393,19 +423,22 @@ Mdrnn<module_type>::sort()
     update_sizes();
     
     delete_structure();
-    init_module();
+    init_structure();
     init_con_vectors();
 
     // Clear the parametrized vector.
     _parametrizeds.clear();
 
-    // Initialize recurrent self connections.
+    // Initialize recurrent self connections. We will keep a recurrency counter
+    // and update it to resemble the sequence structure.
     int recurrency = 1;
     for(int i = 0; i < _timedim; i++)
     {
         FullConnection* con_p = new FullConnection(_module_p, _module_p);
         con_p->set_mode(Component::Sequential);
         con_p->set_recurrent(recurrency);
+        // Multiply with the current blocks-per-dimension so that each 
+        // connections jumps over one dimension.
         recurrency *= _sequence_shape_p[i] / _block_shape_p[i];
         _connections[i].push_back(con_p);
         _parametrizeds.push_back(con_p);
@@ -431,6 +464,8 @@ Mdrnn<module_type>::clear()
     BaseMdrnn::clear();
     _bias.clear();
     _module_p->clear();
+    _inmodule_p->clear();
+    _feedcon_p->clear();
     ConPtrVectorVector::iterator con_vec_iter;
     ConPtrVector::iterator con_iter;
     for (con_vec_iter = _connections.begin();
@@ -468,7 +503,7 @@ Mdrnn<module_type>::_forward()
     // We keep the coordinates of the current block in here.
     double* coords_p = new double[_timedim];
     memset(coords_p, 0, sizeof(double) * _timedim);
-    // TODO: save memory by not copying but referencing.
+
     for(int i = 0; i < sequencelength(); i++)
     {
         ConPtrVectorVector::iterator con_vec_iter;
@@ -495,8 +530,11 @@ Mdrnn<module_type>::_forward()
                 }
             }
         }
-        
-        _module_p->add_to_input(input()[timestep()] + blocksize() * i);
+        _inmodule_p->clear();
+        _inmodule_p->add_to_input(input()[timestep()] + i * blocksize());
+        _inmodule_p->forward();
+        _feedcon_p->forward();
+
         _module_p->forward();
         next_coords(coords_p);
     }
@@ -533,9 +571,9 @@ Mdrnn<module_type>::_backward()
                  con_iter != con_vec_iter->end();
                  con_iter++)
             {
-                // If the current coordinate is zero, we are at a border of the 
-                // input in that dimension. In that case, the connections may not be
-                // forwarded, since we don't want to look around corners.
+                // If the current coordinate is zero, we are at a border of the
+                // input in that dimension. In that case, the connections may
+                // not be forwarded, since we don't want to look around corners.
                 if ((j < _timedim) && (coords_p[j] == 0))
                 {
                     (*con_iter)->dry_backward();
@@ -546,19 +584,24 @@ Mdrnn<module_type>::_backward()
                 }
             }
         }
-        _module_p->add_to_outerror(outerror()[timestep() - 1] + i);
+        _inmodule_p->clear();
+        // These modules are non-sequential. Thus we have to assure that they
+        // are always in the state it would be in if it had just been forwarded.
+        _inmodule_p->dry_forward();
+        _bias.dry_forward();
+
+        _module_p->add_to_outerror(outerror()[timestep() - 1] + i * _hiddensize);
         _module_p->backward();
+        _feedcon_p->backward();
+
+        _inmodule_p->backward();
         next_coords(coords_p);
+        // TODO: save memory by not copying but referencing.
+        double* sink_p = inerror()[timestep() - 1] + i * blocksize();
+        double* source_p = _inmodule_p->inerror()[0];
+        memcpy(sink_p, source_p, blocksize() * sizeof(double));
     }
-    
-    // Copy the output to the mdrnns outputbuffer.
-    // TODO: save memory by not copying but referencing.
-    for(int i = 0; i < sequencelength(); i++)
-    {
-        memcpy(inerror()[timestep() - 1] + i * blocksize(), 
-               _module_p->inerror()[i], 
-               blocksize() * sizeof(double));
-    }
+
 }
 
 

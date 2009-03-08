@@ -66,20 +66,25 @@ Connection::_forward()
 void
 Connection::_backward()
 {
+    // Analoguous to decr in the forward pass.
+    int incr = get_recurrent() ? 0 : 1;
 
-    int this_timestep = timestep() - 1;
-    if (this_timestep + get_recurrent() > sequencelength())
+    if ((timestep() - 1 + get_recurrent() > sequencelength()) ||
+        (outgoing()->timestep() - 1 + incr + get_recurrent() > sequencelength()))
     {
         return;
     }
-    
-    double* sink_p = incoming()->outerror()[this_timestep] \
-                     + _incomingstart;
-    
-    double* source_p = outgoing()->inerror()[this_timestep + get_recurrent()] \
-                       + _outgoingstart;
 
-    
+    int sinkidx = incoming()->timestep() - 1;
+    double* sink_p = incoming()->outerror()[sinkidx];
+    assert(sink_p != 0);
+    sink_p += _incomingstart;
+
+    int srcidx = outgoing()->timestep() - 1 + incr + get_recurrent();
+    double* source_p = outgoing()->inerror()[srcidx];
+    assert(source_p != 0);
+    source_p += _outgoingstart;
+
     backward_process(sink_p, source_p);
 }
 
