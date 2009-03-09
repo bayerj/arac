@@ -93,7 +93,7 @@ void FullConnection::backward_process(double* sink_p, const double* source_p)
     int indim = _incomingstop - _incomingstart;
     int outdim = _outgoingstop - _outgoingstart;
     
-    double* input_p = _incoming_p->output()[timestep() - 1] \
+    double* input_p = _incoming_p->output()[incoming()->timestep() - 1] \
                       + _incomingstart;
 
     cblas_dgemv(CblasColMajor, 
