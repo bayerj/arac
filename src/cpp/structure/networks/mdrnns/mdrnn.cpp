@@ -24,9 +24,12 @@ Mdrnn<LinearLayer>::init_structure()
     _module_p = new LinearLayer(_hiddensize);
     _module_p->set_mode(Component::Sequential);
 
-    _feedcon_p = new IdentityConnection(_inmodule_p, _module_p, 
-                                      0, blocksize(), 0, blocksize());
-    _feedcon_p->set_mode(Component::Sequential);
+    FullConnection* feedcon_p = \
+        new FullConnection(_inmodule_p, _module_p, 
+                           0, blocksize(),
+                           0, _hiddensize);
+    feedcon_p->set_mode(Component::Sequential);
+    _feedcon_p = feedcon_p;
 }
 
 
@@ -35,13 +38,16 @@ void
 Mdrnn<TanhLayer>::init_structure()
 {
     _inmodule_p = new LinearLayer(blocksize());
-    
+
     _module_p = new TanhLayer(_hiddensize);
     _module_p->set_mode(Component::Sequential);
-    
-    _feedcon_p = new IdentityConnection(_inmodule_p, _module_p, 
-                                      0, blocksize(), 0, blocksize());
-    _feedcon_p->set_mode(Component::Sequential);
+
+    FullConnection* feedcon_p = \
+        new FullConnection(_inmodule_p, _module_p, 
+                           0, blocksize(),
+                           0, _hiddensize);
+    feedcon_p->set_mode(Component::Sequential);
+    _feedcon_p = feedcon_p;
 }
 
 
@@ -54,9 +60,12 @@ Mdrnn<SigmoidLayer>::init_structure()
     _module_p = new SigmoidLayer(_hiddensize);
     _module_p->set_mode(Component::Sequential);
 
-    _feedcon_p = new IdentityConnection(_inmodule_p, _module_p,
-                                      0, blocksize(), 0, blocksize());
-    _feedcon_p->set_mode(Component::Sequential);
+    FullConnection* feedcon_p = \
+        new FullConnection(_inmodule_p, _module_p, 
+                           0, blocksize(),
+                           0, _hiddensize);
+    feedcon_p->set_mode(Component::Sequential);
+    _feedcon_p = feedcon_p;
 }
 
 
@@ -94,6 +103,7 @@ Mdrnn<MdlstmLayer>::sort()
     
     // Also clear the parametrized vector.
     _parametrizeds.clear();
+    _parametrizeds.push_back(_feedcon_p);
     
     // Initialize recurrent self connections.
     int recurrency = 1;
@@ -127,6 +137,8 @@ Mdrnn<MdlstmLayer>::sort()
         icon_p->set_recurrent(recurrency);
         _connections[i].push_back(icon_p);
         
+        // Multiply with the current blocks-per-dimension so that each 
+        // connections jumps over one dimension.
         recurrency *= _sequence_shape_p[i] / _block_shape_p[i];
     }
 

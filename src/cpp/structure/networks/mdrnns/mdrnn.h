@@ -9,6 +9,7 @@
 #include <cassert>
 #include <iostream>
 #include <cstring>
+#include <stdio.h>
 
 #include "basemdrnn.h"
 #include "../../connections/connections.h"
@@ -89,6 +90,8 @@ class Mdrnn : public BaseMdrnn
         virtual void clear();
         virtual void clear_derivatives();
         
+        FullConnection& feedcon();
+        
     protected:
         
         void init_multiplied_sizes();
@@ -141,7 +144,7 @@ class Mdrnn : public BaseMdrnn
         /// with _module_p. It feeds the input into the main module.
         /// 
         // TODO: write getter/setter
-        arac::structure::connections::Connection* _feedcon_p;           
+        arac::structure::connections::FullConnection* _feedcon_p;           
 
         ///
         /// Return a reference to the held object of module_type.
@@ -244,6 +247,15 @@ module_type&
 Mdrnn<module_type>::module()
 {
     return *_module_p;
+}
+
+
+template <class module_type>
+inline
+FullConnection&
+Mdrnn<module_type>::feedcon()
+{
+    return *_feedcon_p;
 }
 
 
@@ -418,7 +430,8 @@ template <class module_type>
 void
 Mdrnn<module_type>::sort()
 {
-    // Initialize multilied sizes.
+    // Initialize all variables that are needed later: blocksizes, sequence
+    // shape etc.
     init_multiplied_sizes();
     update_sizes();
     
@@ -428,6 +441,7 @@ Mdrnn<module_type>::sort()
 
     // Clear the parametrized vector.
     _parametrizeds.clear();
+    _parametrizeds.push_back(_feedcon_p);
 
     // Initialize recurrent self connections. We will keep a recurrency counter
     // and update it to resemble the sequence structure.
@@ -500,6 +514,8 @@ template <class module_type>
 void
 Mdrnn<module_type>::_forward()
 {
+    std::cout << "Alive: " << __FILE__ << ":" << __LINE__ << std::endl;
+    std::cout.flush();
     // We keep the coordinates of the current block in here.
     double* coords_p = new double[_timedim];
     memset(coords_p, 0, sizeof(double) * _timedim);
@@ -540,13 +556,16 @@ Mdrnn<module_type>::_forward()
     }
     // Copy the output to the mdrnns outputbuffer.
     // TODO: save memory by not copying but referencing.
-    std::vector<double*>::iterator dblp_iter;
     for(int i = 0; i < sequencelength(); i++)
     {
         memcpy(output()[timestep()] + i * _hiddensize, 
                _module_p->output()[i], 
                _hiddensize * sizeof(double));
     }
+    delete[] coords_p;
+
+    std::cout << "Alive: " << __FILE__ << ":" << __LINE__ << std::endl;
+    std::cout.flush();
 }
 
 
@@ -554,6 +573,8 @@ template <class module_type>
 void
 Mdrnn<module_type>::_backward()
 {
+    std::cout << "Alive: " << __FILE__ << ":" << __LINE__ << std::endl;
+    std::cout.flush();
     // We keep the coordinates of the current block in here.
     double* coords_p = new double[_timedim];
     memset(coords_p, 0, sizeof(double) * _timedim);
@@ -601,6 +622,10 @@ Mdrnn<module_type>::_backward()
         double* source_p = _inmodule_p->inerror()[0];
         memcpy(sink_p, source_p, blocksize() * sizeof(double));
     }
+    std::cout << "Alive: " << __FILE__ << ":" << __LINE__ << std::endl;
+    std::cout.flush();
+
+    delete[] coords_p;
 }
 
 
