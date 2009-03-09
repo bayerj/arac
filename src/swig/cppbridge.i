@@ -37,7 +37,10 @@ PyObject* PyArray_1DFromDoublePointer(int dim, double* data_p)
     int* dims = new int[1];
     dims[0] = dim;
     // TODO: use python function that does not trigger a warning here.
-    return PyArray_FromDimsAndData(1, dims, PyArray_DOUBLE, (char*) data_p);
+    PyObject* res_p = PyArray_FromDimsAndData(1, dims, PyArray_DOUBLE, 
+                                              (char*) data_p);
+    delete[] dims;
+    return res_p;
 }
 
 
@@ -47,7 +50,10 @@ PyObject* PyArray_2DFromDoublePointer(int dim1, int dim2, double* data_p)
     dims[0] = dim1;
     dims[1] = dim2;
     // TODO: use python function that does not trigger a warning here.
-    return PyArray_FromDimsAndData(2, dims, PyArray_DOUBLE, (char*) data_p);
+    PyObject* res_p = PyArray_FromDimsAndData(2, dims, PyArray_DOUBLE, 
+                                              (char*) data_p);
+    delete[] dims;
+    return res_p; 
 }
 
 
@@ -870,9 +876,9 @@ class SimpleBackprop
 
 %extend SimpleBackprop
 {
-    PyObject* lasterror() 
+    PyObject* error() 
     {
-        return PyArray_1DFromDoublePointer($self->dataset().targetsize(), 
+        return PyArray_1DFromDoublePointer($self->network().outsize(), 
                                            $self->error());
     }
 }
