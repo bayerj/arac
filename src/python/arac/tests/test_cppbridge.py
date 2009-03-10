@@ -155,8 +155,11 @@ class TestStructure(TestCase):
         net.set_sequence_shape(1, 2)
         net.sort()
         
-        con1, con2, biascon = net.parametrizeds()
-        pars1, pars2 = con1.get_parameters(), con2.get_parameters()
+        feedcon, con1, con2, biascon = net.parametrizeds()
+        feedpars = feedcon.get_parameters()
+        pars1 = con1.get_parameters()
+        pars2 = con2.get_parameters()
+        feedpars[0] = 1
         pars1[0] = 0.5
         pars2[0] = 2.0
         
