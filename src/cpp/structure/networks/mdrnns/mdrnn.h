@@ -264,11 +264,9 @@ inline
 void
 Mdrnn<module_type>::next_coords(double* coords_p)
 {
-    int i;
-    int carry = 0;
-    for(i = 0; i < _timedim; i++)
+    for(int i = 0; i < _timedim; i++)
     {
-        if (coords_p[i] < _sequence_shape_p[i] - 1)
+        if (coords_p[i] < _sequence_shape_p[i] / _block_shape_p[i] - 1)
         {
             coords_p[i] += 1;
             break;
@@ -514,8 +512,6 @@ template <class module_type>
 void
 Mdrnn<module_type>::_forward()
 {
-    std::cout << "Alive: " << __FILE__ << ":" << __LINE__ << std::endl;
-    std::cout.flush();
     // We keep the coordinates of the current block in here.
     double* coords_p = new double[_timedim];
     memset(coords_p, 0, sizeof(double) * _timedim);
@@ -563,9 +559,6 @@ Mdrnn<module_type>::_forward()
                _hiddensize * sizeof(double));
     }
     delete[] coords_p;
-
-    std::cout << "Alive: " << __FILE__ << ":" << __LINE__ << std::endl;
-    std::cout.flush();
 }
 
 
@@ -573,8 +566,6 @@ template <class module_type>
 void
 Mdrnn<module_type>::_backward()
 {
-    std::cout << "Alive: " << __FILE__ << ":" << __LINE__ << std::endl;
-    std::cout.flush();
     // We keep the coordinates of the current block in here.
     double* coords_p = new double[_timedim];
     memset(coords_p, 0, sizeof(double) * _timedim);
@@ -622,8 +613,6 @@ Mdrnn<module_type>::_backward()
         double* source_p = _inmodule_p->inerror()[0];
         memcpy(sink_p, source_p, blocksize() * sizeof(double));
     }
-    std::cout << "Alive: " << __FILE__ << ":" << __LINE__ << std::endl;
-    std::cout.flush();
 
     delete[] coords_p;
 }
