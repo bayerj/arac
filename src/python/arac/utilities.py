@@ -11,6 +11,8 @@ __author__ = 'Justin S Bayer, bayer.justin@googlemail.com'
 
 import operator
 
+import scipy
+
 
 def block_permutation(shape, blockshape):
     # TODO: move tests to testsuite
@@ -45,6 +47,25 @@ def block_permutation(shape, blockshape):
         dims.append(this_coords)
     coords = zip(*dims)
     return sorted(range(product(shape)), key=lambda x: coords[x])
+
+
+def params_by_network(network):
+    params = []
+    for par in network.parametrizeds():
+        params.append(par.get_parameters())
+    for net in network.networks():
+        for par in net.parametrizeds():
+          params.append(par.get_parameters())
+    return params
+
+
+def num_params(network):
+    return sum(scipy.size(p) for p in params_by_network(network))
+
+
+def samples_and_targets(dataset):
+    return [(dataset.sample(i), dataset.target(i)) for i in
+            range(dataset.size())]
 
 
 if __name__ == '__main__':
