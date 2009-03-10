@@ -917,7 +917,8 @@ TEST(TestConnections, FullConnectionSliced) {
     inlayer_p->input()[0][0] = 2.;
     inlayer_p->input()[0][1] = 3.;
     
-    FullConnection* con_p = new FullConnection(inlayer_p, outlayer_p, 0, 1, 0, 4);
+    FullConnection* con_p = new FullConnection(inlayer_p, outlayer_p, 
+                                               0, 1, 0, 3);
     
     ASSERT_EQ(0, con_p->get_incomingstart())
         << "_incomingstart not initialized properly.";
@@ -925,7 +926,7 @@ TEST(TestConnections, FullConnectionSliced) {
         << "_incomingstop not initialized properly.";
     ASSERT_EQ(0, con_p->get_outgoingstart())
         << "_outgoingstart not initialized properly.";
-    ASSERT_EQ(4, con_p->get_outgoingstop())
+    ASSERT_EQ(3, con_p->get_outgoingstop())
         << "_ougoingstop not initialized properly.";
     
     con_p->get_parameters()[0] = -1;
@@ -1758,9 +1759,53 @@ TEST(TestConnections, TestBlockPermutationConnection)
     
     for (int i = 0; i < 16; i++)
     {
-        net.output()[0][i] = solution_p[i];
+      EXPECT_DOUBLE_EQ(solution_p[i], net.output()[0][i]);
     }
 }
+
+
+TEST(TestConnections, TestBlockPermutationConnectionInversion)
+{
+    std::vector<int> sequence_shape;
+    sequence_shape.push_back(16);
+    sequence_shape.push_back(16);
+    
+    std::vector<int> block_shape;
+    block_shape.push_back(4);
+    block_shape.push_back(2);
+
+    LinearLayer* inlayer_p = new LinearLayer(256);
+    LinearLayer* medlayer_p = new LinearLayer(256);
+    LinearLayer* outlayer_p = new LinearLayer(256);
+    BlockPermutationConnection* con1_p = new BlockPermutationConnection(
+        inlayer_p, medlayer_p, sequence_shape, block_shape);
+    BlockPermutationConnection* con2_p = new BlockPermutationConnection(
+        medlayer_p, outlayer_p, sequence_shape, block_shape);
+    con2_p->invert();
+
+    Network net;
+    net.add_module(inlayer_p, Network::InputModule);
+    net.add_module(medlayer_p);
+    net.add_module(outlayer_p, Network::OutputModule);
+    net.add_connection(con1_p);
+    net.add_connection(con2_p);
+        
+    double* input_p = new double[256];
+        
+    for (int i = 0; i < 256; i++) 
+    {
+        input_p[i] = i; 
+    }
+
+    net.activate(input_p);
+
+    
+    for (int i = 0; i < 16; i++)
+    {
+      EXPECT_DOUBLE_EQ(net.input()[0][i], net.output()[0][i]);
+    }
+}
+
 
 // TODO: Add recurrency test for BlockPermutationConnection.
 

@@ -109,14 +109,14 @@ Mdrnn<MdlstmLayer>::sort()
     int recurrency = 1;
     
     int full_con_instart = 0;
-    int full_con_instop = (3 + _timedim) * _hiddensize;
+    int full_con_instop = _hiddensize;
     int full_con_outstart = 0;
-    int full_con_outstop = _hiddensize;
+    int full_con_outstop = (3 + _timedim) * _hiddensize;
     
     int id_con_instart = full_con_instop;
-    int id_con_instop = _module_p->insize();
+    int id_con_instop = _module_p->outsize();
     int id_con_outstart = full_con_outstop;
-    int id_con_outstop = _module_p->outsize();
+    int id_con_outstop = _module_p->insize();
     
     for(int i = 0; i < _timedim; i++)
     {
@@ -145,7 +145,7 @@ Mdrnn<MdlstmLayer>::sort()
     // Add a connection from the bias.
     FullConnection* con_p = \
         new FullConnection(&_bias, _module_p, 
-                          full_con_instart, full_con_instop, 
+                          0, 1, 
                           full_con_outstart, full_con_outstop);
     _connections[_timedim].push_back(con_p);
     _parametrizeds.push_back(con_p);

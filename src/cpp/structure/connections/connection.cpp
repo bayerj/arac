@@ -16,7 +16,10 @@ Connection::Connection(Module* incoming_p, Module* outgoing_p,
     _outgoingstop(outgoingstop),
     _recurrent(false)
 {
-    
+    assert(_incomingstart <= incoming()->outsize());
+    assert(_incomingstop <= incoming()->outsize());
+    assert(_outgoingstart <= outgoing()->insize());
+    assert(_outgoingstop <= outgoing()->insize());
 }                
 
 Connection::Connection(Module* incoming_p, Module* outgoing_p) :
@@ -52,11 +55,12 @@ Connection::_forward()
         return;
     }
 
-    double* sink_p = _outgoing_p->input()[_outgoing_p->timestep()] + _outgoingstart;
+    double* sink_p = _outgoing_p->input()[_outgoing_p->timestep()];
+    assert(sink_p != 0);
+    sink_p += _outgoingstart;
+
     double* source_p = _incoming_p->output()[_incoming_p->timestep() - decr - get_recurrent()];
     assert(source_p != 0);
-    assert(sink_p != 0);
-
     source_p += _incomingstart;
 
     forward_process(sink_p, source_p);
