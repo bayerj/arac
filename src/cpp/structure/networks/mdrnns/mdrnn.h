@@ -108,8 +108,6 @@ class Mdrnn : public BaseMdrnn
         
         // FIXME: This should be done with integers!
         void next_coords(double* coords);
-        void coords_by_index(double* coords_p, int index);
-        void index_by_coords(int& index, double* coords_p);
         void update_sizes();
         
         int _hiddensize;
@@ -275,36 +273,6 @@ Mdrnn<module_type>::next_coords(double* coords_p)
         {
             coords_p[i] = 0;
         }
-    }
-}
-
-
-template <class module_type>
-inline
-void
-Mdrnn<module_type>::coords_by_index(double* coords_p, int index)
-{
-    int divisor = sequencelength() / blocksize();
-    for(int i = _timedim - 1; i <= 0; i--)
-    {
-        divisor /= _sequence_shape_p[i] / _block_shape_p[i];
-        coords_p[i] = index / divisor;
-        index = index % divisor;
-    }
-}
-
-
-template <class module_type>
-inline
-void
-Mdrnn<module_type>::index_by_coords(int& index, double* coords_p)
-{
-    index = 0;
-    int smallcubesize = 1;
-    for(int i = 0; i < _timedim; i++)
-    {
-        index += coords_p[i] * _sequence_shape_p[i] / _block_shape_p[i];
-        smallcubesize *= _sequence_shape_p[i] / _block_shape_p[i];
     }
 }
 
