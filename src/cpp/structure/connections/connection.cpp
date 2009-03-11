@@ -1,9 +1,12 @@
 // Part of Arac Neural Network Composition Library.
 // (c) 2008 by Justin S Bayer, <bayer.justin@googlemail.com>
 
+
 #include "connection.h"
 
+
 using arac::structure::connections::Connection;
+
 
 Connection::Connection(Module* incoming_p, Module* outgoing_p,
                        int incomingstart, int incomingstop, 
@@ -21,6 +24,7 @@ Connection::Connection(Module* incoming_p, Module* outgoing_p,
     assert(_outgoingstart <= outgoing()->insize());
     assert(_outgoingstop <= outgoing()->insize());
 }                
+
 
 Connection::Connection(Module* incoming_p, Module* outgoing_p) :
     _incoming_p(incoming_p),
