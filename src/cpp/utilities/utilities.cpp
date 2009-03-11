@@ -247,6 +247,7 @@ parametrized_by_network(std::vector<Parametrized*>& params, BaseNetwork& net)
 double
 gradient_check_nonsequential(BaseNetwork& network)
 {
+    network.sort();
     int insize = network.insize();
     int outsize = network.outsize();
     
@@ -255,11 +256,11 @@ gradient_check_nonsequential(BaseNetwork& network)
     double* target_p = new double[outsize];
     const double* result_p;
     double* error_p = new double[outsize];
-    fill_random(input_p, insize, 0.5);
-    fill_random(target_p, outsize, 0.5);
+    fill_random(input_p, insize, 2.5);
+    fill_random(target_p, outsize, 2.5);
     
-    double epsilon = 0.0000001;
-    double biggest = 0;
+    double epsilon = 1e-6;
+    double biggest = 0.0;
 
     // The derivative as computed by the Parametrized object.
     double param_deriv;
@@ -312,8 +313,16 @@ gradient_check_nonsequential(BaseNetwork& network)
             addscale(target_p, result_p, error_p, outsize, -1);
             square(error_p, outsize);
             numeric_deriv -= sum(error_p, outsize);
-            
-            biggest = numeric_deriv > biggest ? numeric_deriv : biggest;
+
+            numeric_deriv /= epsilon * 2;
+
+            double diff = numeric_deriv - param_deriv;
+            if (diff < 0)
+            {
+                diff *= -1;
+            }
+            std::cout << "YO:" << diff << std::endl;
+            biggest = diff > biggest ? diff : biggest;
             param += epsilon;
         }
     }
