@@ -514,7 +514,6 @@ TEST(TestModules, PartialSoftmaxLayer) {
 
 
 TEST(TestModules, LstmLayer) {
-    // ASSERT_TRUE(false) << "Test ist inactive at the moment.";
     LstmLayer* layer_p = new LstmLayer(1);
     
     double* input_p = new double[4];
@@ -1379,8 +1378,6 @@ TEST(TestNetwork, TestTwoLayerNetwork) {
             
         }
     }
-    
-    EXPECT_GT(0.01, gradient_check(*net_p));
 }
  
         
@@ -1622,8 +1619,6 @@ TEST(TestNetwork, TestLinearMdrnn)
         << "back_activate copy not correct.";
     EXPECT_DOUBLE_EQ(net.inerror()[0][3], inerror_p[3])
         << "back_activate copy not correct.";
-        
-    EXPECT_GT(0.01, gradient_check(net));
 }
 
 
@@ -1918,5 +1913,78 @@ TEST(TestNetworkSorting, RegressionWeightBlockPermute)
 
 // TODO: Add a recurrency test fort WeightShareConnection.
 // TODO: Add deep recurrency tests for other connections.
-        
+
+TEST(TestGradient, LSTM)
+{
+    Network* net_p = new Network();
+    LinearLayer* inlayer_p = new LinearLayer(1);
+    LstmLayer* outlayer_p = new LstmLayer(1);
+    FullConnection* con_p = new FullConnection(inlayer_p, outlayer_p);
+    net_p->add_module(inlayer_p, Network::InputModule);
+    net_p->add_module(outlayer_p, Network::OutputModule);
+    net_p->add_connection(con_p);
+    net_p->sort();
+
+    ASSERT_GT(0.001, gradient_check(*net_p));
+    ASSERT_GT(0.001, gradient_check(*net_p));
+    ASSERT_GT(0.001, gradient_check(*net_p));
+}
+
+
+TEST(TestGradient, Sliced)
+{
+    Network* net_p = new Network();
+    LinearLayer* inlayer_p = new LinearLayer(2);
+    LinearLayer* outlayer_p = new LinearLayer(4);
+    FullConnection* con_p = new FullConnection(inlayer_p, outlayer_p, 
+                                               0, 1, 0, 2);
+    net_p->add_module(inlayer_p, Network::InputModule);
+    net_p->add_module(outlayer_p, Network::OutputModule);
+    net_p->add_connection(con_p);
+    net_p->sort();
+    net_p->randomize();
+
+    ASSERT_GT(0.001, gradient_check(*net_p));
+    ASSERT_GT(0.001, gradient_check(*net_p));
+    ASSERT_GT(0.001, gradient_check(*net_p));
+}
+
+
+TEST(TestGradient, TwoLayerNetwork)
+{
+    Network* net_p = new Network();
+    
+    LinearLayer* inlayer_p = new LinearLayer(2);
+    LinearLayer* outlayer_p = new LinearLayer(2);
+    FullConnection* con_p = new FullConnection(inlayer_p, outlayer_p);
+    
+    con_p->get_parameters()[0] = 0.5;
+    con_p->get_parameters()[1] = -2;
+    con_p->get_parameters()[2] = 1.2;
+    con_p->get_parameters()[3] = 4;
+    
+    net_p->add_module(inlayer_p, Network::InputModule);
+    net_p->add_module(outlayer_p, Network::OutputModule);
+    net_p->add_connection(con_p);
+
+    ASSERT_GT(0.001, gradient_check(*net_p));
+    // ASSERT_GT(0.001, gradient_check(*net_p));
+    // ASSERT_GT(0.001, gradient_check(*net_p));
+}
+
+
+TEST(TestGradient, LinearMdrnn)
+{
+    LinearMdrnn net(2, 3);
+    net.set_sequence_shape(0, 10);
+    net.set_sequence_shape(1, 10);
+    net.set_block_shape(1, 2);
+    net.set_block_shape(1, 2);
+    net.sort();
+    net.randomize();
+    
+    EXPECT_GT(0.001, gradient_check(net));
+}
+
+
 }  // namespace
