@@ -259,7 +259,7 @@ gradient_check_nonsequential(BaseNetwork& network)
     fill_random(input_p, insize, 2.5);
     fill_random(target_p, outsize, 2.5);
     
-    double epsilon = 1e-6;
+    double epsilon = 1e-5;
     double biggest = 0.0;
 
     // The derivative as computed by the Parametrized object.
@@ -293,36 +293,38 @@ gradient_check_nonsequential(BaseNetwork& network)
             network.back_activate(error_p);
             param_deriv = parametrized.get_derivatives()[i];
             
-            // Calculate point behind the target.
             network.clear();
-            network.clear_derivatives();
-            numeric_deriv = 0;
+
+            // Calculate point to the right of the target.
             param += epsilon;
             
             result_p = network.activate(input_p);
             addscale(target_p, result_p, error_p, outsize, -1);
             square(error_p, outsize);
-            numeric_deriv += sum(error_p, outsize);
+            // Multiply with 0.5 because of the quadratic error funtion.
+            double righterror = 0.5 * sum(error_p, outsize);
 
-            // Calculate before the target.
             network.clear();
-            network.clear_derivatives();
+            
+            // Calculate point to the left of the target.
             param -= 2 * epsilon;
 
             result_p = network.activate(input_p);
             addscale(target_p, result_p, error_p, outsize, -1);
             square(error_p, outsize);
-            numeric_deriv -= sum(error_p, outsize);
+            // Multiply with 0.5 because of the quadratic error funtion.
+            double lefterror = 0.5 * sum(error_p, outsize);
 
-            numeric_deriv /= epsilon * 2;
+            numeric_deriv = (righterror - lefterror) / (epsilon * -2);
+            // std::cout << "YO:" << numeric_deriv << " <-> " << param_deriv
+            //           << std::endl;
 
             double diff = numeric_deriv - param_deriv;
-            if (diff < 0)
-            {
-                diff *= -1;
-            }
-            std::cout << "YO:" << diff << std::endl;
+            diff *= diff < 0 ? -1 : 1;   // Take absolute value.
+            // std::cout << "YO:" << diff << std::endl;
             biggest = diff > biggest ? diff : biggest;
+
+            // Correct parameter.
             param += epsilon;
         }
     }
