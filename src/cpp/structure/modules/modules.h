@@ -7,15 +7,18 @@
 
 
 #include "bias.h"
+#include "doublegate.h"
 #include "errorscaling.h"
 #include "gate.h"
 #include "linear.h"
 #include "lstm.h"
 #include "mdlstm.h"
 #include "module.h"
+#include "multiplication.h"
 #include "partialsoftmax.h"
 #include "sigmoid.h"
 #include "softmax.h"
+#include "switch.h"
 #include "tanh.h"
 
 

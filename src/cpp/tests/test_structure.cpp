@@ -462,6 +462,57 @@ TEST(TestModules, GateLayer) {
 }
 
 
+TEST(TestModules, DoubleGateLayer)
+{
+    double inpt[4] = {-2, 2, 3, -1};
+    DoubleGateLayer layer(2);
+    layer.add_to_input(inpt);
+    layer.forward();
+         
+    double solution_p[4] = {0.35760876606635261, 
+                            -0.88079707797788231, 
+                            2.6423912339336475, 
+                            -0.119202922022117690};
+    for (int i = 0; i < 4; i++)
+    {
+        EXPECT_DOUBLE_EQ(solution_p[i], layer.output()[0][i]);
+    }
+}
+
+
+TEST(TestModules, SwitchLayer)
+{
+    double inpt[2] = {-2, 2.5};
+    SwitchLayer layer(2);
+    layer.add_to_input(inpt);
+    layer.forward();
+         
+    double solution_p[4] = {0.11920292202211755, 
+                            0.92414181997875655, 
+                            0.88079707797788243, 
+                            0.075858180021243449};
+    for (int i = 0; i < 4; i++)
+    {
+        EXPECT_DOUBLE_EQ(solution_p[i], layer.output()[0][i]);
+    }
+}
+
+
+TEST(TestModules, MultiplicationLayer)
+{
+    double inpt[4] = {-2, 2.5, 3, -1};
+    MultiplicationLayer layer(2);
+    layer.add_to_input(inpt);
+    layer.forward();
+         
+    double solution_p[2] = {-6.0, -2.5};
+    for (int i = 0; i < 2; i++)
+    {
+        EXPECT_DOUBLE_EQ(solution_p[i], layer.output()[0][i]);
+    }
+}
+
+
 TEST(TestModules, PartialSoftmaxLayer) {
     PartialSoftmaxLayer* layer_p = new PartialSoftmaxLayer(4, 2);
     
@@ -1914,6 +1965,7 @@ TEST(TestNetworkSorting, RegressionWeightBlockPermute)
 // TODO: Add a recurrency test fort WeightShareConnection.
 // TODO: Add deep recurrency tests for other connections.
 
+
 TEST(TestGradient, LSTM)
 {
     Network* net_p = new Network();
@@ -1945,8 +1997,6 @@ TEST(TestGradient, Sliced)
     net_p->randomize();
 
     ASSERT_GT(0.001, gradient_check(*net_p));
-    ASSERT_GT(0.001, gradient_check(*net_p));
-    ASSERT_GT(0.001, gradient_check(*net_p));
 }
 
 
@@ -1968,8 +2018,96 @@ TEST(TestGradient, TwoLayerNetwork)
     net_p->add_connection(con_p);
 
     ASSERT_GT(0.001, gradient_check(*net_p));
-    // ASSERT_GT(0.001, gradient_check(*net_p));
-    // ASSERT_GT(0.001, gradient_check(*net_p));
+}
+
+
+TEST(TestGradient, SigmoidLayer)
+{
+    Network* net_p = new Network();
+    
+    LinearLayer* inlayer_p = new LinearLayer(2);
+    SigmoidLayer* outlayer_p = new SigmoidLayer(2);
+    FullConnection* con_p = new FullConnection(inlayer_p, outlayer_p);
+    
+    con_p->randomize();
+    
+    net_p->add_module(inlayer_p, Network::InputModule);
+    net_p->add_module(outlayer_p, Network::OutputModule);
+    net_p->add_connection(con_p);
+
+    ASSERT_GT(0.001, gradient_check(*net_p));
+}
+
+
+TEST(TestGradient, TanhLayer)
+{
+    Network* net_p = new Network();
+    
+    LinearLayer* inlayer_p = new LinearLayer(2);
+    TanhLayer* outlayer_p = new TanhLayer(2);
+    FullConnection* con_p = new FullConnection(inlayer_p, outlayer_p);
+    
+    con_p->randomize();
+    
+    net_p->add_module(inlayer_p, Network::InputModule);
+    net_p->add_module(outlayer_p, Network::OutputModule);
+    net_p->add_connection(con_p);
+
+    ASSERT_GT(0.001, gradient_check(*net_p));
+}
+
+
+TEST(TestGradient, DoubleGateLayer)
+{
+    Network* net_p = new Network();
+    
+    LinearLayer* inlayer_p = new LinearLayer(2);
+    DoubleGateLayer* outlayer_p = new DoubleGateLayer(2);
+    FullConnection* con_p = new FullConnection(inlayer_p, outlayer_p);
+    
+    con_p->randomize();
+    
+    net_p->add_module(inlayer_p, Network::InputModule);
+    net_p->add_module(outlayer_p, Network::OutputModule);
+    net_p->add_connection(con_p);
+
+    ASSERT_GT(0.001, gradient_check(*net_p));
+}
+
+
+TEST(TestGradient, SwitchLayer)
+{
+    Network* net_p = new Network();
+    
+    LinearLayer* inlayer_p = new LinearLayer(2);
+    SwitchLayer* outlayer_p = new SwitchLayer(2);
+    FullConnection* con_p = new FullConnection(inlayer_p, outlayer_p);
+    
+    con_p->randomize();
+    
+    net_p->add_module(inlayer_p, Network::InputModule);
+    net_p->add_module(outlayer_p, Network::OutputModule);
+    net_p->add_connection(con_p);
+
+    ASSERT_GT(0.001, gradient_check(*net_p));
+}
+
+
+TEST(TestGradient, MultiplicationLayer)
+{
+    Network* net_p = new Network();
+    
+    LinearLayer* inlayer_p = new LinearLayer(2);
+    MultiplicationLayer* outlayer_p = new MultiplicationLayer(2);
+    FullConnection* con_p = new FullConnection(inlayer_p, outlayer_p);
+    
+    con_p->randomize();
+    
+    net_p->add_module(inlayer_p, Network::InputModule);
+    net_p->add_module(outlayer_p, Network::OutputModule);
+    net_p->add_connection(con_p);
+
+    ASSERT_GT(0.001, gradient_check(*net_p));
 }
 
 
