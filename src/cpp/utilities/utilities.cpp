@@ -248,7 +248,6 @@ parametrized_by_network(std::vector<Parametrized*>& params, BaseNetwork& net)
 double
 gradient_check_nonsequential(BaseNetwork& network)
 {
-    network.sort();
     int insize = network.insize();
     int outsize = network.outsize();
     
