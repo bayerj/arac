@@ -14,15 +14,15 @@ namespace utilities {
 
 
 void
-print_parameters(arac::structure::networks::Network& net);
+print_parameters(arac::structure::networks::BaseNetwork& net);
 
 
 void
-print_derivatives(arac::structure::networks::Network& net);
+print_derivatives(arac::structure::networks::BaseNetwork& net);
 
 
 void
-print_activations(arac::structure::networks::Network& net, 
+print_activations(arac::structure::networks::BaseNetwork& net, 
                   arac::datasets::SupervisedDataset<double*, double*>& ds);
 
 

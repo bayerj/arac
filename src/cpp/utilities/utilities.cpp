@@ -29,7 +29,7 @@ print_array(const double* array, int length)
     
     
 void
-print_parameters(arac::structure::networks::Network& net)
+print_parameters(arac::structure::networks::BaseNetwork& net)
 {
     std::vector<Parametrized*>::const_iterator param_p_iter;
     for(param_p_iter = net.parametrizeds().begin();
@@ -42,20 +42,21 @@ print_parameters(arac::structure::networks::Network& net)
 
 
 void
-print_derivatives(arac::structure::networks::Network& net)
+print_derivatives(arac::structure::networks::BaseNetwork& net)
 {
     std::vector<Parametrized*>::const_iterator param_p_iter;
     for(param_p_iter = net.parametrizeds().begin();
         param_p_iter != net.parametrizeds().end();
         param_p_iter++)
     {
-        print_array((*param_p_iter)->get_derivatives(), (*param_p_iter)->size());
+        print_array((*param_p_iter)->get_derivatives(), 
+                    (*param_p_iter)->size());
     }
 }
 
 
 void
-print_activations(Network& net, SupervisedDataset<double*, double*>& ds)
+print_activations(BaseNetwork& net, SupervisedDataset<double*, double*>& ds)
 {
     for (int i = 0; i < ds.size(); i++)
     {
