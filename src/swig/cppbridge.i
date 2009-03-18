@@ -291,6 +291,33 @@ class GateLayer : public Module
 };
 
 
+%feature("notabstract") DoubleGateLayer;
+class DoubleGateLayer : public Module
+{
+    public:
+        DoubleGateLayer(int size);
+        virtual ~DoubleGateLayer();
+};
+
+
+%feature("notabstract") MultiplicationLayer;
+class MultiplicationLayer : public Module
+{
+    public:
+        MultiplicationLayer(int size);
+        virtual ~MultiplicationLayer();
+};
+
+
+%feature("notabstract") SwitchLayer;
+class SwitchLayer : public Module
+{
+    public:
+        SwitchLayer(int size);
+        virtual ~SwitchLayer();
+};
+
+
 %feature("notabstract") LinearLayer;
 class LinearLayer : public Module
 {

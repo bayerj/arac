@@ -23,6 +23,7 @@ import scipy
 
 from pybrain.structure import (
     BiasUnit,
+    DoubleGateLayer,
     FeedForwardNetwork,
     FullConnection,
     GateLayer,
@@ -31,12 +32,14 @@ from pybrain.structure import (
     LinearLayer, 
     LSTMLayer,
     MDLSTMLayer,
+    MultiplicationLayer,
     Network,
     PartialSoftmaxLayer,
     RecurrentNetwork,
     SharedFullConnection,
     SigmoidLayer, 
     SoftmaxLayer,
+    SwitchLayer,
     TanhLayer,
 )
 
@@ -56,6 +59,9 @@ class PybrainAracMapper(object):
         BiasUnit: cppbridge.Bias,
         LinearLayer: cppbridge.LinearLayer, 
         GateLayer: cppbridge.GateLayer, 
+        MultiplicationLayer: cppbridge.MultiplicationLayer, 
+        DoubleGateLayer: cppbridge.DoubleGateLayer, 
+        SwitchLayer: cppbridge.SwitchLayer, 
         LSTMLayer: cppbridge.LstmLayer,
         SigmoidLayer: cppbridge.SigmoidLayer, 
         SoftmaxLayer: cppbridge.SoftmaxLayer,
@@ -103,6 +109,18 @@ class PybrainAracMapper(object):
             proxy = self[layer]
         except KeyError:
             proxy = self.classmapping[layer.__class__](layer.outdim)
+            self[layer] = proxy
+        proxy.init_input(layer.inputbuffer)
+        proxy.init_output(layer.outputbuffer)
+        proxy.init_inerror(layer.inputerror)
+        proxy.init_outerror(layer.outputerror)
+        return proxy
+
+    def _halfofoutput_layer_handler(self, layer):
+        try:
+            proxy = self[layer]
+        except KeyError:
+            proxy = self.classmapping[layer.__class__](layer.outdim / 2)
             self[layer] = proxy
         proxy.init_input(layer.inputbuffer)
         proxy.init_output(layer.outputbuffer)
@@ -200,6 +218,9 @@ class PybrainAracMapper(object):
             FeedForwardNetwork: self._network_handler,
             FullConnection: self._parametrized_connection_handler,
             GateLayer: self._simple_layer_handler, 
+            MultiplicationLayer: self._simple_layer_handler, 
+            DoubleGateLayer: self._halfofoutput_layer_handler,
+            SwitchLayer: self._halfofoutput_layer_handler,
             IdentityConnection: self._identity_connection_handler, 
             LinearConnection: self._parametrized_connection_handler,
             LinearLayer: self._simple_layer_handler, 
