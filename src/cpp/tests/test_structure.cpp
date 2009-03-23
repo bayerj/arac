@@ -1670,6 +1670,9 @@ TEST(TestNetwork, TestLinearMdrnn)
         << "back_activate copy not correct.";
     EXPECT_DOUBLE_EQ(net.inerror()[0][3], inerror_p[3])
         << "back_activate copy not correct.";
+
+    print_parameters(net);
+    print_derivatives(net);
 }
 
 
@@ -2088,6 +2091,7 @@ TEST(TestGradient, SwitchLayer)
     net_p->add_module(inlayer_p, Network::InputModule);
     net_p->add_module(outlayer_p, Network::OutputModule);
     net_p->add_connection(con_p);
+    net_p->sort();
 
     ASSERT_GT(0.001, gradient_check(*net_p));
 }
@@ -2095,7 +2099,7 @@ TEST(TestGradient, SwitchLayer)
 
 TEST(TestGradient, MultiplicationLayer)
 {
-    Network* net_p = new Network();
+    Network net;
     
     LinearLayer* inlayer_p = new LinearLayer(2);
     MultiplicationLayer* outlayer_p = new MultiplicationLayer(2);
@@ -2103,25 +2107,41 @@ TEST(TestGradient, MultiplicationLayer)
     
     con_p->randomize();
     
-    net_p->add_module(inlayer_p, Network::InputModule);
-    net_p->add_module(outlayer_p, Network::OutputModule);
-    net_p->add_connection(con_p);
+    net.add_module(inlayer_p, Network::InputModule);
+    net.add_module(outlayer_p, Network::OutputModule);
+    net.add_connection(con_p);
+    net.sort();
 
-    ASSERT_GT(0.001, gradient_check(*net_p));
+    EXPECT_GT(0.001, gradient_check(net));
 }
 
 
-TEST(TestGradient, LinearMdrnn)
+TEST(TestGradient, TanhMdrnn)
 {
-    LinearMdrnn net(2, 3);
+    TanhMdrnn net(2, 3);
     net.set_sequence_shape(0, 10);
     net.set_sequence_shape(1, 10);
-    net.set_block_shape(1, 2);
-    net.set_block_shape(1, 2);
+    net.set_block_shape(1, 1);
+    net.set_block_shape(1, 1);
     net.sort();
     net.randomize();
     
+    std::cout << "Parameters: ";
+    print_parameters(net);
+    std::cout << std::endl;
+    std::cout << "Derivatives: ";
+    print_derivatives(net);
+    std::cout << std::endl;
+
     EXPECT_GT(0.001, gradient_check(net));
+
+    std::cout << "Parameters: ";
+    print_parameters(net);
+    std::cout << std::endl;
+    std::cout << "Derivatives: ";
+    print_derivatives(net);
+    std::cout << std::endl;
+
 }
 
 
