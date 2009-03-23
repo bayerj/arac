@@ -498,8 +498,8 @@ Mdrnn<module_type>::_forward()
                  con_iter++)
             {
                 // If the current coordinate is zero, we are at a border of the 
-                // input in that dimension. In that case, the connections may not be
-                // forwarded, since we don't want to look around corners.
+                // input in that dimension. In that case, the connections may
+                // not be forwarded, since we don't want to look around corners.
                 if ((j < _timedim) && (coords_p[j] == 0))
                 {
                     (*con_iter)->dry_forward();

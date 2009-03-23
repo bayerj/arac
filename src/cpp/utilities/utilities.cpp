@@ -177,13 +177,10 @@ void block_permutation(std::vector<int>& perm,
     }
 }                      
 
-// TODO: use better rng, like mt from tr1 or sth.
-static int count = 0;
+
 void fill_random(double* sink_p, int length, double interval)
 {
-    int seed = time(NULL) * (count + 1);
-    srand(seed);
-    count += length;
+    srand(time(NULL));
     for(int i = 0; i < length; i++)
     {
         double value = RAND_MAX - RAND_MAX / 2;
