@@ -78,12 +78,12 @@ class Buffer
         /// Return the size of a single row in the Buffer.
         ///
         size_t rowsize();
-        
+
         ///
         /// Set the size of a single row.
         ///
         void set_rowsize(size_t value);
-        
+
         ///
         /// Return the number of rows in the buffer.
         ///
@@ -93,20 +93,27 @@ class Buffer
         /// Return a pointer to the row at the given index.
         ///
         double* operator [](size_t index);
-        
+
     protected:
-        
+
+        ///
+        /// Tell wether the space used by the buffer is one big chunk of
+        /// memory.
+        ///
+        void contmemory();
+
         ///
         /// Vector that holds the pointer to the rows.
         ///
         DoublePtrVec _content;
         size_t _rowsize;
         bool _owner;
-    
+        bool _contmemory;
+
 };
 
 
-inline 
+inline
 size_t
 Buffer::rowsize()
 {
@@ -143,6 +150,10 @@ void
 Buffer::append(double* row)
 {
     _owner = false;
+    if (row - sizeof(double) * _rowsize != _content.back())
+    {
+        _contmemory = false;
+    }
     _content.push_back(row);
 }
 

@@ -12,7 +12,8 @@ using arac::common::Buffer;
 
 Buffer::Buffer(size_t rowsize, bool owner) : 
     _rowsize(rowsize), 
-    _owner(owner)
+    _owner(owner),
+    _contmemory(true)
 {
     expand();
 }
@@ -43,14 +44,22 @@ void Buffer::expand()
     double* new_chunk = new double[_rowsize];
     memset((void*) new_chunk, 0, sizeof(double) * _rowsize);
     _content.push_back(new_chunk);
+    _contmemory = false;
 }
 
 
 void Buffer::clear()
 {
-    for(size_t i = 0; i < size(); i++)
+    if (_contmemory)
     {
-        clear_at(i);
+        memset((void*) _content[0], 0, sizeof(double) * _rowsize * size());
+    }
+    else
+    {
+        for(size_t i = 0; i < size(); i++)
+        {
+            clear_at(i);
+        }
     }
 }
 
@@ -73,4 +82,5 @@ void Buffer::free_memory()
         }
     }
     _content.clear();
+    _contmemory = true;
 }
