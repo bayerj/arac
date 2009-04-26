@@ -7,6 +7,7 @@
 
 
 #include <cassert>
+#include <iostream>
 
 #include "typedefs.h"
 
@@ -94,13 +95,13 @@ class Buffer
         ///
         double* operator [](size_t index);
 
-    protected:
+        ///
+        /// Tell wether the memory held by the buffer is continuous.
+        ///
+        bool contmemory();
 
-        ///
-        /// Tell wether the space used by the buffer is one big chunk of
-        /// memory.
-        ///
-        void contmemory();
+
+    protected:
 
         ///
         /// Vector that holds the pointer to the rows.
@@ -147,19 +148,6 @@ Buffer::operator[] (size_t index)
 
 inline
 void
-Buffer::append(double* row)
-{
-    _owner = false;
-    if (row - sizeof(double) * _rowsize != _content.back())
-    {
-        _contmemory = false;
-    }
-    _content.push_back(row);
-}
-
-
-inline
-void
 Buffer::make_owner()
 {
     _owner = true;
@@ -172,6 +160,15 @@ Buffer::owner()
 {
     return _owner;
 }
+
+
+inline
+bool
+Buffer::contmemory()
+{
+    return _contmemory;
+}
+
 
 
 }
