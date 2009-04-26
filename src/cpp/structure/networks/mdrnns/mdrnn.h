@@ -91,6 +91,8 @@ class Mdrnn : public BaseMdrnn
         virtual void clear_derivatives();
         
         FullConnection& feedcon();
+
+        FullConnection& biascon();
         
     protected:
         
@@ -143,6 +145,11 @@ class Mdrnn : public BaseMdrnn
         /// 
         // TODO: write getter/setter
         arac::structure::connections::FullConnection* _feedcon_p;           
+
+        /// 
+        /// The connection from the bias to _module_p.
+        /// 
+        arac::structure::connections::FullConnection* _biascon_p;           
 
         ///
         /// Return a reference to the held object of module_type.
@@ -259,6 +266,15 @@ Mdrnn<module_type>::feedcon()
 
 template <class module_type>
 inline
+FullConnection&
+Mdrnn<module_type>::biascon()
+{
+    return *_biascon_p;
+}
+
+
+template <class module_type>
+inline
 void
 Mdrnn<module_type>::next_coords(double* coords_p)
 {
@@ -283,7 +299,8 @@ Mdrnn<module_type>::Mdrnn(int timedim, int hiddensize) :
     _hiddensize(hiddensize),
     _inmodule_p(0),
     _module_p(0),
-    _feedcon_p(0)
+    _feedcon_p(0), 
+    _biascon_p(0)
 {
     _sequence_shape_p = new int[_timedim];
     _block_shape_p = new int[_timedim];
@@ -325,6 +342,11 @@ Mdrnn<module_type>::delete_structure()
     if (_feedcon_p != 0)
     {
         delete _feedcon_p;
+    }
+
+    if (_biascon_p != 0)
+    {
+        delete _biascon_p;
     }
     
     ConPtrVectorVector::iterator con_vec_iter;
@@ -408,6 +430,7 @@ Mdrnn<module_type>::sort()
     // Clear the parametrized vector.
     _parametrizeds.clear();
     _parametrizeds.push_back(_feedcon_p);
+    _parametrizeds.push_back(_biascon_p);
 
     // Initialize recurrent self connections. We will keep a recurrency counter
     // and update it to resemble the sequence structure.
@@ -424,11 +447,6 @@ Mdrnn<module_type>::sort()
         _parametrizeds.push_back(con_p);
     }
 
-    // Add a connection from the bias.
-    FullConnection* con_p = new FullConnection(&_bias, _module_p);
-    _connections[_timedim].push_back(con_p);
-    _parametrizeds.push_back(con_p);
-    
     // Ininitialize buffers.
     init_buffers();
     
@@ -500,7 +518,9 @@ Mdrnn<module_type>::_forward()
                 // If the current coordinate is zero, we are at a border of the 
                 // input in that dimension. In that case, the connections may
                 // not be forwarded, since we don't want to look around corners.
-                if ((j < _timedim) && (coords_p[j] == 0))
+                // The bias, however, which is the last connection in the vector
+                // has to be forwarded anyways.
+                if (coords_p[j] == 0)
                 {
                     (*con_iter)->dry_forward();
                 }
@@ -514,6 +534,7 @@ Mdrnn<module_type>::_forward()
         _inmodule_p->add_to_input(input()[timestep()] + i * blocksize());
         _inmodule_p->forward();
         _feedcon_p->forward();
+        _biascon_p->forward();
 
         _module_p->forward();
         next_coords(coords_p);
@@ -554,7 +575,7 @@ Mdrnn<module_type>::_backward()
                 // If the current coordinate is zero, we are at a border of the
                 // input in that dimension. In that case, the connections may
                 // not be forwarded, since we don't want to look around corners.
-                if ((j < _timedim) && (coords_p[j] == 0))
+                if (coords_p[j] == 0)
                 {
                     (*con_iter)->dry_backward();
                 }
@@ -573,6 +594,7 @@ Mdrnn<module_type>::_backward()
         _module_p->add_to_outerror(outerror()[timestep() - 1] + i * _hiddensize);
         _module_p->backward();
         _feedcon_p->backward();
+        _biascon_p->backward();
 
         _inmodule_p->backward();
         next_coords(coords_p);

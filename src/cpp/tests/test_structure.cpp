@@ -1599,6 +1599,7 @@ TEST(TestNetwork, TestLinearMdrnn)
     net.sort();
     // Make sure that the input is passed into the mdrnn with no changes.
     net.feedcon().get_parameters()[0] = 1;
+    net.biascon().get_parameters()[0] = 0;
 
     // std::cout << net.parametrizeds()[0]->size() << std::endl;
     
@@ -1606,8 +1607,8 @@ TEST(TestNetwork, TestLinearMdrnn)
     params_p[0] = 0.5;
     params_p[1] = 2;
 
-    net.parametrizeds()[1]->set_parameters(params_p);
-    net.parametrizeds()[2]->set_parameters(params_p + 1);
+    net.parametrizeds()[2]->set_parameters(params_p);
+    net.parametrizeds()[3]->set_parameters(params_p + 1);
     
     double* input_p = new double[4];
     input_p[0] = 1;

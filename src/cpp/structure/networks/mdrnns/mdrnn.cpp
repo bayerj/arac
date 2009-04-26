@@ -30,6 +30,10 @@ Mdrnn<LinearLayer>::init_structure()
                            0, _hiddensize);
     feedcon_p->set_mode(Component::Sequential);
     _feedcon_p = feedcon_p;
+   
+    // Add a connection from the bias.
+    _biascon_p = new FullConnection(&_bias, _module_p);
+    _parametrizeds.push_back(_biascon_p);
 }
 
 
@@ -48,6 +52,10 @@ Mdrnn<TanhLayer>::init_structure()
                            0, _hiddensize);
     feedcon_p->set_mode(Component::Sequential);
     _feedcon_p = feedcon_p;
+   
+    // Add a connection from the bias.
+    _biascon_p = new FullConnection(&_bias, _module_p);
+    _parametrizeds.push_back(_biascon_p);
 }
 
 
@@ -66,6 +74,10 @@ Mdrnn<SigmoidLayer>::init_structure()
                            0, _hiddensize);
     feedcon_p->set_mode(Component::Sequential);
     _feedcon_p = feedcon_p;
+   
+    // Add a connection from the bias.
+    _biascon_p = new FullConnection(&_bias, _module_p);
+    _parametrizeds.push_back(_biascon_p);
 }
 
 
@@ -86,6 +98,16 @@ Mdrnn<MdlstmLayer>::init_structure()
     feedcon_p->set_mode(Component::Sequential);
     _parametrizeds.push_back(feedcon_p);
     _feedcon_p = feedcon_p;
+    
+    // Add a connection from the bias.
+    int full_con_instart = 0;
+    int full_con_instop = _hiddensize;
+    int full_con_outstart = 0;
+    int full_con_outstop = (3 + _timedim) * _hiddensize;
+    _biascon_p = new FullConnection(&_bias, _module_p, 
+                                    0, 1, 
+                                    full_con_outstart, full_con_outstop);
+    _parametrizeds.push_back(_biascon_p);
 }
 
 
@@ -142,14 +164,6 @@ Mdrnn<MdlstmLayer>::sort()
         recurrency *= _sequence_shape_p[i] / _block_shape_p[i];
     }
 
-    // Add a connection from the bias.
-    FullConnection* con_p = \
-        new FullConnection(&_bias, _module_p, 
-                          0, 1, 
-                          full_con_outstart, full_con_outstop);
-    _connections[_timedim].push_back(con_p);
-    _parametrizeds.push_back(con_p);
-    
     // Ininitialize buffers.
     init_buffers();
     
