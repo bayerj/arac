@@ -1677,6 +1677,37 @@ TEST(TestNetwork, TestLinearMdrnn)
 }
 
 
+TEST(TestNetwork, TestMdrnnBiasUsed)
+{
+    LinearMdrnn net(2, 1);
+    net.set_sequence_shape(0, 2);
+    net.set_sequence_shape(1, 2);
+    net.sort();
+    // Make sure that the input is passed into the mdrnn with no changes.
+    net.feedcon().get_parameters()[0] = 0;
+    net.biascon().get_parameters()[0] = 1.2;
+
+    // std::cout << net.parametrizeds()[0]->size() << std::endl;
+
+    double* input_p = new double[4];
+    input_p[0] = 1;
+    input_p[1] = 2;
+    input_p[2] = 3;
+    input_p[3] = 4;
+
+    const double* output_p = net.activate(input_p);
+
+    EXPECT_DOUBLE_EQ(1.2, output_p[0])
+        << "Forward pass incorrect.";
+    EXPECT_DOUBLE_EQ(1.2, output_p[1])
+        << "Forward pass incorrect.";
+    EXPECT_DOUBLE_EQ(1.2, output_p[2])
+        << "Forward pass incorrect.";
+    EXPECT_DOUBLE_EQ(1.2, output_p[3])
+        << "Forward pass incorrect.";
+}
+
+
 TEST(TestNetwork, NetworkClearConnection)
 {
     Network* net_p = new Network();

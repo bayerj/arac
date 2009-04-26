@@ -534,6 +534,7 @@ Mdrnn<module_type>::_forward()
         _inmodule_p->add_to_input(input()[timestep()] + i * blocksize());
         _inmodule_p->forward();
         _feedcon_p->forward();
+        _bias.forward();
         _biascon_p->forward();
 
         _module_p->forward();
