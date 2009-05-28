@@ -133,6 +133,14 @@ class Backprop
         /// combination.
         ///
         virtual void process_sample(SampleType inpt, TargetType target)  = 0;
+            
+        ///
+        /// Method that processes a sample from the dataset and its target, 
+        /// additionally scaling the error at the targets according to an 
+        /// importance.
+        /// 
+        virtual void process_sample(SampleType inpt, TargetType target, 
+                                    TargetType importance)  = 0;
 
 };
 
@@ -220,11 +228,18 @@ Backprop<SampleType, TargetType>::train_stochastic()
 {
     int index = rand() % dataset().size();
     
-    SampleType sample = dataset()[index].first;
-    TargetType target = dataset()[index].second;
     network().clear();
     network().clear_derivatives();
-    this->process_sample(sample, target);
+    SampleType sample = dataset()[index].first;
+    TargetType target = dataset()[index].second;
+    if (dataset().has_importance())
+    {
+        this->process_sample(sample, target, dataset().importance(index));
+    }
+    else
+    {
+        this->process_sample(sample, target);
+    }
     learn();
 }
 
@@ -256,6 +271,8 @@ class SimpleBackprop : public Backprop<double*, double*>
     
     protected:
         virtual void process_sample(double* input_p, double* target_p);
+        virtual void process_sample(double* input_p, double* target_p,
+                                    double* importance_p);
 };
 
 
@@ -274,6 +291,8 @@ class SemiSequentialBackprop : public Backprop<Sequence, double*>
 
     protected:
         virtual void process_sample(Sequence input_p, double* target_p);
+        virtual void process_sample(Sequence input_p, double* target_p,
+                                    double* importance_p);
 
     private:
         double* _output_p;
@@ -293,6 +312,9 @@ class SequentialBackprop : public Backprop<Sequence, Sequence>
 
     protected:
         virtual void process_sample(Sequence input, Sequence target);
+        virtual void process_sample(Sequence input, Sequence target,
+                                    Sequence importance);
+        
     private:
         std::vector<const double*> _outputs;
 

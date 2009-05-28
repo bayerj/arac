@@ -55,6 +55,21 @@ class SupervisedDataset : public UnsupervisedDataset<SampleType>
         /// Return the (sample, target) pair of the dataset at the given index.
         ///
         std::pair<SampleType, TargetType>& operator[](int index);
+
+        ///
+        /// Tell wether this dataset uses importance.
+        ///
+        bool has_importance();
+
+        /// 
+        /// Return the importance of a sample/target pair.
+        ///
+        TargetType importance(int index);
+
+        ///
+        /// Set the importance of a sample/target pair.
+        ///
+        void set_importance(int index, TargetType importance);
         
     private:
  
@@ -67,14 +82,25 @@ class SupervisedDataset : public UnsupervisedDataset<SampleType>
         /// Vector that holds the (sample, target) pairs.
         ///
         std::vector<std::pair<SampleType, TargetType> > _rows;
-        
+
+        ///
+        /// Vector that holds the importances of (sample, target) pairs.
+        ///
+        std::vector<TargetType> _importance;
+
+        ///
+        /// Flag that tells whether importance is used.
+        ///
+        bool _has_importance;
 };
 
 
 template<typename SampleType, typename TargetType>
-SupervisedDataset<SampleType, TargetType>::SupervisedDataset(int samplesize, int targetsize) :
+SupervisedDataset<SampleType, TargetType>::SupervisedDataset(int samplesize, 
+                                                             int targetsize) :
     UnsupervisedDataset<SampleType>(samplesize),
-    _targetsize(targetsize)
+    _targetsize(targetsize),
+    _has_importance(false)
 {
     
 }
@@ -112,6 +138,35 @@ SupervisedDataset<SampleType, TargetType>::operator[](int index)
 {
     assert(index < size());
     return _rows[index];
+}
+
+template<typename SampleType, typename TargetType>
+inline
+bool
+SupervisedDataset<SampleType, TargetType>::has_importance()
+{
+    return _has_importance;
+}
+
+
+template<typename SampleType, typename TargetType>
+inline
+TargetType
+SupervisedDataset<SampleType, TargetType>::importance(int index)
+{
+    return _importance[index];
+}
+
+
+template<typename SampleType, typename TargetType>
+inline
+void
+SupervisedDataset<SampleType, TargetType>::set_importance(int index, 
+                                                          TargetType importance)
+{
+    _has_importance = true;
+    _importance.reserve(size());
+    _importance[index] = importance;
 }
 
 

@@ -4,6 +4,7 @@
     
 #include <iostream>
 #include <vector>
+#include <cassert>
 
 #include <numpy/arrayobject.h>
 
@@ -25,10 +26,25 @@ void init_buffer(Buffer& buffer, double* content_p, int length, int rowsize)
 {
     buffer.free_memory();
     buffer.set_rowsize(rowsize);
+    bool prev = buffer.contmemory();
     for(int i = 0; i < length; i++)
     {
         buffer.append(content_p + i * rowsize);
+        // std::cout << content_p
     }
+    // if (prev != buffer.contmemory())
+    // {
+    //     int prevptr = 0;
+    //     for(int i = 0; i < length; i++)
+    //     {
+    //         if (prevptr != 0)
+    //         {
+    //          //  std::cout << content_p + i * rowsize - prevptr 
+    //          //            << "<->" << rowsize << std::endl;
+    //         }
+    //         prevptr = content_p + i * rowsize;
+    //     }
+    // }
 }
 
 
@@ -465,7 +481,7 @@ class BaseNetwork : public Module
 
 %extend BaseNetwork
 {
-    // TODO: don't make the API request a output array, but return a PyObject*
+    // TODO: do not make the API request a output array, but return a PyObject*
     // instead.
     
     virtual void activate(double* input_p, int inlength, 
@@ -736,6 +752,7 @@ class MdlstmMdrnn : public BaseMdrnn
         
 %apply (double* INPLACE_ARRAY1, int DIM1) {(double* sample_p, int samplelength), 
                                            (double* target_p, int targetlength)};
+%apply (double* INPLACE_ARRAY1, int DIM1) {(double* importance_p, int importancelength)};
 
 
 class SupervisedSimpleDataset
@@ -747,6 +764,9 @@ class SupervisedSimpleDataset
        virtual int size();
        int samplesize();
        int targetsize();
+
+       bool has_importance();
+
 };
 
 
@@ -763,6 +783,17 @@ class SupervisedSimpleDataset
         }
         $self->append(sample_p, target_p);
     }
+
+    void set_importance(int index, double* importance_p, int importancelength)
+    {
+        if (importancelength != $self->targetsize()) 
+        {
+            PyErr_Format(PyExc_ValueError, "Arrays of lengths %d given",
+                         importancelength);
+            return;
+        }
+        $self->set_importance(index, importance_p);
+    }
     
     PyObject* sample(int index)
     {
@@ -774,6 +805,12 @@ class SupervisedSimpleDataset
     {
         SupervisedSimpleDataset& ds = *($self);
         return PyArray_1DFromDoublePointer($self->targetsize(), ds[index].second);
+    }
+    
+    PyObject* importance(int index)
+    {
+        SupervisedSimpleDataset& ds = *($self);
+        return PyArray_1DFromDoublePointer($self->targetsize(), ds.importance(index));
     }
 };
 
