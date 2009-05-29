@@ -1430,8 +1430,8 @@ TEST(TestNetwork, TestTwoLayerNetwork) {
         }
     }
 }
- 
-        
+
+
 TEST(TestNetwork, TestRecurrentLayerNetwork) {
     Network* net_p = new Network();
     net_p->set_mode(Component::Sequential);
@@ -1492,11 +1492,11 @@ TEST(TestNetwork, TestRecurrentLayerNetwork) {
         << "Error not returned correctly.";
     EXPECT_DOUBLE_EQ(-5, net_p->inerror()[0][1])
         << "Error not returned correctly.";
-        
+
     EXPECT_GT(0.01, gradient_check(*net_p));
 }
-        
-        
+
+
 TEST(TestNetwork, TestRecurrentNetworkTimesteps) {
     Network* net_p = new Network();
     
@@ -1589,36 +1589,39 @@ TEST(TestNetwork, TestRecurrentNetworkTimesteps) {
     ASSERT_EQ(0, con_p->timestep())
         << "Wrong timestep.";
 }
-        
-        
+
+
 TEST(TestNetwork, TestLinearMdrnn)
 {
     LinearMdrnn net(2, 1);
     net.set_sequence_shape(0, 2);
     net.set_sequence_shape(1, 2);
     net.sort();
+
     // Make sure that the input is passed into the mdrnn with no changes.
     net.feedcon().get_parameters()[0] = 1;
+
+    // Disable bias.
     net.biascon().get_parameters()[0] = 0;
 
     // std::cout << net.parametrizeds()[0]->size() << std::endl;
-    
+
     double* params_p = new double[2];
     params_p[0] = 0.5;
     params_p[1] = 2;
 
     net.parametrizeds()[2]->set_parameters(params_p);
     net.parametrizeds()[3]->set_parameters(params_p + 1);
-    
+
     double* input_p = new double[4];
     input_p[0] = 1;
     input_p[1] = 2;
     input_p[2] = 3;
     input_p[3] = 4;
-    
+
     const double* output_p = net.activate(input_p);
 
-    ASSERT_DOUBLE_EQ(1, net.input()[0][0]) 
+    ASSERT_DOUBLE_EQ(1, net.input()[0][0])
         << "Networks' input not filled correctly.";
     ASSERT_DOUBLE_EQ(2, net.input()[0][1])
         << "Networks' input not filled correctly.";
@@ -1626,8 +1629,8 @@ TEST(TestNetwork, TestLinearMdrnn)
         << "Networks' input not filled correctly.";
     ASSERT_DOUBLE_EQ(4, net.input()[0][3])
         << "Networks' input not filled correctly.";
-    
-    EXPECT_DOUBLE_EQ(1, output_p[0]) 
+
+    EXPECT_DOUBLE_EQ(1, output_p[0])
         << "Forward pass incorrect.";
     EXPECT_DOUBLE_EQ(2.5, output_p[1])
         << "Forward pass incorrect.";
@@ -1635,14 +1638,14 @@ TEST(TestNetwork, TestLinearMdrnn)
         << "Forward pass incorrect.";
     EXPECT_DOUBLE_EQ(11.5, output_p[3])
         << "Forward pass incorrect.";
-        
+
     double* outerror_p = new double[4];
-    
+
     outerror_p[0] = 2;
     outerror_p[1] = 4;
     outerror_p[2] = 8;
     outerror_p[3] = 10;
-    
+
     const double* inerror_p = net.back_activate(outerror_p);
 
     ASSERT_DOUBLE_EQ(2, net.outerror()[0][0]) 
@@ -1733,7 +1736,7 @@ TEST(TestNetwork, NetworkClearConnection)
         << "Timestep was not reseted.";
 }
 
- 
+
 TEST(TestConnections, TestPermutationConnection)
 {
     std::vector<int> perm;
@@ -1967,31 +1970,31 @@ TEST(TestNetworkSorting, RegressionWeightBlockPermute)
     LinearLayer hidden1(4);
     PartialSoftmaxLayer hidden2(4, 2);
     LinearLayer outlayer(4);
-    
+
     std::vector<int> seqshape;
     seqshape.push_back(2);
     seqshape.push_back(2);
-    
+
     std::vector<int> blockshape;
     blockshape.push_back(1);
     blockshape.push_back(1);
-    
+
     BlockPermutationConnection con1(&inlayer, &hidden1, seqshape, blockshape);
-    
+
     WeightShareConnection con2(&hidden1, &hidden2, 2, 2);
     IdentityConnection con3(&hidden2, &outlayer);
-    
+
     Network net;
-    
+
     net.add_module(&inlayer, Network::InputModule);
     net.add_module(&hidden1);
     net.add_module(&hidden2);
     net.add_module(&outlayer, Network::OutputModule);
-    
+
     net.add_connection(&con1);
     net.add_connection(&con2);
     net.add_connection(&con3);
-    
+
     net.sort();
     net.randomize();
 }
