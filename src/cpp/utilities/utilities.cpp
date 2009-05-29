@@ -274,6 +274,7 @@ gradient_check_nonsequential(BaseNetwork& network)
     // sequentially.
     std::vector<Parametrized*> params;
     parametrized_by_network(params, network);
+    std::cout << params.size() << std::endl;
 
     std::vector<arac::structure::Parametrized*>::iterator param_iter;
     // Now iterate over all parametrized objects in order to play with every 
@@ -282,11 +283,13 @@ gradient_check_nonsequential(BaseNetwork& network)
          param_iter != params.end();
          param_iter++)
     {
+        std::cout << "yikes" << std::endl;
         Parametrized& parametrized = **param_iter;
         for (int i = 0; i < parametrized.size(); i++)
         {
             // First calculate analytical derivative.
             double& param = parametrized.get_parameters()[i];
+            double old_param = param;
             network.clear();
             network.clear_derivatives();
             result_p = network.activate(input_p);
@@ -299,7 +302,7 @@ gradient_check_nonsequential(BaseNetwork& network)
             network.clear();
 
             // Calculate point to the right of the target.
-            param += epsilon;
+            param = old_param + epsilon;
             
             result_p = network.activate(input_p);
             addscale(target_p, result_p, error_p, outsize, -1);
@@ -310,7 +313,7 @@ gradient_check_nonsequential(BaseNetwork& network)
             network.clear();
             
             // Calculate point to the left of the target.
-            param -= 2 * epsilon;
+            param = old_param - epsilon;
 
             result_p = network.activate(input_p);
             addscale(target_p, result_p, error_p, outsize, -1);
@@ -319,8 +322,8 @@ gradient_check_nonsequential(BaseNetwork& network)
             double lefterror = 0.5 * sum(error_p, outsize);
 
             numeric_deriv = (righterror - lefterror) / (epsilon * -2);
-            // std::cout << "YO:" << numeric_deriv << " <-> " << param_deriv
-            //           << std::endl;
+            std::cout << "YO:" << numeric_deriv << " <-> " << param_deriv
+                      << std::endl;
 
             double diff = numeric_deriv - param_deriv;
             diff *= diff < 0 ? -1 : 1;   // Take absolute value.
@@ -328,7 +331,7 @@ gradient_check_nonsequential(BaseNetwork& network)
             biggest = diff > biggest ? diff : biggest;
 
             // Correct parameter.
-            param += epsilon;
+            param = old_param;
         }
     }
     
