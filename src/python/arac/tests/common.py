@@ -22,7 +22,7 @@ class TestCase(unittest.TestCase):
         for a, b in zip(arr1, arr2):
             self.assertNear(a, b)
             
-    def assertNear(self, a, b, epsilon=0.0001):
+    def assertNear(self, a, b, epsilon=0.000001):
         self.assert_(abs(a - b) < epsilon, 
                      "|%f - %f| > %f" % (a, b, epsilon))
         
