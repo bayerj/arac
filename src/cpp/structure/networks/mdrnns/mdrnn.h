@@ -586,11 +586,11 @@ Mdrnn<module_type>::_backward()
                 }
             }
         }
+
+        // TODO: Maybe make inmodule sequential to avoid this.
         _inmodule_p->clear();
-        // These modules are non-sequential. Thus we have to assure that they
-        // are always in the state it would be in if it had just been forwarded.
-        _inmodule_p->dry_forward();
-        _bias.dry_forward();
+        _inmodule_p->add_to_input(input()[timestep() - 1] + i * blocksize());
+        _inmodule_p->forward();
 
         _module_p->add_to_outerror(outerror()[timestep() - 1] + i * _hiddensize);
         _module_p->backward();
@@ -599,6 +599,7 @@ Mdrnn<module_type>::_backward()
 
         _inmodule_p->backward();
         next_coords(coords_p);
+
         // TODO: save memory by not copying but referencing.
         double* sink_p = inerror()[timestep() - 1] + i * blocksize();
         double* source_p = _inmodule_p->inerror()[0];

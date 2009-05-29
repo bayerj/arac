@@ -33,6 +33,7 @@ Mdrnn<LinearLayer>::init_structure()
    
     // Add a connection from the bias.
     _biascon_p = new FullConnection(&_bias, _module_p);
+     _biascon_p->set_mode(Component::Sequential);
     _parametrizeds.push_back(_biascon_p);
 }
 
@@ -55,6 +56,7 @@ Mdrnn<TanhLayer>::init_structure()
    
     // Add a connection from the bias.
     _biascon_p = new FullConnection(&_bias, _module_p);
+    _biascon_p->set_mode(Component::Sequential);
     _parametrizeds.push_back(_biascon_p);
 }
 
@@ -77,6 +79,7 @@ Mdrnn<SigmoidLayer>::init_structure()
    
     // Add a connection from the bias.
     _biascon_p = new FullConnection(&_bias, _module_p);
+    _biascon_p->set_mode(Component::Sequential);
     _parametrizeds.push_back(_biascon_p);
 }
 
@@ -107,6 +110,7 @@ Mdrnn<MdlstmLayer>::init_structure()
     _biascon_p = new FullConnection(&_bias, _module_p, 
                                     0, 1, 
                                     full_con_outstart, full_con_outstop);
+    _biascon_p->set_mode(Component::Sequential);
     _parametrizeds.push_back(_biascon_p);
 }
 
@@ -126,6 +130,7 @@ Mdrnn<MdlstmLayer>::sort()
     // Also clear the parametrized vector.
     _parametrizeds.clear();
     _parametrizeds.push_back(_feedcon_p);
+    _parametrizeds.push_back(_biascon_p);
     
     // Initialize recurrent self connections.
     int recurrency = 1;
@@ -143,7 +148,7 @@ Mdrnn<MdlstmLayer>::sort()
     for(int i = 0; i < _timedim; i++)
     {
         FullConnection* fcon_p = \
-            new FullConnection(_module_p, _module_p, 
+            new FullConnection(_module_p, _module_p,
                                full_con_instart, full_con_instop,
                                full_con_outstart, full_con_outstop);
         fcon_p->set_mode(Component::Sequential);
