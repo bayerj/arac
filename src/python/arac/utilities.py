@@ -68,6 +68,15 @@ def samples_and_targets(dataset):
             range(dataset.size())]
 
 
+def fill_params(net, params):
+    params_ = params_by_network(net)
+    start = 0
+    for p in params_:
+        stop = scipy.size(p) + start
+        p[:] = params[start:stop]
+        start = stop
+
+
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
