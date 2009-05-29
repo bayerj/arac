@@ -639,6 +639,19 @@ class BlockPermutationConnection : public Connection
 };
 
 
+%feature("notabstract") PermutationConnection;
+class PermutationConnection : public Connection
+{
+    public:
+        PermutationConnection(Module* incoming_p, Module* outgoing_p, 
+                              std::vector<int> permutation);
+        virtual ~PermutationConnection();
+        
+        std::vector<int>& permutation();
+        void invert();
+};
+
+
 %feature("notabstract") WeightShareConnection;
 class WeightShareConnection : public Connection, public Parametrized
 {
