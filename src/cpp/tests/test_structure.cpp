@@ -2001,7 +2001,24 @@ TEST(TestNetworkSorting, RegressionWeightBlockPermute)
 // TODO: Add deep recurrency tests for other connections.
 
 
-TEST(TestGradient, LSTM)
+TEST(TestGradient, MdlstmLayer)
+{
+    Network* net_p = new Network();
+    LinearLayer* inlayer_p = new LinearLayer(1);
+    MdlstmLayer* outlayer_p = new MdlstmLayer(2, 1);
+    FullConnection* con_p = new FullConnection(inlayer_p, outlayer_p);
+    net_p->add_module(inlayer_p, Network::InputModule);
+    net_p->add_module(outlayer_p, Network::OutputModule);
+    net_p->add_connection(con_p);
+    net_p->sort();
+
+    ASSERT_GT(0.001, gradient_check(*net_p));
+    ASSERT_GT(0.001, gradient_check(*net_p));
+    ASSERT_GT(0.001, gradient_check(*net_p));
+}
+
+
+TEST(TestGradient, LstmLayer)
 {
     Network* net_p = new Network();
     LinearLayer* inlayer_p = new LinearLayer(1);
@@ -2176,5 +2193,32 @@ TEST(TestGradient, TanhMdrnn)
 
 }
 
+TEST(TestGradient, MdlstmMdrnn)
+{
+    MdlstmMdrnn net(2, 1);
+    net.set_sequence_shape(0, 10);
+    net.set_sequence_shape(1, 10);
+    net.set_block_shape(1, 1);
+    net.set_block_shape(1, 1);
+    net.sort();
+    net.randomize();
+
+    std::cout << "Parameters: ";
+    print_parameters(net);
+    std::cout << std::endl;
+    std::cout << "Derivatives: ";
+    print_derivatives(net);
+    std::cout << std::endl;
+
+    EXPECT_GT(0.001, gradient_check(net));
+
+    std::cout << "Parameters: ";
+    print_parameters(net);
+    std::cout << std::endl;
+    std::cout << "Derivatives: ";
+    print_derivatives(net);
+    std::cout << std::endl;
+
+}
 
 }  // namespace
