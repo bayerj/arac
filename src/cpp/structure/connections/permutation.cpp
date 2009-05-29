@@ -9,7 +9,6 @@
 
 using arac::structure::connections::PermutationConnection;
 using arac::structure::connections::Connection;
-using arac::structure::Parametrized;
 using arac::structure::modules::Module;
 
 

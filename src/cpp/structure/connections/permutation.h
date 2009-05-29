@@ -7,7 +7,6 @@
 
 
 #include "../modules/module.h"
-#include "../parametrized.h"
 #include "connection.h"
 
 
@@ -17,11 +16,10 @@ namespace connections {
 
     
 using namespace arac::structure::modules;
-using arac::structure::Parametrized;
 
 
 ///
-/// TOOD: docu,ent
+/// TOOD: document
 ///
 
 class PermutationConnection : public Connection
