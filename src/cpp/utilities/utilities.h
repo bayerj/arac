@@ -43,7 +43,8 @@ void fill_random(double* sink_p, int length, double interval = 0.01);
 /// biggest difference between an analytical and a numerical gradient.
 ///
 double
-gradient_check(arac::structure::networks::BaseNetwork& network);
+gradient_check(arac::structure::networks::BaseNetwork& network,
+               bool verbose=false);
 
 
 ///

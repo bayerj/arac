@@ -249,7 +249,7 @@ parametrized_by_network(std::vector<Parametrized*>& params, BaseNetwork& net)
 
 
 double
-gradient_check_nonsequential(BaseNetwork& network)
+gradient_check_nonsequential(BaseNetwork& network, bool verbose)
 {
     int insize = network.insize();
     int outsize = network.outsize();
@@ -283,7 +283,10 @@ gradient_check_nonsequential(BaseNetwork& network)
          param_iter != params.end();
          param_iter++)
     {
-        std::cout << "yikes" << std::endl;
+        if (verbose)
+        {
+          std::cout << "New Parametrized instace." << std::endl;
+        }
         Parametrized& parametrized = **param_iter;
         for (int i = 0; i < parametrized.size(); i++)
         {
@@ -322,12 +325,16 @@ gradient_check_nonsequential(BaseNetwork& network)
             double lefterror = 0.5 * sum(error_p, outsize);
 
             numeric_deriv = (righterror - lefterror) / (epsilon * -2);
-            std::cout << "YO:" << numeric_deriv << " <-> " << param_deriv
-                      << std::endl;
+            if (verbose)
+            {
+              std::cout << "Numeric/Analytical:" << numeric_deriv 
+                        << " <-> " 
+                        << param_deriv
+                        << std::endl;
+            }
 
             double diff = numeric_deriv - param_deriv;
             diff *= diff < 0 ? -1 : 1;   // Take absolute value.
-            // std::cout << "YO:" << diff << std::endl;
             biggest = diff > biggest ? diff : biggest;
 
             // Correct parameter.
@@ -340,10 +347,10 @@ gradient_check_nonsequential(BaseNetwork& network)
 
 
 double
-gradient_check(BaseNetwork& network)
+gradient_check(BaseNetwork& network, bool verbose)
 {
     // TODO: alternative for sequential/non-sequential
-    return gradient_check_nonsequential(network);
+    return gradient_check_nonsequential(network, verbose);
 }
 
 
