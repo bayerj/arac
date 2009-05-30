@@ -2170,11 +2170,11 @@ TEST(TestGradient, MultiplicationLayer)
 
 TEST(TestGradient, TanhMdrnn)
 {
-    TanhMdrnn net(2, 3);
+    TanhMdrnn net(2, 5);
     net.set_sequence_shape(0, 10);
     net.set_sequence_shape(1, 10);
-    net.set_block_shape(1, 1);
-    net.set_block_shape(1, 1);
+    net.set_block_shape(0, 2);
+    net.set_block_shape(1, 2);
     net.sort();
     net.randomize();
     
@@ -2193,8 +2193,82 @@ TEST(TestGradient, TanhMdrnn)
     std::cout << "Derivatives: ";
     print_derivatives(net);
     std::cout << std::endl;
-
 }
+
+
+TEST(TestGradient, MdMdrnn)
+{
+    int hidden = 5;
+
+    LinearLayer inlayer = LinearLayer(16);
+    LinearLayer outlayer = LinearLayer(4);
+
+    TanhMdrnn hiddenlayer1 = TanhMdrnn(2, hidden);
+    hiddenlayer1.set_sequence_shape(0, 4);
+    hiddenlayer1.set_sequence_shape(1, 4);
+    hiddenlayer1.set_block_shape(0, 2);
+    hiddenlayer1.set_block_shape(1, 2);
+    hiddenlayer1.sort();
+    hiddenlayer1.randomize();
+    
+    TanhMdrnn hiddenlayer2 = TanhMdrnn(2, hidden);
+    hiddenlayer2.set_sequence_shape(0, 4);
+    hiddenlayer2.set_sequence_shape(1, 4);
+    hiddenlayer2.set_block_shape(0, 2);
+    hiddenlayer2.set_block_shape(1, 2);
+    hiddenlayer2.sort();
+    hiddenlayer2.randomize();
+
+    LinearLayer intermediate1 = LinearLayer(4 * hidden);
+    LinearLayer intermediate2 = LinearLayer(4 * hidden);
+
+    std::vector<int> inperm;
+    for (int i = 15; i >= 0; i--)
+    {
+      inperm.push_back(i);
+    }
+
+    std::vector<int> outperm;
+    for (int i = 4 * hidden - 1; i >= 0; i--)
+    {
+      outperm.push_back(i);
+    }
+
+    IdentityConnection incon = 
+      IdentityConnection(&inlayer, &hiddenlayer1);
+    IdentityConnection outcon = 
+      IdentityConnection(&hiddenlayer1, &intermediate1);
+
+    PermutationConnection blockvamp = \
+      PermutationConnection(&inlayer, &hiddenlayer2, inperm);
+    PermutationConnection blockrevamp = \
+      PermutationConnection(&hiddenlayer2, &intermediate2, outperm);
+
+    WeightShareConnection outcon1 = 
+      WeightShareConnection(&intermediate1, &outlayer, hidden, 1);
+    WeightShareConnection outcon2 = 
+      WeightShareConnection(&intermediate2, &outlayer, hidden, 1);
+
+    Network net;
+    net.add_module(&inlayer, Network::InputModule);
+    net.add_module(&outlayer, Network::OutputModule);
+    net.add_module(&intermediate1);
+    net.add_module(&intermediate2);
+    net.add_module(&hiddenlayer1);
+    net.add_module(&hiddenlayer2);
+    net.add_connection(&incon);
+    net.add_connection(&outcon);
+    net.add_connection(&blockvamp);
+    net.add_connection(&blockrevamp);
+    net.add_connection(&outcon1);
+    net.add_connection(&outcon2);
+    net.sort();
+    net.randomize();
+
+    EXPECT_GT(0.001, gradient_check(net, true));
+}
+
+
 
 TEST(TestGradient, MdlstmMdrnn)
 {
