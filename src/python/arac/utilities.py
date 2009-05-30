@@ -50,13 +50,15 @@ def block_permutation(shape, blockshape):
 
 
 def params_by_network(network):
-    params = []
-    for par in network.parametrizeds():
-        params.append(par.get_parameters())
-    for net in network.networks():
-        for par in net.parametrizeds():
-          params.append(par.get_parameters())
-    return params
+  """Return a list of arrays containing the parameters of a network."""
+  # FIXME: make clear whether this is a copy or not
+  params = []
+  for par in network.parametrizeds():
+    params.append(par.get_parameters())
+  for net in network.networks():
+    for par in net.parametrizeds():
+      params.append(par.get_parameters())
+  return params
 
 
 def num_params(network):
