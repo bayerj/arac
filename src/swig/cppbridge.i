@@ -1009,3 +1009,6 @@ class SequentialBackprop
         BaseNetwork& network();
         SupervisedSequentialDataset& dataset();
 };
+
+
+double gradient_check(BaseNetwork& network);
