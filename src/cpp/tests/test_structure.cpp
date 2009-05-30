@@ -1674,9 +1674,6 @@ TEST(TestNetwork, TestLinearMdrnn)
         << "back_activate copy not correct.";
     EXPECT_DOUBLE_EQ(net.inerror()[0][3], inerror_p[3])
         << "back_activate copy not correct.";
-
-    print_parameters(net);
-    print_derivatives(net);
 }
 
 
@@ -2032,9 +2029,7 @@ TEST(TestGradient, LstmLayer)
     net_p->add_connection(con_p);
     net_p->sort();
 
-    ASSERT_GT(0.001, gradient_check(*net_p));
-    ASSERT_GT(0.001, gradient_check(*net_p));
-    ASSERT_GT(0.001, gradient_check(*net_p));
+    ASSERT_GT(0.001, gradient_check(*net_p, true));
 }
 
 
@@ -2178,21 +2173,7 @@ TEST(TestGradient, TanhMdrnn)
     net.sort();
     net.randomize();
     
-    std::cout << "Parameters: ";
-    print_parameters(net);
-    std::cout << std::endl;
-    std::cout << "Derivatives: ";
-    print_derivatives(net);
-    std::cout << std::endl;
-
     EXPECT_GT(0.001, gradient_check(net));
-
-    std::cout << "Parameters: ";
-    print_parameters(net);
-    std::cout << std::endl;
-    std::cout << "Derivatives: ";
-    print_derivatives(net);
-    std::cout << std::endl;
 }
 
 
@@ -2265,9 +2246,8 @@ TEST(TestGradient, MdMdrnn)
     net.sort();
     net.randomize();
 
-    EXPECT_GT(0.001, gradient_check(net, true));
+    EXPECT_GT(0.001, gradient_check(net));
 }
-
 
 
 TEST(TestGradient, MdlstmMdrnn)
@@ -2280,22 +2260,7 @@ TEST(TestGradient, MdlstmMdrnn)
     net.sort();
     net.randomize();
 
-    std::cout << "Parameters: ";
-    print_parameters(net);
-    std::cout << std::endl;
-    std::cout << "Derivatives: ";
-    print_derivatives(net);
-    std::cout << std::endl;
-
-    EXPECT_GT(0.001, gradient_check(net));
-
-    std::cout << "Parameters: ";
-    print_parameters(net);
-    std::cout << std::endl;
-    std::cout << "Derivatives: ";
-    print_derivatives(net);
-    std::cout << std::endl;
-
+    EXPECT_GT(0.001, gradient_check(net, true));
 }
 
 }  // namespace

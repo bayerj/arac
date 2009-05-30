@@ -274,7 +274,6 @@ gradient_check_nonsequential(BaseNetwork& network, bool verbose)
     // sequentially.
     std::vector<Parametrized*> params;
     parametrized_by_network(params, network);
-    std::cout << params.size() << std::endl;
 
     std::vector<arac::structure::Parametrized*>::iterator param_iter;
     // Now iterate over all parametrized objects in order to play with every 
@@ -285,7 +284,7 @@ gradient_check_nonsequential(BaseNetwork& network, bool verbose)
     {
         if (verbose)
         {
-          std::cout << "New Parametrized instace." << std::endl;
+          std::cout << "New Parametrized instance." << std::endl;
         }
         Parametrized& parametrized = **param_iter;
         for (int i = 0; i < parametrized.size(); i++)
