@@ -276,7 +276,7 @@ Mdrnn<module_type>::biascon()
 template <class module_type>
 inline
 void
-Mdrnn<module_type>::next_coords(double* coords_p)
+Mdrnn<module_type>::next_coords(int* coords_p)
 {
     for(int i = 0; i < _timedim; i++)
     {
@@ -464,6 +464,7 @@ Mdrnn<module_type>::clear()
     _module_p->clear();
     _inmodule_p->clear();
     _feedcon_p->clear();
+    _biascon_p->clear();
     ConPtrVectorVector::iterator con_vec_iter;
     ConPtrVector::iterator con_iter;
     for (con_vec_iter = _connections.begin();
@@ -558,8 +559,8 @@ void
 Mdrnn<module_type>::_backward()
 {
     // We keep the coordinates of the current block in here.
-    double* coords_p = new double[_timedim];
-    memset(coords_p, 0, sizeof(double) * _timedim);
+    int* coords_p = new int[_timedim];
+    memset(coords_p, 0, sizeof(int) * _timedim);
     // TODO: save memory by not copying but referencing.
     for(int i = sequencelength() - 1; i >= 0; i--)
     {
