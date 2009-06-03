@@ -109,7 +109,7 @@ class Mdrnn : public BaseMdrnn
         void delete_structure();
         
         // FIXME: This should be done with integers!
-        void next_coords(double* coords);
+        void next_coords(int* coords);
         void update_sizes();
         
         int _hiddensize;
@@ -499,8 +499,8 @@ void
 Mdrnn<module_type>::_forward()
 {
     // We keep the coordinates of the current block in here.
-    double* coords_p = new double[_timedim];
-    memset(coords_p, 0, sizeof(double) * _timedim);
+    int* coords_p = new int[_timedim];
+    memset(coords_p, 0, sizeof(int) * _timedim);
 
     for(int i = 0; i < sequencelength(); i++)
     {
@@ -540,8 +540,9 @@ Mdrnn<module_type>::_forward()
         _module_p->forward();
         next_coords(coords_p);
     }
-    // Copy the output to the mdrnns outputbuffer.
-    // TODO: save memory by not copying but referencing.
+    // Copy the output to the mdrnns outputbuffer. We cannot reference this
+    // since some layers might have special buffers (e.g. MdlstmLayers store
+    // the states in the output layer.)
     for(int i = 0; i < sequencelength(); i++)
     {
         memcpy(output()[timestep()] + i * _hiddensize, 
