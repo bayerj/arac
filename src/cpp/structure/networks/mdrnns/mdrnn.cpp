@@ -34,7 +34,6 @@ Mdrnn<LinearLayer>::init_structure()
     // Add a connection from the bias.
     _biascon_p = new FullConnection(&_bias, _module_p);
      _biascon_p->set_mode(Component::Sequential);
-    _parametrizeds.push_back(_biascon_p);
 }
 
 
@@ -57,7 +56,6 @@ Mdrnn<TanhLayer>::init_structure()
     // Add a connection from the bias.
     _biascon_p = new FullConnection(&_bias, _module_p);
     _biascon_p->set_mode(Component::Sequential);
-    _parametrizeds.push_back(_biascon_p);
 }
 
 
@@ -80,7 +78,6 @@ Mdrnn<SigmoidLayer>::init_structure()
     // Add a connection from the bias.
     _biascon_p = new FullConnection(&_bias, _module_p);
     _biascon_p->set_mode(Component::Sequential);
-    _parametrizeds.push_back(_biascon_p);
 }
 
 
@@ -99,7 +96,6 @@ Mdrnn<MdlstmLayer>::init_structure()
                            0, blocksize(),
                            0, (3 + _timedim) * _hiddensize);
     feedcon_p->set_mode(Component::Sequential);
-    _parametrizeds.push_back(feedcon_p);
     _feedcon_p = feedcon_p;
     
     // Add a connection from the bias.
@@ -111,7 +107,6 @@ Mdrnn<MdlstmLayer>::init_structure()
                                     0, 1, 
                                     full_con_outstart, full_con_outstop);
     _biascon_p->set_mode(Component::Sequential);
-    _parametrizeds.push_back(_biascon_p);
 }
 
 
