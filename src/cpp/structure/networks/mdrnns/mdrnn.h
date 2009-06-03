@@ -596,7 +596,17 @@ Mdrnn<module_type>::_backward()
         _inmodule_p->add_to_input(input()[timestep() - 1] + i * blocksize());
         _inmodule_p->forward();
 
-        _module_p->add_to_outerror(outerror()[timestep() - 1] + i * _hiddensize);
+        // We do not use add_to_outerror here, since this is broken for 
+        // MdlstmLayers: the second half of the MdlstmLayers should ne get an 
+        // error signal since it's internal states.
+        // TODO: this should be fixed, actually.
+        double* mod_outerr_p = _module_p->outerror()[_module_p->timestep() - 1];
+        double* own_outerr_p = outerror()[timestep() - 1] + i * _hiddensize;
+        for (int j = 0; j < _hiddensize; j++)
+        {
+            mod_outerr_p[j] += own_outerr_p[j];
+        }
+
         _module_p->backward();
         _feedcon_p->backward();
         _biascon_p->backward();
@@ -604,7 +614,6 @@ Mdrnn<module_type>::_backward()
         _inmodule_p->backward();
         next_coords(coords_p);
 
-        // TODO: save memory by not copying but referencing.
         double* sink_p = inerror()[timestep() - 1] + i * blocksize();
         double* source_p = _inmodule_p->inerror()[0];
         memcpy(sink_p, source_p, blocksize() * sizeof(double));
