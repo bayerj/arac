@@ -152,11 +152,16 @@ MdlstmLayer::_forward()
     //     }
     // }
     
-    // Squash the input gates and forget gates.
+    // Squash the input gates.
     for (int i = 0; i < size; i++)
     {
         input_gate_squashed()[timestep()][i] = \
             gate_squasher(_input_gate_unsquashed[timestep()][i]);
+    }
+
+    // Squash the forget gates.
+    for (int i = 0; i < size * _timedim; i++)
+    {
         forget_gate_squashed()[timestep()][i] = \
             gate_squasher(forget_gate_unsquashed()[timestep()][i]);
     }
