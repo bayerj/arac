@@ -33,7 +33,7 @@ Mdrnn<LinearLayer>::init_structure()
    
     // Add a connection from the bias.
     _biascon_p = new FullConnection(&_bias, _module_p);
-     _biascon_p->set_mode(Component::Sequential);
+    _biascon_p->set_mode(Component::Sequential);
 }
 
 
