@@ -2004,16 +2004,15 @@ TEST(TestNetworkSorting, RegressionWeightBlockPermute)
 TEST(TestGradient, MdlstmLayer)
 {
     Network* net_p = new Network();
-    LinearLayer* inlayer_p = new LinearLayer(1);
-    MdlstmLayer* outlayer_p = new MdlstmLayer(2, 1);
+    LinearLayer* inlayer_p = new LinearLayer(2);
+    MdlstmLayer* outlayer_p = new MdlstmLayer(2, 2);
     FullConnection* con_p = new FullConnection(inlayer_p, outlayer_p);
     net_p->add_module(inlayer_p, Network::InputModule);
     net_p->add_module(outlayer_p, Network::OutputModule);
     net_p->add_connection(con_p);
     net_p->sort();
+    net_p->randomize();
 
-    ASSERT_GT(0.001, gradient_check(*net_p));
-    ASSERT_GT(0.001, gradient_check(*net_p));
     ASSERT_GT(0.001, gradient_check(*net_p));
 }
 
@@ -2028,8 +2027,11 @@ TEST(TestGradient, LstmLayer)
     net_p->add_module(outlayer_p, Network::OutputModule);
     net_p->add_connection(con_p);
     net_p->sort();
+    net_p->randomize();
 
-    ASSERT_GT(0.001, gradient_check(*net_p, true));
+    // ASSERT_GT(0.001, gradient_check(*net_p))
+    ASSERT_GT(-1, 0) 
+      << "Gradient check not yet implemented for sequential modules.";
 }
 
 
@@ -2165,7 +2167,7 @@ TEST(TestGradient, MultiplicationLayer)
 
 TEST(TestGradient, TanhMdrnn)
 {
-    TanhMdrnn net(2, 5);
+    TanhMdrnn net(2, 2);
     net.set_sequence_shape(0, 10);
     net.set_sequence_shape(1, 10);
     net.set_block_shape(0, 2);
@@ -2255,8 +2257,8 @@ TEST(TestGradient, MdlstmMdrnn)
     MdlstmMdrnn net(2, 1);
     net.set_sequence_shape(0, 10);
     net.set_sequence_shape(1, 10);
-    net.set_block_shape(1, 1);
-    net.set_block_shape(1, 1);
+    net.set_block_shape(0, 2);
+    net.set_block_shape(1, 2);
     net.sort();
     net.randomize();
 
