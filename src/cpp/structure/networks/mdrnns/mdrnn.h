@@ -485,6 +485,8 @@ template <class module_type>
 void
 Mdrnn<module_type>::clear_derivatives()
 {
+    _feedcon_p->clear_derivatives();
+    _biascon_p->clear_derivatives();
     std::vector<Parametrized*>::iterator param_iter;
     for (param_iter = _parametrizeds.begin();
          param_iter != _parametrizeds.end();
