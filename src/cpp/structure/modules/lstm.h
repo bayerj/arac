@@ -65,6 +65,7 @@ class LstmLayer : public Module
         ///
         /// Since the lstm cell is a special case of the mdlstm cell, the lstm
         /// layer is implemented by wrapping an MdlstmLayer object.
+        ///
         MdlstmLayer _mdlstm;
 
         arac::common::Buffer* _state_p;
