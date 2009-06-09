@@ -120,12 +120,14 @@ void FullConnection::backward_process(double* sink_p, const double* source_p)
                 // Incrementer.
                 1);   
 
-    double* derivs_p = get_derivatives();
-    for (int i = 0; i < outdim; i++)
-    {
-        for (int j = 0; j < indim; j++)
-        {
-            derivs_p[i * indim + j] += source_p[i] * input_p[j];
-        }
-    }
+    cblas_dger(CblasColMajor, 
+               indim,
+               outdim,
+               1.0,
+               input_p,
+               1, 
+               source_p,
+               1, 
+               get_derivatives(),
+               indim);
 }
