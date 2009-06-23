@@ -2262,7 +2262,7 @@ TEST(TestGradient, MdlstmMdrnn)
     net.sort();
     net.randomize();
 
-    EXPECT_GT(0.001, gradient_check(net, true));
+    EXPECT_GT(0.001, gradient_check(net));
 }
 
 }  // namespace
