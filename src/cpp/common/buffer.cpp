@@ -10,8 +10,8 @@
 using arac::common::Buffer;
 
 
-Buffer::Buffer(size_t rowsize, bool owner) : 
-    _rowsize(rowsize), 
+Buffer::Buffer(size_t rowsize, bool owner) :
+    _rowsize(rowsize),
     _owner(owner),
     _contmemory(true)
 {
