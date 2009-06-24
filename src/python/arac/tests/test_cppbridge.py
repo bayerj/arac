@@ -102,10 +102,10 @@ class TestStructure(TestCase):
         self.assertEqual(pointer(paras[0]), pointer(c1))
         self.assertEqual(pointer(paras[1]), pointer(c2))
         
-    def testWeightShareConnection(self):
+    def testConvolveConnection(self):
         l1 = arac.cppbridge.LinearLayer(3)
         l2 = arac.cppbridge.LinearLayer(15)
-        c = arac.cppbridge.WeightShareConnection(l1, l2, 1, 5)
+        c = arac.cppbridge.ConvolveConnection(l1, l2, 1, 5)
         params = scipy.array((1, 2, 3, 4, 5), dtype='float64')
         derivs = scipy.zeros(5)
         c.set_parameters(params)

@@ -10,16 +10,16 @@ extern "C"
 }
 
 
-#include "weightshare.h"
+#include "convolve.h"
 
 
-using arac::structure::connections::WeightShareConnection;
+using arac::structure::connections::ConvolveConnection;
 using arac::structure::connections::Connection;
 using arac::structure::Parametrized;
 using arac::structure::modules::Module;
 
 
-WeightShareConnection::WeightShareConnection(Module* incoming_p, Module* outgoing_p, 
+ConvolveConnection::ConvolveConnection(Module* incoming_p, Module* outgoing_p, 
                                              int inchunk, int outchunk) :
     Connection(incoming_p, outgoing_p),
     Parametrized(inchunk * outchunk),
@@ -34,14 +34,14 @@ WeightShareConnection::WeightShareConnection(Module* incoming_p, Module* outgoin
 }
 
 
-WeightShareConnection::~WeightShareConnection()
+ConvolveConnection::~ConvolveConnection()
 {
     
 }
 
 
 void
-WeightShareConnection::forward_process(double* sink_p, const double* source_p)
+ConvolveConnection::forward_process(double* sink_p, const double* source_p)
 {
     for (int i = 0; i < _n_chunks; i++)
     {
@@ -74,7 +74,7 @@ WeightShareConnection::forward_process(double* sink_p, const double* source_p)
 
 
 void
-WeightShareConnection::backward_process(double* sink_p, const double* source_p)
+ConvolveConnection::backward_process(double* sink_p, const double* source_p)
 {
     int indim = _incomingstop - _incomingstart;
     int outdim = _outgoingstop - _outgoingstart;
@@ -109,12 +109,12 @@ WeightShareConnection::backward_process(double* sink_p, const double* source_p)
                 // Incrementer.
                 1);   
 
-      for (int j = 0; j < _outchunk; j++)
-      {
+        for (int j = 0; j < _outchunk; j++)
+        {
           for (int k = 0; k < _inchunk; k++)
           {
               derivs_p[j * _inchunk + k] += source_p[i * _outchunk + j] * input_p[i * _inchunk + k];
           }
-      }
+        }
     }
 }

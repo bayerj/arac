@@ -7,9 +7,10 @@
 
 
 #include "connection.h"
-#include "weightshare.h"
+#include "convolve.h"
 #include "full.h"
 #include "identity.h"
+#include "inconvolve.h"
 #include "linear.h"
 #include "permutation.h"
 #include "blockpermutation.h"

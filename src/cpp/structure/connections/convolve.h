@@ -2,8 +2,8 @@
 // (c) 2008 by Justin S Bayer, <bayer.justin@googlemail.com>
 
 
-#ifndef Arac_STRUCTURE_CONNECTIONS_WEIGHTSHARE_INCLUDED
-#define Arac_STRUCTURE_CONNECTIONS_WEIGHTSHARE_INCLUDED
+#ifndef Arac_STRUCTURE_CONNECTIONS_CONVOLVE_INCLUDED
+#define Arac_STRUCTURE_CONNECTIONS_CONVOLVE_INCLUDED
 
 
 #include "../modules/module.h"
@@ -22,30 +22,30 @@ using arac::structure::Parametrized;
 
 
 ///
-/// TOOD: docu,ent
+/// TODO: document
 ///
 
-class WeightShareConnection : public Connection, public Parametrized
+class ConvolveConnection : public Connection, public Parametrized
 {
     public: 
    
         ///
-        /// Create a new ConvolutionalConnection object.
+        /// Create a new ConvolveConnection object.
         ///
-        WeightShareConnection(Module* incoming_p, Module* outgoing_p, 
+        ConvolveConnection(Module* incoming_p, Module* outgoing_p, 
                               int inchunk, int outchunk);
 
         ///
-        /// Create a new ConvolutionalConnection object and use the
+        /// Create a new ConvolveConnection object and use the
         /// supplied arrays as parameters and derivatives.
         ///
-        WeightShareConnection(Module* incoming_p, Module* outgoing_p,
+        ConvolveConnection(Module* incoming_p, Module* outgoing_p,
                        double* parameters_p, double* derivatives_p);
            
         ///            
-        /// Destroy the ConvolutionalConnection object.
+        /// Destroy the ConvolveConnection object.
         ///
-        virtual ~WeightShareConnection();
+        virtual ~ConvolveConnection();
         
     protected:
         virtual void forward_process(double* sink_p, const double* source_p);

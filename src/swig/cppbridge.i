@@ -652,13 +652,21 @@ class PermutationConnection : public Connection
 };
 
 
-%feature("notabstract") WeightShareConnection;
-class WeightShareConnection : public Connection, public Parametrized
+%feature("notabstract") ConvolveConnection;
+class ConvolveConnection : public Connection, public Parametrized
 {
     public:
-        WeightShareConnection(Module* incoming_p, Module* outgoing_p, 
+        ConvolveConnection(Module* incoming_p, Module* outgoing_p, 
                               int inchunk, int outchunk);
-        ~WeightShareConnection();
+        ~ConvolveConnection();
+};
+
+%feature("notabstract") InConvolveConnection;
+class InConvolveConnection : public Connection, public Parametrized
+{
+    public:
+        InConvolveConnection(Module* incoming_p, Module* outgoing_p, int chunk);
+        ~InConvolveConnection();
 };
 
 

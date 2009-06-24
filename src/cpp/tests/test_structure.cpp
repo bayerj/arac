@@ -1888,15 +1888,12 @@ TEST(TestConnections, TestBlockPermutationConnectionInversion)
 }
 
 
-// TODO: Add recurrency test for BlockPermutationConnection.
-
-
-TEST(TestConnections, TestWeightShareConnection)
+TEST(TestConnections, TestConvolveConnection)
 {
     LinearLayer* inlayer_p = new LinearLayer(3);
     LinearLayer* outlayer_p = new LinearLayer(15);
-    WeightShareConnection* con_p = new \
-        WeightShareConnection(inlayer_p, outlayer_p, 1, 5);
+    ConvolveConnection* con_p = new \
+        ConvolveConnection(inlayer_p, outlayer_p, 1, 5);
         
     double* params_p = new double[5];
     params_p[0] = 1;
@@ -1961,6 +1958,43 @@ TEST(TestConnections, TestWeightShareConnection)
 }
 
 
+TEST(TestConnections, TestInConvolveConnection)
+{
+    LinearLayer* inlayer_p = new LinearLayer(6);
+    LinearLayer* outlayer_p = new LinearLayer(3);
+    InConvolveConnection* con_p = new \
+        InConvolveConnection(inlayer_p, outlayer_p, 2);
+        
+    double* params_p = new double[6];
+    params_p[0] = 1;
+    params_p[1] = 2;
+    params_p[2] = 3;
+    params_p[3] = 4;
+    params_p[4] = 5;
+    params_p[5] = 6;
+            
+    con_p->set_parameters(params_p);
+    
+    inlayer_p->input()[0][0] = 0;
+    inlayer_p->input()[0][1] = 1;
+    inlayer_p->input()[0][2] = 2;
+    inlayer_p->input()[0][3] = 3;
+    inlayer_p->input()[0][4] = 4;
+    inlayer_p->input()[0][5] = 5;
+
+    inlayer_p->forward();
+    con_p->forward();
+    outlayer_p->forward();
+    
+    double solution_p[3] = {24., 54., 84.};
+                          
+    for (int i = 0; i < 3; i++)
+    {
+        EXPECT_EQ(solution_p[i], outlayer_p->input()[0][i])
+            << "Wrong input for outlayer at " << i;
+    }
+}
+
 TEST(TestNetworkSorting, RegressionWeightBlockPermute)
 {
     LinearLayer inlayer(4);
@@ -1978,7 +2012,7 @@ TEST(TestNetworkSorting, RegressionWeightBlockPermute)
 
     BlockPermutationConnection con1(&inlayer, &hidden1, seqshape, blockshape);
 
-    WeightShareConnection con2(&hidden1, &hidden2, 2, 2);
+    ConvolveConnection con2(&hidden1, &hidden2, 2, 2);
     IdentityConnection con3(&hidden2, &outlayer);
 
     Network net;
@@ -1995,10 +2029,6 @@ TEST(TestNetworkSorting, RegressionWeightBlockPermute)
     net.sort();
     net.randomize();
 }
-
-
-// TODO: Add a recurrency test fort WeightShareConnection.
-// TODO: Add deep recurrency tests for other connections.
 
 
 TEST(TestGradient, MdlstmLayer)
@@ -2227,10 +2257,10 @@ TEST(TestGradient, MdMdrnn)
     PermutationConnection blockrevamp = \
       PermutationConnection(&hiddenlayer2, &intermediate2, outperm);
 
-    WeightShareConnection outcon1 = 
-      WeightShareConnection(&intermediate1, &outlayer, hidden, 1);
-    WeightShareConnection outcon2 = 
-      WeightShareConnection(&intermediate2, &outlayer, hidden, 1);
+    ConvolveConnection outcon1 = 
+      ConvolveConnection(&intermediate1, &outlayer, hidden, 1);
+    ConvolveConnection outcon2 = 
+      ConvolveConnection(&intermediate2, &outlayer, hidden, 1);
 
     Network net;
     net.add_module(&inlayer, Network::InputModule);
@@ -2264,5 +2294,26 @@ TEST(TestGradient, MdlstmMdrnn)
 
     EXPECT_GT(0.001, gradient_check(net));
 }
+
+
+TEST(TestGradient, InConvolveConnection)
+{
+    // Network net;
+    // 
+    // LinearLayer* inlayer_p = new LinearLayer(6);
+    // LinearLayer* outlayer_p = new LinearLayer(3);
+    // InConvolveConnection* con_p = new \
+    //     InConvolveConnection(inlayer_p, outlayer_p, 2);
+
+    // con_p->randomize();
+    // 
+    // net.add_module(inlayer_p, Network::InputModule);
+    // net.add_module(outlayer_p, Network::OutputModule);
+    // net.add_connection(con_p);
+    // net.sort();
+
+    // EXPECT_GT(0.001, gradient_check(net));
+}
+
 
 }  // namespace
