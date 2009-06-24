@@ -22,11 +22,11 @@ print_derivatives(arac::structure::networks::BaseNetwork& net);
 
 
 void
-print_activations(arac::structure::networks::BaseNetwork& net, 
+print_activations(arac::structure::networks::BaseNetwork& net,
                   arac::datasets::SupervisedDataset<double*, double*>& ds);
 
 
-void block_permutation(std::vector<int>& perm, 
+void block_permutation(std::vector<int>& perm,
                        std::vector<int>& sequence_shape,
                        std::vector<int>& block_shape);
 
@@ -48,7 +48,7 @@ gradient_check(arac::structure::networks::BaseNetwork& network,
 
 
 ///
-/// Recursively walk a BaseNetwork topology and push all encountered 
+/// Recursively walk a BaseNetwork topology and push all encountered
 /// Parametrized objects to the end of a vector.
 ///
 void
