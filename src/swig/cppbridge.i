@@ -438,9 +438,16 @@ class SigmoidLayer : public Module
 {
     public:
         SigmoidLayer(int size);
-        virtual ~LinearLayer();
+        virtual ~SigmoidLayer();
 };
 
+%feature("notabstract") CosineLayer;
+class CosineLayer : public Module
+{
+    public:
+        CosineLayer(int size);
+        virtual ~CosineLayer();
+};
 
 %feature("notabstract") SoftmaxLayer;
 class SoftmaxLayer : public Module

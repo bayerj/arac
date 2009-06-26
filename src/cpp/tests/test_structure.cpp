@@ -185,6 +185,41 @@ TEST(TestModules, LinearLayer) {
 }
 
 
+TEST(TestModules, CosineLayer) {
+    CosineLayer* layer_p = new CosineLayer(2);
+
+    double* input_p = new double[2];
+    input_p[0] = 3.;
+    input_p[1] = 4.;
+    input_p[2] = 0.;
+
+    layer_p->add_to_input(input_p);
+    
+    layer_p->forward();
+    
+    ASSERT_DOUBLE_EQ(0.6, layer_p->output()[0][0])
+        << "Forward pass incorrect.";
+        
+    ASSERT_DOUBLE_EQ(0.8, layer_p->output()[0][1])
+        << "Forward pass incorrect.";
+
+    double* outerror_p = new double[2];
+    outerror_p[0] = 1;
+    outerror_p[1] = 3;
+    layer_p->add_to_outerror(outerror_p);
+    layer_p->backward();
+    
+    EXPECT_DOUBLE_EQ(0.128, layer_p->inerror()[0][0])
+        << "Backward pass incorrect.";
+    
+    EXPECT_DOUBLE_EQ(0.216, layer_p->inerror()[0][1])
+        << "Backward pass incorrect.";
+
+    EXPECT_DOUBLE_EQ(0.0, layer_p->inerror()[0][2])
+        << "Backward pass incorrect.";
+}
+
+
 TEST(TestModules, LinearLayerSequential) {
     LinearLayer* layer_p = new LinearLayer(2);
     layer_p->set_mode(Component::Sequential);
@@ -2137,6 +2172,24 @@ TEST(TestGradient, SigmoidLayer)
     
     LinearLayer* inlayer_p = new LinearLayer(2);
     SigmoidLayer* outlayer_p = new SigmoidLayer(2);
+    FullConnection* con_p = new FullConnection(inlayer_p, outlayer_p);
+    
+    con_p->randomize();
+    
+    net_p->add_module(inlayer_p, Network::InputModule);
+    net_p->add_module(outlayer_p, Network::OutputModule);
+    net_p->add_connection(con_p);
+
+    ASSERT_GT(0.001, gradient_check(*net_p));
+}
+
+
+TEST(TestGradient, CosineLayer)
+{
+    Network* net_p = new Network();
+    
+    LinearLayer* inlayer_p = new LinearLayer(2);
+    CosineLayer* outlayer_p = new CosineLayer(2);
     FullConnection* con_p = new FullConnection(inlayer_p, outlayer_p);
     
     con_p->randomize();

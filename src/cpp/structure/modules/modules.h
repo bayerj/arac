@@ -7,6 +7,7 @@
 
 
 #include "bias.h"
+#include "cosine.h"
 #include "doublegate.h"
 #include "errorscaling.h"
 #include "gate.h"
