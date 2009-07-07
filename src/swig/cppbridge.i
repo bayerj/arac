@@ -209,6 +209,7 @@ class Parametrized
     public: 
         Parametrized();
         Parametrized(int size);
+        int size();
         virtual ~Parametrized();
         void clear_derivatives();
 };
