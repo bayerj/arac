@@ -671,6 +671,15 @@ class InConvolveConnection : public Connection, public Parametrized
 };
 
 
+%feature("notabstract") OutConvolveConnection;
+class OutConvolveConnection : public Connection, public Parametrized
+{
+    public:
+        OutConvolveConnection(Module* incoming_p, Module* outgoing_p, int chunk);
+        ~OutConvolveConnection();
+};
+
+
 %feature("notabstract") Network;
 class Network : public BaseNetwork
 {
