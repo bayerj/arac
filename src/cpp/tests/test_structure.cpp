@@ -1998,7 +1998,7 @@ TEST(TestConnections, TestInConvolveConnection)
 
 TEST(TestConnections, TestOutConvolveConnection)
 {
-    LinearLayer* inlayer_p = new Bias();
+    Bias* inlayer_p = new Bias();
     LinearLayer* outlayer_p = new LinearLayer(4);
     OutConvolveConnection* con_p = new \
         OutConvolveConnection(inlayer_p, outlayer_p, 2);
@@ -2326,21 +2326,21 @@ TEST(TestGradient, MdlstmMdrnn)
 
 TEST(TestGradient, InConvolveConnection)
 {
-    // Network net;
-    // 
-    // LinearLayer* inlayer_p = new LinearLayer(6);
-    // LinearLayer* outlayer_p = new LinearLayer(3);
-    // InConvolveConnection* con_p = new \
-    //     InConvolveConnection(inlayer_p, outlayer_p, 2);
+    Network net;
+    
+    LinearLayer* inlayer_p = new LinearLayer(6);
+    LinearLayer* outlayer_p = new LinearLayer(3);
+    InConvolveConnection* con_p = new \
+        InConvolveConnection(inlayer_p, outlayer_p, 2);
 
-    // con_p->randomize();
-    // 
-    // net.add_module(inlayer_p, Network::InputModule);
-    // net.add_module(outlayer_p, Network::OutputModule);
-    // net.add_connection(con_p);
-    // net.sort();
+    con_p->randomize();
+    
+    net.add_module(inlayer_p, Network::InputModule);
+    net.add_module(outlayer_p, Network::OutputModule);
+    net.add_connection(con_p);
+    net.sort();
 
-    // EXPECT_GT(0.001, gradient_check(net));
+    EXPECT_GT(0.001, gradient_check(net));
 }
 
 

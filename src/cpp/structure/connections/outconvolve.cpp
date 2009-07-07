@@ -23,12 +23,12 @@ OutConvolveConnection::OutConvolveConnection(Module* incoming_p,
                                              Module* outgoing_p, 
                                              int chunk) :
     Connection(incoming_p, outgoing_p),
-    Parametrized(chunk * outgoing_p->insize()),
+    Parametrized(chunk * incoming()->outsize()),
     _chunk(chunk)
 {
-    assert(incoming()->outsize() % chunk == 0);
+    assert(outgoing()->insize() % chunk == 0);
 
-    _n_chunks = incoming()->outsize() / chunk;
+    _n_chunks = outgoing()->insize() / chunk;
 }
 
 
@@ -49,22 +49,22 @@ OutConvolveConnection::forward_process(double* sink_p, const double* source_p)
                 // the right
                 CblasNoTrans,
                 // Dimensions of the matrix
-                _outgoing_p->insize(),        
                 _chunk,
+                _incoming_p->outsize(),        
                 // Scalar for the matrix
                 1.0,                    
                 // Pointer to the matrix
                 get_parameters(),    
                 // Dimension of the vector
-                _chunk,
+                _incoming_p->outsize(),
                 // Pointer to the vector
-                source_p + (i * _chunk),
+                source_p,
                 // Some incrementer.
                 1,                      
                 // Scalar of the target vector
                 1.0,                    
                 // Pointer to the target vector
-                sink_p,
+                sink_p + (i * _chunk),
                 // Incrementer.
                 1);   
     }
@@ -80,7 +80,6 @@ OutConvolveConnection::backward_process(double* sink_p, const double* source_p)
     double* input_p = _incoming_p->output()[timestep() - 1] \
                       + _incomingstart;
     double* derivs_p = get_derivatives();
-
     for (int i = 0; i < _n_chunks; i++)
     {
         cblas_dgemv(CblasColMajor, 
@@ -89,29 +88,29 @@ OutConvolveConnection::backward_process(double* sink_p, const double* source_p)
                 CblasNoTrans,
                 // Dimensions of the matrix
                 _chunk,        
-                _outgoing_p->insize(),
+                indim,
                 // Scalar for the matrix
                 1.0,                    
                 // Pointer to the matrix
                 get_parameters(),    
                 // Dimension of the vector
-                _chunk,
+                indim,
                 // Pointer to the vector
-                source_p,
+                source_p + (i * _chunk),
                 // Some incrementer.
                 1,                      
                 // Scalar of the target vector
                 1.0,                    
                 // Pointer to the target vector
-                sink_p + (i * _chunk),
+                sink_p,
                 // Incrementer.
                 1);   
 
-        for (int j = 0; j < _outgoing_p->insize(); j++)
+        for (int j = 0; j < _chunk; j++)
         {
-          for (int k = 0; k < _chunk; k++)
+          for (int k = 0; k < _incoming_p->outsize(); k++)
           {
-              derivs_p[j * _chunk + k] += source_p[j] * input_p[i * _chunk + k];
+              derivs_p[j * _incoming_p->outsize() + k] += source_p[i * _chunk + j] * input_p[k];
           }
         }
     }

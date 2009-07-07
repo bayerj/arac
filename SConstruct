@@ -8,6 +8,7 @@ TARGET = '/usr/local'
 LIBPATH = ['/usr/lib', '.', '/usr/local/lib', '/sw/lib']
 CPPPATH = ['/usr/local/include', '/sw/include', '/usr/include']
 CCFLAGS = ['-g', '-O3']
+#CCFLAGS = ['-O3']
 
 PYTHONPATH = [distutils.sysconfig.get_python_inc()]
 NUMPYPATH = numpy.distutils.misc_util.get_numpy_include_dirs()
