@@ -1995,6 +1995,34 @@ TEST(TestConnections, TestInConvolveConnection)
     }
 }
 
+
+TEST(TestConnections, TestOutConvolveConnection)
+{
+    LinearLayer* inlayer_p = new Bias();
+    LinearLayer* outlayer_p = new LinearLayer(4);
+    OutConvolveConnection* con_p = new \
+        OutConvolveConnection(inlayer_p, outlayer_p, 2);
+        
+    double* params_p = new double[6];
+    params_p[0] = 1;
+    params_p[1] = 2;
+            
+    con_p->set_parameters(params_p);
+    
+    inlayer_p->forward();
+    con_p->forward();
+    outlayer_p->forward();
+    
+    double solution_p[4] = {1., 2., 1., 2.};
+                          
+    for (int i = 0; i < 3; i++)
+    {
+        EXPECT_EQ(solution_p[i], outlayer_p->input()[0][i])
+            << "Wrong input for outlayer at " << i;
+    }
+}
+
+
 TEST(TestNetworkSorting, RegressionWeightBlockPermute)
 {
     LinearLayer inlayer(4);
@@ -2313,6 +2341,26 @@ TEST(TestGradient, InConvolveConnection)
     // net.sort();
 
     // EXPECT_GT(0.001, gradient_check(net));
+}
+
+
+TEST(TestGradient, OutConvolveConnection)
+{
+    Network net;
+    
+    LinearLayer* inlayer_p = new LinearLayer(3);
+    LinearLayer* outlayer_p = new LinearLayer(6);
+    OutConvolveConnection* con_p = new \
+        OutConvolveConnection(inlayer_p, outlayer_p, 2);
+
+    con_p->randomize();
+    
+    net.add_module(inlayer_p, Network::InputModule);
+    net.add_module(outlayer_p, Network::OutputModule);
+    net.add_connection(con_p);
+    net.sort();
+
+    EXPECT_GT(0.001, gradient_check(net));
 }
 
 
