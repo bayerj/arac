@@ -87,14 +87,14 @@ OutConvolveConnection::backward_process(double* sink_p, const double* source_p)
                 // the right
                 CblasNoTrans,
                 // Dimensions of the matrix
+                _incoming_p->outsize(),
                 _chunk,        
-                indim,
                 // Scalar for the matrix
                 1.0,                    
                 // Pointer to the matrix
                 get_parameters(),    
                 // Dimension of the vector
-                indim,
+                _incoming_p->outsize(),
                 // Pointer to the vector
                 source_p + (i * _chunk),
                 // Some incrementer.
