@@ -8,6 +8,8 @@
 #ifndef Arac_INCLUDED
 #define Arac_INCLUDED
 
+#include "stdlib.h"
+
 #include "structure/structure.h"
 #include "datasets/datasets.h"
 #include "utilities/utilities.h"
