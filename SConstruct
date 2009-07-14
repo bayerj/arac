@@ -1,5 +1,17 @@
+import sys
 import distutils.sysconfig
 import numpy.distutils.misc_util
+
+# Some settings depending on the platform.
+if sys.platform == 'darwin':
+    linkflags = '-Wno-long-double -undefined suppress -flat_namespace'
+    libname = 'libarac.dylib'
+    frameworksflags = '-flat_namespace -undefined suppress'
+elif sys.platform == 'linux2':
+    libname = 'libarac.so'
+else:
+    raise SystemExit("Cannot build on %s." % sys.platform)
+
 
 SetOption('num_jobs', 4)
 
@@ -29,8 +41,6 @@ library_globs = ['src/cpp/*.cpp',
                  'src/cpp/structure/networks/*.cpp',
                  'src/cpp/structure/networks/mdrnns/*.cpp']
 lib = libenv.SharedLibrary('libarac.dylib', sum([Glob(i) for i in library_globs], []))
-# libenv.Install('/usr/local/lib', lib)
-# libenv.Alias('install', '/usr/local/lib')
 
 # Then compile the tests.
 testenv = Environment(LIBS=['arac', 'gtest'], CPPPATH=CPPPATH, LIBPATH=LIBPATH)
@@ -40,9 +50,11 @@ test = testenv.Program('test-arac', Glob('src/cpp/tests/*.cpp'))
 swigenv = Environment(SWIGFLAGS=['-python', '-c++', '-outdir', 'src/python/arac'],
                       CPPPATH=CPPPATH + NUMPYPATH + PYTHONPATH,
                       LIBS=['arac'],
-                      FRAMEWORKSFLAGS = '-flat_namespace -undefined suppress',                      LINKFLAGS='-Wno-long-double -undefined suppress -flat_namespace',
+                      FRAMEWORKSFLAGS=frameworksflags,
+                      LINKFLAGS=linkflags,
                       LIBPATH=LIBPATH,
-                      LDMODULEPREFIX='src/python/arac/_', LDMODULESUFFIX = '.so',
+                      LDMODULEPREFIX='src/python/arac/_', 
+                      LDMODULESUFFIX = '.so',
                       )
 swig = swigenv.LoadableModule('cppbridge', 
                              ['src/swig/cppbridge.i'])
