@@ -4,11 +4,13 @@ import numpy.distutils.misc_util
 
 # Some settings depending on the platform.
 if sys.platform == 'darwin':
-    linkflags = '-Wno-long-double -undefined suppress -flat_namespace'
     libname = 'libarac.dylib'
+    linkflags = '-Wno-long-double -undefined suppress -flat_namespace'
     frameworksflags = '-flat_namespace -undefined suppress'
 elif sys.platform == 'linux2':
     libname = 'libarac.so'
+    frameworksflags = ''
+    linkflags = '' 
 else:
     raise SystemExit("Cannot build on %s." % sys.platform)
 
@@ -40,7 +42,7 @@ library_globs = ['src/cpp/*.cpp',
                  'src/cpp/structure/modules/*.cpp',  
                  'src/cpp/structure/networks/*.cpp',
                  'src/cpp/structure/networks/mdrnns/*.cpp']
-lib = libenv.SharedLibrary('libarac.dylib', sum([Glob(i) for i in library_globs], []))
+lib = libenv.SharedLibrary(libname, sum([Glob(i) for i in library_globs], []))
 
 # Then compile the tests.
 testenv = Environment(LIBS=['arac', 'gtest'], CPPPATH=CPPPATH, LIBPATH=LIBPATH)
