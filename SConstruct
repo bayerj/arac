@@ -2,11 +2,16 @@ import sys
 import distutils.sysconfig
 import numpy.distutils.misc_util
 
+LIBPATH = ['/usr/lib', '.', '/usr/local/lib', '/sw/lib']
+CPPPATH = ['/usr/local/include', '/sw/include', '/usr/include']
+CCFLAGS = ['-O3']
+
 # Some settings depending on the platform.
 if sys.platform == 'darwin':
     libname = 'libarac.dylib'
-    linkflags = '-Wno-long-double -undefined suppress -flat_namespace'
+    linkflags = '-Wno-long-double -undefined suppress -flat_namespace '
     frameworksflags = '-flat_namespace -undefined suppress'
+    CPPPATH.append('/System/Library/Frameworks/vecLib.framework/Versions/A/Headers')
 elif sys.platform == 'linux2':
     libname = 'libarac.so'
     frameworksflags = ''
@@ -14,19 +19,10 @@ elif sys.platform == 'linux2':
 else:
     raise SystemExit("Cannot build on %s." % sys.platform)
 
-
-SetOption('num_jobs', 4)
-
 TARGET = '/usr/local'
-
-LIBPATH = ['/usr/lib', '.', '/usr/local/lib', '/sw/lib']
-CPPPATH = ['/usr/local/include', '/sw/include', '/usr/include']
-CCFLAGS = ['-g', '-O3']
-#CCFLAGS = ['-O3']
 
 PYTHONPATH = [distutils.sysconfig.get_python_inc()]
 NUMPYPATH = numpy.distutils.misc_util.get_numpy_include_dirs()
-
 
 # First compile and link the library.
 libenv = Environment(LIBS=['m', 'blas'], CPPPATH=CPPPATH, LIBPATH=LIBPATH,
