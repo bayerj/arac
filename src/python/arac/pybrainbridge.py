@@ -319,6 +319,9 @@ class _Network(Network):
         return result
         
     def backActivate(self, outerr):
+        if self.offset < 1:
+          # TODO: better exception class here.
+          raise ValueException("Offset has to be at least 1.")
         outerr = scipy.asarray(outerr, dtype='float64')
         # We reshape here in order to make sure that the array has the correct
         # dimensions when passed to the Swig-Proxy.

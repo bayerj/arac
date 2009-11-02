@@ -86,10 +86,15 @@ class Backprop
         void set_momentum(const double value);        
 
         ///
-        /// Return a pointer to the last error.
+        /// Return a pointer to the last error vector.
         ///
         double* error();
-        
+
+        ///
+        /// Return a pointer to the last loss.
+        ///
+        double loss();
+       
         ///
         /// Pick a random sample from the dataset and perform one step of
         /// backpropagation.
@@ -98,6 +103,15 @@ class Backprop
         /// former is to be implemented by subclasses.
         ///
         void train_stochastic();
+
+        ///
+        /// Perform online training on the dataset. Samples are drawn without
+        /// replacemet.
+        ///
+        /// This method calls the methods process_sample and learn, of which the
+        /// former is to be implemented by subclasses.
+        ///
+        void train_stochastic_batch();
         
     protected:
         
@@ -142,6 +156,10 @@ class Backprop
         virtual void process_sample(SampleType inpt, TargetType target, 
                                     TargetType importance)  = 0;
 
+    private:
+
+        double _loss;
+
 };
 
 
@@ -150,7 +168,8 @@ Backprop<SampleType, TargetType>::Backprop(BaseNetwork& network,
                                            DatasetType& dataset) :
     _network(network),
     _dataset(dataset),
-    _descender(network, 0.005)
+    _descender(network, 0.005),
+    _loss(0.0)
 {
     _network.sort();
     assert(_network.insize() == _dataset.samplesize());
@@ -187,6 +206,14 @@ double
 Backprop<SampleType, TargetType>::learningrate()
 {
     return _descender.stepratio();
+}
+
+
+template<typename SampleType, typename TargetType>
+double
+Backprop<SampleType, TargetType>::loss()
+{
+    return _loss;
 }
 
 
@@ -241,6 +268,58 @@ Backprop<SampleType, TargetType>::train_stochastic()
         this->process_sample(sample, target);
     }
     learn();
+}
+
+
+template<typename SampleType, typename TargetType>
+void
+Backprop<SampleType, TargetType>::train_stochastic_batch()
+{
+    _loss = 0.0;
+
+    // Create a vector of indices and shuffle it.
+    std::vector<int> indices;
+    indices.reserve(dataset().size());
+    for (int i = 0; i < dataset().size(); ++i)
+    {
+        indices.push_back(i);
+    }
+    for (int i = 0; i < dataset().size(); ++i)
+    {
+        int rest = dataset().size() - i;
+        int index = rand() % rest;
+        int swap = indices[i];
+        indices[i] = indices[i + index];
+        indices[i + index] = swap;
+    }
+
+    std::vector<int>::const_iterator index_iter;
+    for (index_iter = indices.begin(); 
+         index_iter != indices.end();
+         ++index_iter)
+    {
+        int index = *index_iter;
+        network().clear();
+        network().clear_derivatives();
+    
+        SampleType sample = dataset()[index].first;
+        TargetType target = dataset()[index].second;
+        if (dataset().has_importance())
+        {
+            this->process_sample(sample, target, dataset().importance(index));
+        }
+        else
+        {
+            this->process_sample(sample, target);
+        }
+        learn();
+ 
+        // Update loss.
+        for (int i = 0; i < network().outsize(); ++i)
+        {
+            _loss += _error_p[i] * _error_p[i];
+        }
+    }
 }
 
 

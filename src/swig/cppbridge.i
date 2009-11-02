@@ -964,6 +964,9 @@ class SimpleBackprop
         virtual ~SimpleBackprop();
     
         void train_stochastic();    
+        void train_stochastic_batch();    
+
+        double loss();
         
         double learningrate();
         void set_learningrate(const double value);

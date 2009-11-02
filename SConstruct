@@ -21,7 +21,8 @@ TARGET = '/usr/local'
 
 LIBPATH = ['/usr/lib', '.', '/usr/local/lib', '/sw/lib']
 CPPPATH = ['/usr/local/include', '/sw/include', '/usr/include']
-CCFLAGS = ['-g', '-O3']
+CCFLAGS = ['-g', '-O0']
+#CCFLAGS = ['-g', '-O3']
 #CCFLAGS = ['-O3']
 
 PYTHONPATH = [distutils.sysconfig.get_python_inc()]
