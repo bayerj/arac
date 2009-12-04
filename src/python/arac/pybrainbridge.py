@@ -358,7 +358,7 @@ class _RecurrentNetwork(RecurrentNetworkComponent, _Network):
     def activate(self, inputbuffer):
         while True:
             # Grow buffers until they have the correct size.
-            if self.offset < self.outputbuffer.shape[0]:
+            if self.offset + 1 < self.outputbuffer.shape[0]:
                 break
             # TODO: _growBuffers() is called more than once.
             self._growBuffers()
