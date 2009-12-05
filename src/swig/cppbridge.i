@@ -30,21 +30,7 @@ void init_buffer(Buffer& buffer, double* content_p, int length, int rowsize)
     for(int i = 0; i < length; i++)
     {
         buffer.append(content_p + i * rowsize);
-        // std::cout << content_p
     }
-    // if (prev != buffer.contmemory())
-    // {
-    //     int prevptr = 0;
-    //     for(int i = 0; i < length; i++)
-    //     {
-    //         if (prevptr != 0)
-    //         {
-    //          //  std::cout << content_p + i * rowsize - prevptr 
-    //          //            << "<->" << rowsize << std::endl;
-    //         }
-    //         prevptr = content_p + i * rowsize;
-    //     }
-    // }
 }
 
 

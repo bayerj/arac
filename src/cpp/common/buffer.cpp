@@ -41,7 +41,7 @@ Buffer::append(double* row)
     _owner = false;
     if ((_contmemory) && (size() > 0))
     {
-        if (row != _content.back() + sizeof(double) * _rowsize)
+        if (row != _content.back() + _rowsize)
         {
             _contmemory = false;
         }
@@ -67,12 +67,10 @@ void Buffer::clear()
 {
     if (_contmemory)
     {
-        // std::cout << "Big memory reset..." << std::endl;
         memset((void*) _content[0], 0, sizeof(double) * _rowsize * size());
     }
     else
     {
-        // std::cout << "Small memory reset..." << std::endl;
         for(size_t i = 0; i < size(); i++)
         {
             clear_at(i);
