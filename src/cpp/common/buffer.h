@@ -111,6 +111,12 @@ class Buffer
         bool _owner;
         bool _contmemory;
 
+        // Index that says up to which row the buffer has been used recently. Is
+        // being reset by .clear() and clear_at(). Is updated by append(), 
+        // add and operator [].
+        // The index is an exclusive upper bound.
+        size_t _dirtyindex;
+
 };
 
 
@@ -142,6 +148,7 @@ inline
 double*
 Buffer::operator[] (size_t index)
 {
+    _dirtyindex = _dirtyindex <= index ? index + 1 : _dirtyindex;
     return _content[index];
 }
 

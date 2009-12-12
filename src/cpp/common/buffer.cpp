@@ -13,7 +13,8 @@ using arac::common::Buffer;
 Buffer::Buffer(size_t rowsize, bool owner) :
     _rowsize(rowsize),
     _owner(owner),
-    _contmemory(true)
+    _contmemory(true),
+    _dirtyindex(0)
 {
     expand();
 }
@@ -27,7 +28,16 @@ Buffer::~Buffer()
 
 void Buffer::add(double* addend_p, int index)
 {
-    double* current_p = index == -1 ? _content.back() : _content[index];
+
+    if (index == -1)
+    {
+        // Last element.
+        index = _content.size() - 1;
+    }
+    _dirtyindex = _dirtyindex <= index + 1 ? index + 1 : _dirtyindex;
+
+    double* current_p = _content[index];
+
     for(size_t i = 0; i < _rowsize; i++)
     {
         current_p[i] += addend_p[i];
@@ -47,6 +57,7 @@ Buffer::append(double* row)
         }
     }
     _content.push_back(row);
+    _dirtyindex = _content.size();
 }
 
 
@@ -67,15 +78,16 @@ void Buffer::clear()
 {
     if (_contmemory)
     {
-        memset((void*) _content[0], 0, sizeof(double) * _rowsize * size());
+        memset((void*) _content[0], 0, sizeof(double) * _rowsize * _dirtyindex);
     }
     else
     {
-        for(size_t i = 0; i < size(); i++)
+        for(size_t i = 0; i < _dirtyindex; i++)
         {
             clear_at(i);
         }
     }
+    _dirtyindex = 0;
 }
 
 
