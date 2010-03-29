@@ -417,25 +417,31 @@ TEST(TestModules, TanhLayer) {
 
 
 TEST(TestModules, SoftmaxLayer) {
-    SoftmaxLayer* layer_p = new SoftmaxLayer(2);
+    SoftmaxLayer* layer_p = new SoftmaxLayer(3);
 
     double* input_p = new double[2];
-    input_p[0] = 2.;
-    input_p[1] = 4.;
+    input_p[0] = 4.6296992222786457;
+    input_p[1] = -0.36272901550781184;
+    input_p[2] = 15.440919648395607;
 
     layer_p->add_to_input(input_p);
     
-    ASSERT_DOUBLE_EQ(2, layer_p->input()[0][0])
+    ASSERT_DOUBLE_EQ(input_p[0], layer_p->input()[0][0])
         << "add_to_input not working.";
-    ASSERT_DOUBLE_EQ(4, layer_p->input()[0][1])
+    ASSERT_DOUBLE_EQ(input_p[1], layer_p->input()[0][1])
+        << "add_to_input not working.";
+    ASSERT_DOUBLE_EQ(input_p[2], layer_p->input()[0][2])
         << "add_to_input not working.";
     
     layer_p->forward();
     
-    ASSERT_DOUBLE_EQ(0.11920292202211756, layer_p->output()[0][0])
+    ASSERT_DOUBLE_EQ(2.0171481969464377e-05, layer_p->output()[0][0])
         << "Forward pass incorrect.";
         
-    ASSERT_DOUBLE_EQ(0.88079707797788243, layer_p->output()[0][1])
+    ASSERT_DOUBLE_EQ(1.3694739368803625e-07, layer_p->output()[0][1])
+        << "Forward pass incorrect.";
+    
+    ASSERT_DOUBLE_EQ(0.99997969157063693, layer_p->output()[0][2])
         << "Forward pass incorrect.";
 
     double* outerror_p = new double[2];

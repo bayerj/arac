@@ -18,13 +18,17 @@ SoftmaxLayer::_forward()
     double* output_p = output()[timestep()];
     for(int i = 0; i < _insize; i++)
     {
-        double item = exp(input_p[i]);
-        item = item < -500 ? -500 : item;
-        item = item > 500 ? 500 : item;
+        // Clip of input argument if its to extreme to avoid NaNs and inf as a
+        // result of exp().
+        double inpt;
+        inpt = input_p[i] < -500 ? -500 : input_p[i];
+        inpt = inpt > 500 ? 500 : inpt;
+        double item = exp(inpt);
+
         sum += item;
         output_p[i] = item;
     }
-    for(int i = 0; i < _outsize; i++)
+    for(int i = 0; i < _insize; i++)
     {
         output_p[i] /= sum;
     }
